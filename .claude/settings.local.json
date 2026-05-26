@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:www.bfe.admin.ch)",
+      "WebFetch(domain:opendata.swiss)",
+      "WebFetch(domain:chargeprice.app)",
+      "WebFetch(domain:unece.org)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:chargeprice.github.io)",
+      "PowerShell(node -e \"console.log\\(require\\('crypto'\\).randomBytes\\(32\\).toString\\('hex'\\)\\)\")",
+      "PowerShell(pnpm add -D dotenv-cli 2>&1)",
+      "PowerShell($out = pnpm exec tsc --noEmit 2>&1; \"exit: $LASTEXITCODE\"; $out | Out-String)",
+      "PowerShell($out = pnpm exec tsc --noEmit 2>&1; \"tsc exit: $LASTEXITCODE\"; $out | Out-String; \"---\"; $out = pnpm lint 2>$null; \"lint exit: $LASTEXITCODE\"; $out | Out-String)",
+      "PowerShell($out = pnpm exec tsc --noEmit 2>&1; \"tsc: $LASTEXITCODE\"; $out | Out-String; \"---\"; $out = pnpm lint 2>$null; \"lint: $LASTEXITCODE\")",
+      "PowerShell($out = pnpm exec tsc --noEmit 2>&1; \"tsc: $LASTEXITCODE\"; $out | Out-String; \"---\"; $out = pnpm lint 2>$null; \"lint: $LASTEXITCODE\"; $out | Out-String)",
+      "PowerShell($out = pnpm exec tsc --noEmit 2>&1; \"tsc: $LASTEXITCODE\"; if \\($LASTEXITCODE -ne 0\\) { $out | Out-String }; \"---\"; $out = pnpm lint 2>$null; \"lint: $LASTEXITCODE\"; if \\($LASTEXITCODE -ne 0\\) { $out | Out-String })",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "PowerShell($out = pnpm exec tsc --noEmit 2>&1; \"tsc: $LASTEXITCODE\"; if \\($LASTEXITCODE -ne 0\\) { $out | Out-String })",
+      "WebFetch(domain:api.openchargemap.io)",
+      "WebFetch(domain:openchargemap.org)",
+      "PowerShell($out = pnpm exec tsc --noEmit 2>&1; \"tsc: $LASTEXITCODE\"; if \\($LASTEXITCODE -ne 0\\) { $out | Out-String }; \"---\"; $out = pnpm lint 2>$null; \"lint: $LASTEXITCODE\"; if \\($LASTEXITCODE -ne 0\\) { $out | Out-String }; \"---\"; \"grep TariffHint:\"; Get-Content components\\\\StationSheet.tsx | Select-String -Pattern \"TariffHint|OcmId|hasOcm|usageCost\" | Select-Object LineNumber, Line)",
+      "PowerShell($out = pnpm exec tsc --noEmit 2>&1; \"tsc: $LASTEXITCODE\"; if \\($LASTEXITCODE -ne 0\\) { $out | Out-String }; \"---\"; $out = pnpm lint 2>$null; \"lint: $LASTEXITCODE\")",
+      "WebFetch(domain:vectortiles.geo.admin.ch)",
+      "WebFetch(domain:web.ecarup.com)",
+      "PowerShell($out = pnpm exec tsc --noEmit 2>&1; \"tsc: $LASTEXITCODE\"; if \\($LASTEXITCODE -ne 0\\) { $out | Out-String }; \"---\"; \"Line 111 context:\"; \\(Get-Content components\\\\StationSheet.tsx\\)[105..120])",
+      "PowerShell(Get-ChildItem -Force | Where-Object { -not $_.PSIsContainer } | Select-Object Name, Mode | Format-Table -AutoSize)"
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "name": "ladestation-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:generate": "dotenv -e .env.local -- drizzle-kit generate",
+    "db:migrate": "dotenv -e .env.local -- drizzle-kit migrate",
+    "db:studio": "dotenv -e .env.local -- drizzle-kit studio",
+    "db:push": "dotenv -e .env.local -- drizzle-kit push",
+    "sync:static": "tsx scripts/sync-bfe-static.ts",
+    "sync:static:local": "dotenv -e .env.local -- tsx scripts/sync-bfe-static.ts"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.100.13",
+    "drizzle-orm": "^0.45.2",
+    "maplibre-gl": "^5.24.0",
+    "next": "16.2.6",
+    "postgres": "^3.4.9",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/pg": "^8.20.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dotenv-cli": "^11.0.0",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.6",
+    "tailwindcss": "^4",
+    "tsx": "^4.22.3",
+    "typescript": "^5"
+  }
+}
