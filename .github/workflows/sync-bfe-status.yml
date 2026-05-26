@@ -16,7 +16,8 @@ jobs:
           VERCEL_URL: ${{ secrets.VERCEL_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          response=$(curl -sS -w "\n%{http_code}" \
+          response=$(curl -sS -L --proto-redir =https \
+            -w "\n%{http_code}" \
             -H "Authorization: Bearer $CRON_SECRET" \
             "$VERCEL_URL/api/cron/sync-bfe-status")
           body=$(echo "$response" | head -n -1)
