@@ -39,13 +39,16 @@ export function Map({ data, onBboxChange, onSelect }: Props) {
     });
     mapRef.current = map;
 
-    map.addControl(new maplibregl.NavigationControl(), "top-right");
+    map.addControl(
+      new maplibregl.NavigationControl({ showCompass: false }),
+      "bottom-right",
+    );
     map.addControl(
       new maplibregl.GeolocateControl({
         positionOptions: { enableHighAccuracy: true },
         trackUserLocation: false,
       }),
-      "top-right",
+      "bottom-right",
     );
 
     const emitBbox = () => {
