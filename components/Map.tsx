@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import maplibregl, { Map as MapInstance } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { StationFeatureCollection } from "@/lib/types";
+import type { FlyTarget } from "@/components/SearchBox";
 
 const STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
 
@@ -11,11 +12,12 @@ const SOURCE_ID = "stations";
 
 type Props = {
   data: StationFeatureCollection | undefined;
+  flyTo: FlyTarget | null;
   onBboxChange: (bbox: [number, number, number, number]) => void;
   onSelect: (evseId: string) => void;
 };
 
-export function Map({ data, onBboxChange, onSelect }: Props) {
+export function Map({ data, flyTo, onBboxChange, onSelect }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapInstance | null>(null);
   const onBboxRef = useRef(onBboxChange);
@@ -41,13 +43,6 @@ export function Map({ data, onBboxChange, onSelect }: Props) {
 
     map.addControl(
       new maplibregl.NavigationControl({ showCompass: false }),
-      "bottom-right",
-    );
-    map.addControl(
-      new maplibregl.GeolocateControl({
-        positionOptions: { enableHighAccuracy: true },
-        trackUserLocation: false,
-      }),
       "bottom-right",
     );
 
@@ -215,6 +210,16 @@ export function Map({ data, onBboxChange, onSelect }: Props) {
     if (map.isStyleLoaded()) apply();
     else map.once("load", apply);
   }, [data]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !flyTo) return;
+    map.flyTo({
+      center: [flyTo.lon, flyTo.lat],
+      zoom: flyTo.zoom,
+      speed: 1.6,
+    });
+  }, [flyTo]);
 
   return <div ref={containerRef} className="h-full w-full" />;
 }

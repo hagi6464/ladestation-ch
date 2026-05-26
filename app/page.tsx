@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Map } from "@/components/Map";
 import { FilterBar } from "@/components/FilterBar";
 import { StationSheet } from "@/components/StationSheet";
+import { SearchBox, type FlyTarget } from "@/components/SearchBox";
 import type { Filters, StationFeatureCollection } from "@/lib/types";
 
 type Bbox = [number, number, number, number];
@@ -39,6 +40,7 @@ export default function Page() {
     current: "any",
   });
   const [selectedEvseId, setSelectedEvseId] = useState<string | null>(null);
+  const [flyTarget, setFlyTarget] = useState<FlyTarget | null>(null);
 
   const debouncedBbox = useDebounced(bbox, 350);
 
@@ -74,13 +76,17 @@ export default function Page() {
     <div className="relative h-full w-full">
       <Map
         data={data}
+        flyTo={flyTarget}
         onBboxChange={handleBboxChange}
         onSelect={setSelectedEvseId}
       />
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col items-start gap-2 p-3 sm:flex-row sm:items-center sm:gap-4">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col items-start gap-2 p-3 sm:flex-row sm:flex-wrap sm:items-start sm:gap-3">
         <div className="pointer-events-auto rounded-xl bg-white/95 px-3 py-2 text-sm font-semibold text-zinc-900 shadow-md backdrop-blur dark:bg-zinc-900/90 dark:text-zinc-50">
           ⚡ Ladestation Schweiz
+        </div>
+        <div className="pointer-events-auto w-full sm:w-auto">
+          <SearchBox onLocate={(t) => setFlyTarget({ ...t })} />
         </div>
         <div className="pointer-events-auto">
           <FilterBar filters={filters} onChange={setFilters} />
