@@ -44,7 +44,7 @@ export function SearchBox({ onLocate }: Props) {
         if (list.length === 0 && data.outOfArea) {
           setOpen(false);
           setError(
-            "Für dieses Gebiet liegen keine Ladesäulen-Daten vor (abgedeckt: Schweiz, Liechtenstein und ~20 km Grenzregion).",
+            "Für dieses Gebiet liegen keine Ladesäulen-Daten vor (abgedeckt: Schweiz, Liechtenstein und ~40 km Grenzregion).",
           );
         } else {
           setOpen(true);
