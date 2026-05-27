@@ -114,16 +114,11 @@ export function Map({ data, flyTo, onBboxChange, onSelect }: Props) {
         filter: ["!", ["has", "point_count"]],
         paint: {
           "circle-color": [
-            "match",
-            ["get", "status"],
-            "Available",
+            "case",
+            [">=", ["get", "available"], 1],
             "#10b981",
-            "Occupied",
+            ["get", "hasStatus"],
             "#ef4444",
-            "Reserved",
-            "#f59e0b",
-            "OutOfService",
-            "#94a3b8",
             "#64748b",
           ],
           "circle-radius": [

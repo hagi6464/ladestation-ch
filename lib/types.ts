@@ -5,8 +5,9 @@ export type StationFeatureProperties = {
   maxPowerKw: number | null;
   isAc: boolean;
   isDc: boolean;
-  status: string | null;
-  plugs: string[];
+  total: number;
+  available: number;
+  hasStatus: boolean;
 };
 
 export type StationFeature = {
@@ -21,29 +22,33 @@ export type StationFeatureCollection = {
   truncated: boolean;
 };
 
-export type StationDetail = {
+export type StationPoint = {
   evseId: string;
+  maxPowerKw: number | null;
+  isAc: boolean;
+  isDc: boolean;
+  plugs: string[];
+  status: string | null;
+};
+
+export type StationDetail = {
+  evseId: string; // repräsentativer Ladepunkt (für Tarif-Lookup)
+  name: string | null;
   operatorName: string | null;
-  chargingStationId: string | null;
   lat: number;
   lon: number;
   city: string | null;
   postalCode: string | null;
   street: string | null;
-  nameDe: string | null;
-  nameFr: string | null;
-  nameEn: string | null;
-  plugs: string[];
   authModes: string[];
-  maxPowerKw: number | null;
-  isAc: boolean;
-  isDc: boolean;
-  isOpen24h: boolean;
   accessibility: string | null;
   renewableEnergy: boolean;
+  isOpen24h: boolean;
   hotline: string | null;
-  status: string | null;
-  statusFetchedAt: string | null;
+  total: number;
+  available: number;
+  hasStatus: boolean;
+  points: StationPoint[];
 };
 
 export type Filters = {

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq, gte, lte, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { stations, stationStatus } from "@/lib/db/schema";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,7 +12,9 @@ const querySchema = z.object({
   bbox: z
     .string()
     .regex(/^-?\d+(\.\d+)?,-?\d+(\.\d+)?,-?\d+(\.\d+)?,-?\d+(\.\d+)?$/)
-    .transform((s) => s.split(",").map(Number) as [number, number, number, number]),
+    .transform(
+      (s) => s.split(",").map(Number) as [number, number, number, number],
+    ),
   minPower: z.coerce.number().min(0).optional(),
   current: z.enum(["ac", "dc", "any"]).default("any"),
 });
@@ -28,10 +29,17 @@ type Feature = {
     maxPowerKw: number | null;
     isAc: boolean;
     isDc: boolean;
-    status: string | null;
-    plugs: string[];
+    total: number;
+    available: number;
+    hasStatus: boolean;
   };
 };
+
+// Gruppierungsschlüssel: geteilte charging_station_id, sonst gerundete Koordinaten
+const STATION_KEY = sql`CASE
+  WHEN s.charging_station_id <> s.evse_id THEN s.charging_station_id
+  ELSE round(s.lat::numeric, 5)::text || ',' || round(s.lon::numeric, 5)::text
+END`;
 
 export async function GET(req: NextRequest) {
   const parsed = querySchema.safeParse(
@@ -46,55 +54,62 @@ export async function GET(req: NextRequest) {
   const { bbox, minPower, current } = parsed.data;
   const [west, south, east, north] = bbox;
 
-  const conditions = [
-    gte(stations.lat, south),
-    lte(stations.lat, north),
-    gte(stations.lon, west),
-    lte(stations.lon, east),
+  const filters = [
+    sql`s.lat BETWEEN ${south} AND ${north}`,
+    sql`s.lon BETWEEN ${west} AND ${east}`,
   ];
-  if (minPower != null) {
-    conditions.push(gte(stations.maxPowerKw, minPower));
-  }
-  if (current === "ac") conditions.push(eq(stations.isAc, true));
-  if (current === "dc") conditions.push(eq(stations.isDc, true));
+  if (minPower != null) filters.push(sql`s.max_power_kw >= ${minPower}`);
+  if (current === "ac") filters.push(sql`s.is_ac = true`);
+  if (current === "dc") filters.push(sql`s.is_dc = true`);
+  const whereClause = sql.join(filters, sql` AND `);
 
-  const rows = await db
-    .select({
-      evseId: stations.evseId,
-      lat: stations.lat,
-      lon: stations.lon,
-      nameDe: stations.nameDe,
-      nameEn: stations.nameEn,
-      operatorName: stations.operatorName,
-      maxPowerKw: stations.maxPowerKw,
-      isAc: stations.isAc,
-      isDc: stations.isDc,
-      plugs: stations.plugs,
-      status: stationStatus.status,
-    })
-    .from(stations)
-    .leftJoin(stationStatus, eq(stations.evseId, stationStatus.evseId))
-    .where(and(...conditions))
-    .orderBy(sql`${stations.maxPowerKw} desc nulls last`)
-    .limit(MAX_FEATURES);
+  const rows = (await db.execute(sql`
+    SELECT
+      ${STATION_KEY} AS station_key,
+      (array_agg(s.evse_id ORDER BY s.max_power_kw DESC NULLS LAST))[1] AS evse_id,
+      avg(s.lat) AS lat,
+      avg(s.lon) AS lon,
+      (array_agg(COALESCE(s.name_de, s.name_en) ORDER BY s.max_power_kw DESC NULLS LAST))[1] AS name,
+      (array_agg(s.operator_name ORDER BY s.max_power_kw DESC NULLS LAST))[1] AS operator_name,
+      max(s.max_power_kw) AS max_power_kw,
+      bool_or(s.is_ac) AS is_ac,
+      bool_or(s.is_dc) AS is_dc,
+      count(*)::int AS total,
+      count(*) FILTER (WHERE st.status = 'Available')::int AS available,
+      count(st.status)::int AS with_status
+    FROM stations s
+    LEFT JOIN station_status st ON st.evse_id = s.evse_id
+    WHERE ${whereClause}
+    GROUP BY station_key
+    ORDER BY max(s.max_power_kw) DESC NULLS LAST
+    LIMIT ${MAX_FEATURES}
+  `)) as unknown as Array<Record<string, unknown>>;
 
   const features: Feature[] = rows.map((r) => ({
     type: "Feature",
-    geometry: { type: "Point", coordinates: [r.lon, r.lat] },
+    geometry: {
+      type: "Point",
+      coordinates: [Number(r.lon), Number(r.lat)],
+    },
     properties: {
-      evseId: r.evseId,
-      name: r.nameDe ?? r.nameEn ?? null,
-      operatorName: r.operatorName,
-      maxPowerKw: r.maxPowerKw,
-      isAc: r.isAc,
-      isDc: r.isDc,
-      status: r.status,
-      plugs: r.plugs,
+      evseId: String(r.evse_id),
+      name: (r.name as string | null) ?? null,
+      operatorName: (r.operator_name as string | null) ?? null,
+      maxPowerKw: r.max_power_kw != null ? Number(r.max_power_kw) : null,
+      isAc: Boolean(r.is_ac),
+      isDc: Boolean(r.is_dc),
+      total: Number(r.total),
+      available: Number(r.available),
+      hasStatus: Number(r.with_status) > 0,
     },
   }));
 
   return NextResponse.json(
-    { type: "FeatureCollection", features, truncated: rows.length === MAX_FEATURES },
+    {
+      type: "FeatureCollection",
+      features,
+      truncated: rows.length === MAX_FEATURES,
+    },
     { headers: { "Cache-Control": "public, max-age=30" } },
   );
 }

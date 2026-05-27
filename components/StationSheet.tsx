@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import type { StationDetail } from "@/lib/types";
+import type { StationDetail, StationPoint } from "@/lib/types";
 import { PlugIcon, classifyPlug } from "@/components/PlugIcon";
 import { labelAuthModes, labelAccessibility } from "@/lib/oicp-labels";
 
@@ -273,19 +273,69 @@ function TariffSection({
   return <CpoStandardTariffSection cpo={data.cpoStandardTariff} />;
 }
 
-function statusBadge(status: string | null) {
-  if (status === "Available")
-    return { label: "Frei", className: "bg-emerald-100 text-emerald-700" };
-  if (status === "Occupied")
-    return { label: "Besetzt", className: "bg-red-100 text-red-700" };
-  if (status === "Reserved")
-    return { label: "Reserviert", className: "bg-amber-100 text-amber-700" };
-  if (status === "OutOfService")
+function availabilityBadge(data: StationDetail) {
+  if (!data.hasStatus)
     return {
-      label: "Ausser Betrieb",
-      className: "bg-zinc-200 text-zinc-700",
+      label: `${data.total} Ladepunkt${data.total === 1 ? "" : "e"}`,
+      className: "bg-zinc-100 text-zinc-600",
     };
-  return { label: "Unbekannt", className: "bg-zinc-100 text-zinc-600" };
+  const cls =
+    data.available >= 1
+      ? "bg-emerald-100 text-emerald-700"
+      : "bg-red-100 text-red-700";
+  return {
+    label: `${data.available} von ${data.total} frei`,
+    className: cls,
+  };
+}
+
+function pointStatus(status: string | null) {
+  if (status === "Available") return { label: "Frei", dot: "bg-emerald-500" };
+  if (status === "Occupied") return { label: "Besetzt", dot: "bg-red-500" };
+  if (status === "Reserved") return { label: "Reserviert", dot: "bg-amber-500" };
+  if (status === "OutOfService")
+    return { label: "Ausser Betrieb", dot: "bg-zinc-400" };
+  return { label: "Unbekannt", dot: "bg-zinc-300" };
+}
+
+function PointsList({ points }: { points: StationPoint[] }) {
+  return (
+    <div>
+      <div className="text-xs uppercase text-zinc-500">
+        Ladepunkte ({points.length})
+      </div>
+      <ul className="mt-1 space-y-1">
+        {points.map((p) => {
+          const st = pointStatus(p.status);
+          const plugLabels = Array.from(
+            new Set(p.plugs.map((pl) => classifyPlug(pl).label)),
+          );
+          return (
+            <li
+              key={p.evseId}
+              className="flex items-center gap-2 rounded-md bg-zinc-50 px-2 py-1 text-xs dark:bg-zinc-800/60"
+            >
+              <span
+                className={`h-2.5 w-2.5 shrink-0 rounded-full ${st.dot}`}
+                title={st.label}
+                aria-label={st.label}
+              />
+              <span className="font-medium tabular-nums">
+                {p.maxPowerKw ? `${p.maxPowerKw} kW` : "–"}
+              </span>
+              <span className="text-zinc-400">·</span>
+              <span className="truncate text-zinc-600 dark:text-zinc-300">
+                {plugLabels.join(", ") || "—"}
+              </span>
+              <span className="ml-auto shrink-0 text-zinc-500">
+                {st.label}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
 }
 
 export function StationSheet({ evseId, onClose }: Props) {
@@ -311,7 +361,7 @@ export function StationSheet({ evseId, onClose }: Props) {
     >
       <div className="mb-3 flex items-start justify-between gap-3">
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-          {data?.nameDe ?? data?.nameFr ?? data?.nameEn ?? "Ladestation"}
+          {data?.name ?? "Ladestation"}
         </h2>
         <button
           type="button"
@@ -335,26 +385,32 @@ export function StationSheet({ evseId, onClose }: Props) {
           <div className="flex flex-wrap items-center gap-2">
             <span
               className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                statusBadge(data.status).className
+                availabilityBadge(data).className
               }`}
             >
-              {statusBadge(data.status).label}
+              {availabilityBadge(data).label}
             </span>
-            {data.isDc && (
+            {data.points.some((p) => p.isDc) && (
               <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
                 DC
               </span>
             )}
-            {data.isAc && (
+            {data.points.some((p) => p.isAc) && (
               <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-700">
                 AC
               </span>
             )}
-            {data.maxPowerKw && (
-              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-                bis {data.maxPowerKw} kW
-              </span>
-            )}
+            {(() => {
+              const maxKw = Math.max(
+                0,
+                ...data.points.map((p) => p.maxPowerKw ?? 0),
+              );
+              return maxKw > 0 ? (
+                <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+                  bis {maxKw} kW
+                </span>
+              ) : null;
+            })()}
             {data.renewableEnergy && (
               <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
                 🌱 100% erneuerbar
@@ -383,16 +439,24 @@ export function StationSheet({ evseId, onClose }: Props) {
             </div>
           )}
 
-          {data.plugs.length > 0 && (
-            <div>
-              <div className="text-xs uppercase text-zinc-500">Stecker</div>
-              <div className="flex flex-wrap gap-1.5">
-                {data.plugs.map((p) => {
-                  const { type, label } = classifyPlug(p);
-                  return (
+          {(() => {
+            const plugTypes = Array.from(
+              new Map(
+                data.points
+                  .flatMap((p) => p.plugs)
+                  .map((pl) => {
+                    const c = classifyPlug(pl);
+                    return [c.type, c] as const;
+                  }),
+              ).values(),
+            );
+            return plugTypes.length > 0 ? (
+              <div>
+                <div className="text-xs uppercase text-zinc-500">Stecker</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {plugTypes.map(({ type, label }) => (
                     <span
-                      key={p}
-                      title={p}
+                      key={type}
                       className="inline-flex items-center gap-1.5 rounded-md bg-zinc-100 px-2 py-1 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
                     >
                       <PlugIcon
@@ -402,11 +466,13 @@ export function StationSheet({ evseId, onClose }: Props) {
                       />
                       {label}
                     </span>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            ) : null;
+          })()}
+
+          <PointsList points={data.points} />
 
           {(data.authModes.length > 0 ||
             labelAccessibility(data.accessibility)) && (
