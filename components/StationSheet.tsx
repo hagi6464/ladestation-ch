@@ -412,15 +412,27 @@ export function StationSheet({ evseId, onClose }: Props) {
               ) : null;
             })()}
             {data.renewableEnergy && (
-              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
+              <span
+                title="100% erneuerbare Energie"
+                className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700"
+              >
                 🌱 100% erneuerbar
               </span>
             )}
-            {data.isOpen24h && (
-              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-                24 h
-              </span>
-            )}
+            <span
+              title={
+                data.isOpen24h
+                  ? "Rund um die Uhr zugänglich"
+                  : "Nicht durchgehend zugänglich"
+              }
+              className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                data.isOpen24h
+                  ? "bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100"
+                  : "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
+              }`}
+            >
+              {data.isOpen24h ? "24 h Zugang" : "Kein 24 h Zugang"}
+            </span>
           </div>
 
           <div>
