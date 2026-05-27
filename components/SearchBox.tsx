@@ -8,42 +8,11 @@ type Props = {
   onLocate: (target: FlyTarget) => void;
 };
 
-type PhotonFeature = {
-  geometry: { coordinates: [number, number] };
-  properties: {
-    name?: string;
-    city?: string;
-    state?: string;
-    countrycode?: string;
-    postcode?: string;
-    street?: string;
-    housenumber?: string;
-  };
-};
-
 async function geocode(query: string): Promise<FlyTarget | null> {
-  const url = new URL("https://photon.komoot.io/api/");
-  url.searchParams.set("q", query);
-  url.searchParams.set("limit", "10");
-  url.searchParams.set("lang", "de");
-  // Bias auf Schweiz-Mitte
-  url.searchParams.set("lat", "46.8");
-  url.searchParams.set("lon", "8.2");
-
-  const res = await fetch(url.toString());
+  const res = await fetch(`/api/geocode?q=${encodeURIComponent(query)}`);
   if (!res.ok) throw new Error(`Geocoder HTTP ${res.status}`);
-  const data = (await res.json()) as { features: PhotonFeature[] };
-
-  const chHit = data.features.find(
-    (f) => f.properties.countrycode === "CH",
-  );
-  const hit = chHit ?? data.features[0];
-  if (!hit) return null;
-
-  const [lon, lat] = hit.geometry.coordinates;
-  // Häuser/Strassen näher zoomen als Orte
-  const zoom = hit.properties.housenumber || hit.properties.street ? 16 : 13;
-  return { lat, lon, zoom };
+  const data = (await res.json()) as { result: FlyTarget | null };
+  return data.result;
 }
 
 export function SearchBox({ onLocate }: Props) {
