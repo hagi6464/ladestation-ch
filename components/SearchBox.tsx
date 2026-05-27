@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { isInServiceArea } from "@/lib/service-area";
 
 export type FlyTarget = { lat: number; lon: number; zoom: number };
 type GeocodeResult = FlyTarget & { label: string };
@@ -33,10 +34,21 @@ export function SearchBox({ onLocate }: Props) {
       try {
         const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = (await res.json()) as { results: GeocodeResult[] };
-        setResults(data.results ?? []);
-        setOpen(true);
+        const data = (await res.json()) as {
+          results: GeocodeResult[];
+          outOfArea?: boolean;
+        };
+        const list = data.results ?? [];
+        setResults(list);
         setActiveIndex(-1);
+        if (list.length === 0 && data.outOfArea) {
+          setOpen(false);
+          setError(
+            "Für dieses Gebiet liegen keine Ladesäulen-Daten vor (abgedeckt: Schweiz, Liechtenstein und ~20 km Grenzregion).",
+          );
+        } else {
+          setOpen(true);
+        }
       } catch {
         setError("Suche fehlgeschlagen. Bitte erneut versuchen.");
         setResults([]);
@@ -82,11 +94,14 @@ export function SearchBox({ onLocate }: Props) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setBusy(false);
-        onLocate({
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
-          zoom: 14,
-        });
+        const { latitude, longitude } = pos.coords;
+        if (!isInServiceArea(latitude, longitude)) {
+          setError(
+            "Dein Standort liegt ausserhalb des abgedeckten Gebiets (Schweiz/Liechtenstein). Keine Ladesäulen-Daten verfügbar.",
+          );
+          return;
+        }
+        onLocate({ lat: latitude, lon: longitude, zoom: 14 });
       },
       (err) => {
         setBusy(false);

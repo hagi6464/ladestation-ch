@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { isInServiceArea } from "@/lib/service-area";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -64,23 +65,27 @@ export async function GET(req: NextRequest) {
     }
     const data = (await res.json()) as { features: PhotonFeature[] };
 
+    const hadHits = data.features.length > 0;
     const seen = new Set<string>();
     const results = data.features
-      .filter((f) => f.properties.countrycode === "CH")
       .map((f) => {
         const [lon, lat] = f.geometry.coordinates;
         const zoom =
           f.properties.housenumber || f.properties.street ? 16 : 13;
         return { label: buildLabel(f.properties), lat, lon, zoom };
       })
+      .filter((r) => isInServiceArea(r.lat, r.lon))
       .filter((r) => {
         if (r.label.length === 0 || seen.has(r.label)) return false;
         seen.add(r.label);
         return true;
       });
 
+    // Photon fand Orte, aber alle ausserhalb des abgedeckten Gebiets
+    const outOfArea = hadHits && results.length === 0;
+
     return NextResponse.json(
-      { results },
+      { results, outOfArea },
       { headers: { "Cache-Control": "public, max-age=3600" } },
     );
   } catch (err) {
