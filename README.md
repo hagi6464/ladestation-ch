@@ -62,9 +62,8 @@ components/
   PlugIcon.tsx                 SVG-Icons der Stecker-Typen
   FilterBar.tsx                AC/DC + kW Filter
 lib/
-  db/schema.ts                 Drizzle-Schema (stations, station_status, price_cache)
+  db/schema.ts                 Drizzle-Schema (stations, station_status)
   db/index.ts                  Postgres-Client
-  db/migrations/               generierte SQL-Migrationen
   bfe.ts                       typed Parser für OICP-JSON
   cpo-tariffs.ts               kuratierte Eigentarife der CH-CPOs
 ```
@@ -78,6 +77,6 @@ lib/
 - **Phase 1:** BFE-Sync + DB-Schema ✓
 - **Phase 2:** Karten-UI mit Markern, Filter, Detail-Sheet, Navigation ✓
 - **Phase 3:** CPO-Eigentarife pro Säule ✓
-- **Phase 4:** Geocoding-Suche, Deployment auf Vercel, Polish
+- **Phase 4:** Geocoding-Suche, Deployment auf Vercel, Polish ✓ (live unter [ladestation-ch.vercel.app](https://ladestation-ch.vercel.app))
 
 Detaillierter Plan: siehe [Plan-Datei](C:/Users/cadmin/.claude/plans/suche-nach-der-offizillen-sprightly-umbrella.md).

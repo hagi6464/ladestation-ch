@@ -1,8 +1,14 @@
 /**
  * Kuratierte Eigentarife der wichtigsten CH-Ladesäulenbetreiber.
  *
- * Quelle: Web-Recherche der Anbieter-Websites (Stand: 2026-05). Preise sind
- * approximativ — vor Production-Use auf der jeweiligen `pricingUrl` verifizieren.
+ * Quelle: Web-Recherche der Anbieter-Websites. Preise sind approximativ —
+ * vor Production-Use auf der jeweiligen `pricingUrl` verifizieren.
+ *
+ * Stand 2026-05-28: 7 CPOs (energie360, migrol, evpass, move, ionity, tesla,
+ * plugnroll) via Web-Recherche verifiziert/aktualisiert. Restliche 8 (swisscharge,
+ * gofast, tcs, shellrecharge, enbw, allego, ewz, ewb) konnten nicht öffentlich
+ * verifiziert werden (Preise nur in App oder Seite offline) — Werte unverändert
+ * seit initial-Befüllung.
  *
  * Pflege: 1-2x pro Jahr durchgehen. Bei Änderung Preis aktualisieren und
  * `lastUpdated` setzen. UI zeigt `lastUpdated` als Vertrauensindikator.
@@ -50,12 +56,14 @@ export const CPO_TARIFFS: CpoTariff[] = [
       "https://www.energie360.ch/de/leistungen/mobilitaet/easycharge/",
     tariffs: [
       {
-        name: "easycharge Direkttarif",
+        name: "easycharge Ad-hoc",
         requiresMembership: false,
-        acPerKwh: 0.45,
-        dcPerKwh: 0.59,
+        acPerKwh: 0.55,
+        dcPerKwh: 0.69,
+        blockingFeeChfPerMin: 0.25,
+        blockingStartsAfterMinutes: 60,
         notes:
-          "Ad-hoc Laden ohne Abo. Tatsächlicher Preis kann je nach Standort variieren.",
+          "Direkt-Tarif ohne Registrierung (DC ≥100 kW). DC <100 kW: 0.65/kWh. Mit kostenloser Registrierung günstiger: AC 0.50, DC slow 0.59, DC fast 0.65. Coop-Standorte zusätzlich vergünstigt (AC 0.39).",
       },
     ],
     lastUpdated: "2026-05",
@@ -106,19 +114,18 @@ export const CPO_TARIFFS: CpoTariff[] = [
     displayName: "MOVE Mobility",
     aliases: ["move mobility", "move.ch", "alpiq move"],
     websiteUrl: "https://move.ch",
-    pricingUrl: "https://move.ch/de/preise",
+    pricingUrl: "https://www.move.ch/de/private/public-charging/",
     tariffs: [
       {
-        name: "MOVE Direkttarif AC",
-        requiresMembership: false,
-        acPerKwh: 0.45,
-      },
-      {
-        name: "MOVE Direkttarif DC",
-        requiresMembership: false,
-        dcPerKwh: 0.72,
+        name: "MOVE basic (mit Abo)",
+        requiresMembership: true,
+        monthlyFeeChf: 4.9,
+        acPerKwh: 0.46,
+        dcPerKwh: 0.59,
+        blockingFeeChfPerMin: 0.25,
+        blockingStartsAfterMinutes: 61,
         notes:
-          "Misch-Modell mit Energie- und Zeit-Komponente. ~CHF 36–38 für 50 kWh.",
+          "Grundgebühr CHF 4.90/Monat. Preise gelten im MOVE-Netz. Roaming teurer: AC 0.59 · DC 0.69 + 0.10/min ab 23 kW. Ohne Abo: ad-hoc Direktzahlung via Kreditkarte an MOVE-eigenen Säulen möglich.",
       },
     ],
     lastUpdated: "2026-05",
@@ -128,15 +135,15 @@ export const CPO_TARIFFS: CpoTariff[] = [
     displayName: "evpass (Shell)",
     aliases: ["evpass", "ev pass", "groupe e"],
     websiteUrl: "https://www.evpass.ch",
-    pricingUrl: "https://www.evpass.ch/de/tarife",
+    pricingUrl: "https://acs.evpass.ch/Pricing",
     tariffs: [
       {
         name: "evpass Direkttarif",
         requiresMembership: false,
-        acPerKwh: 0.55,
-        dcPerKwh: 0.89,
+        acPerKwh: 0.69,
+        dcPerKwh: 0.99,
         notes:
-          "Eher teurer Tarif. ~CHF 46 für 50 kWh. Tankkarten-Abos günstiger.",
+          "Plus Startgebühr CHF 0.99 pro Session. DC ≤80 kW: 0.89/kWh · DC >80 kW: 0.99/kWh. Parkgebühr CHF 0.30/min ab 5 min nach Lade-Ende. Premium-Abo (CHF 20/Mt) deutlich günstiger.",
       },
     ],
     lastUpdated: "2026-05",
@@ -152,13 +159,14 @@ export const CPO_TARIFFS: CpoTariff[] = [
       {
         name: "M-Charge AC",
         requiresMembership: false,
-        acPerKwh: 0.39,
+        acPerKwh: 0.38,
       },
       {
         name: "M-Charge DC",
         requiresMembership: false,
         dcPerKwh: 0.55,
-        notes: "Über 2'000 Punkte an Migros-Standorten. AC bis 22 kW, DC bis 320 kW.",
+        notes:
+          "DC gestaffelt nach Leistung: <64 kW 0.48 · <200 kW 0.55 · <400 kW 0.59 CHF/kWh. An ausgewählten Migros-Standorten Aktionspreis 0.19/kWh (Mai 2026).",
       },
     ],
     lastUpdated: "2026-05",
@@ -168,20 +176,20 @@ export const CPO_TARIFFS: CpoTariff[] = [
     displayName: "IONITY",
     aliases: ["ionity"],
     websiteUrl: "https://ionity.eu",
-    pricingUrl: "https://ionity.eu/de/charging-prices",
+    pricingUrl: "https://support.ionity.eu/faqs/how-much-does-it-cost-to-charge-at-ionity",
     tariffs: [
       {
         name: "IONITY Direkt",
         requiresMembership: false,
-        dcPerKwh: 0.79,
+        dcPerKwh: 0.65,
         notes: "Ad-hoc Laden bis 350 kW.",
       },
       {
         name: "IONITY Passport Power",
         requiresMembership: true,
-        monthlyFeeChf: 17.99,
-        dcPerKwh: 0.39,
-        notes: "Abo für Vielfahrer auf Autobahn-Hubs.",
+        monthlyFeeChf: 11.5,
+        dcPerKwh: 0.46,
+        notes: "Abo ~ EUR 11.99/Monat (≈ CHF 11.50). Für Vielfahrer auf Autobahn-Hubs.",
       },
     ],
     lastUpdated: "2026-05",
@@ -196,16 +204,16 @@ export const CPO_TARIFFS: CpoTariff[] = [
       {
         name: "Tesla-Fahrer",
         requiresMembership: false,
-        dcPerKwh: 0.5,
+        dcPerKwh: 0.45,
         notes:
-          "Preis variiert nach Standort und Tageszeit. ~CHF 25 für 50 kWh.",
+          "Preis variiert nach Standort und Tageszeit: CHF 0.30–0.53/kWh. Off-Peak günstiger.",
       },
       {
         name: "Andere Marken",
         requiresMembership: false,
-        dcPerKwh: 0.68,
+        dcPerKwh: 0.55,
         notes:
-          "Aufschlag für Nicht-Tesla. Mit Supercharger-Membership (CHF 12.90/Monat) günstiger.",
+          "Range CHF 0.40–0.73/kWh nach Standort/Tageszeit. Mit Supercharger-Membership ~ EUR 9.99/Monat (≈ CHF 9.50) gilt Tesla-Tarif.",
       },
     ],
     lastUpdated: "2026-05",
@@ -238,9 +246,10 @@ export const CPO_TARIFFS: CpoTariff[] = [
       {
         name: "Plug'n Roll Direkt",
         requiresMembership: false,
-        acPerKwh: 0.52,
-        dcPerKwh: 0.76,
-        notes: "~CHF 38 für 50 kWh.",
+        acPerKwh: 0.45,
+        dcPerKwh: 0.7,
+        notes:
+          "Plus Startgebühr CHF 1.50 pro Session. Direktzahlung via Karte/TWINT/PostFinance vor Ort, ohne Abo.",
       },
     ],
     lastUpdated: "2026-05",

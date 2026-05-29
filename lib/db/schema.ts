@@ -69,20 +69,3 @@ export const stationStatus = pgTable("station_status", {
 
 export type StationStatus = typeof stationStatus.$inferSelect;
 export type NewStationStatus = typeof stationStatus.$inferInsert;
-
-export const priceCache = pgTable(
-  "price_cache",
-  {
-    cacheKey: text("cache_key").primaryKey(),
-    evseId: text("evse_id").notNull(),
-    kwh: real("kwh").notNull(),
-    minutes: real("minutes").notNull(),
-    response: jsonb("response").notNull(),
-    fetchedAt: timestamp("fetched_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (t) => [index("price_cache_evse_idx").on(t.evseId)],
-);
-
-export type PriceCacheRow = typeof priceCache.$inferSelect;
