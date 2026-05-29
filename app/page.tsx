@@ -6,6 +6,7 @@ import { Map } from "@/components/Map";
 import { FilterBar } from "@/components/FilterBar";
 import { StationSheet } from "@/components/StationSheet";
 import { SearchBox, type FlyTarget } from "@/components/SearchBox";
+import { useFavorites } from "@/lib/favorites";
 import type { Filters, StationFeatureCollection } from "@/lib/types";
 
 type Bbox = [number, number, number, number];
@@ -38,23 +39,37 @@ export default function Page() {
   const [filters, setFilters] = useState<Filters>({
     minPower: 0,
     current: "any",
+    favoritesOnly: false,
   });
+  const { ids: favoriteIds } = useFavorites();
   const [selectedEvseId, setSelectedEvseId] = useState<string | null>(null);
   const [flyTarget, setFlyTarget] = useState<FlyTarget | null>(null);
 
   const debouncedBbox = useDebounced(bbox, 350);
 
+  const { minPower, current } = filters;
   const queryKey = useMemo(
-    () => ["stations", debouncedBbox, filters] as const,
-    [debouncedBbox, filters],
+    () => ["stations", debouncedBbox, minPower, current] as const,
+    [debouncedBbox, minPower, current],
   );
 
-  const { data } = useQuery({
+  const { data: rawData } = useQuery({
     queryKey,
     queryFn: () => fetchStations(debouncedBbox!, filters),
     enabled: !!debouncedBbox,
     placeholderData: (prev) => prev,
   });
+
+  const data = useMemo<StationFeatureCollection | undefined>(() => {
+    if (!rawData) return rawData;
+    if (!filters.favoritesOnly) return rawData;
+    return {
+      ...rawData,
+      features: rawData.features.filter((f) =>
+        favoriteIds.has(f.properties.evseId),
+      ),
+    };
+  }, [rawData, filters.favoritesOnly, favoriteIds]);
 
   const lastBboxRef = useRef<Bbox | null>(null);
   const handleBboxChange = (next: Bbox) => {

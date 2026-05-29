@@ -12,7 +12,8 @@
     "db:studio": "dotenv -e .env.local -- drizzle-kit studio",
     "db:push": "dotenv -e .env.local -- drizzle-kit push",
     "sync:static": "tsx scripts/sync-bfe-static.ts",
-    "sync:static:local": "dotenv -e .env.local -- tsx scripts/sync-bfe-static.ts"
+    "sync:static:local": "dotenv -e .env.local -- tsx scripts/sync-bfe-static.ts",
+    "check:cpo-urls": "tsx scripts/check-cpo-urls.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.100.13",

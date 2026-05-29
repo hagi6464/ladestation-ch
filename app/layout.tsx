@@ -1,7 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { RegisterSW } from "@/components/RegisterSW";
+import { InstallBanner } from "@/components/InstallBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,6 +19,19 @@ export const metadata: Metadata = {
   title: "Ladestation Schweiz",
   description:
     "Alle öffentlichen Ladesäulen in der Schweiz mit Preisvergleich",
+  applicationName: "Ladestation Schweiz",
+  appleWebApp: {
+    capable: true,
+    title: "Ladestation",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#10b981",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -31,6 +46,8 @@ export default function RootLayout({
     >
       <body className="h-full">
         <Providers>{children}</Providers>
+        <RegisterSW />
+        <InstallBanner />
       </body>
     </html>
   );

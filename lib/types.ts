@@ -54,4 +54,5 @@ export type StationDetail = {
 export type Filters = {
   minPower: number;
   current: "any" | "ac" | "dc";
+  favoritesOnly: boolean;
 };

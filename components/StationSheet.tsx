@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { StationDetail, StationPoint } from "@/lib/types";
 import { PlugIcon, classifyPlug } from "@/components/PlugIcon";
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { labelAuthModes, labelAccessibility } from "@/lib/oicp-labels";
 
 type CpoTariffEntry = {
@@ -363,14 +364,17 @@ export function StationSheet({ evseId, onClose }: Props) {
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
           {data?.name ?? "Ladestation"}
         </h2>
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-full p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
-          aria-label="Schliessen"
-        >
-          ✕
-        </button>
+        <div className="flex shrink-0 items-center gap-1">
+          <FavoriteButton evseId={evseId} />
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+            aria-label="Schliessen"
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       {isPending && <p className="text-sm text-zinc-500">Lade Details…</p>}
