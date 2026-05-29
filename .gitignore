@@ -65,3 +65,9 @@ next-env.d.ts
 *.bak
 *.tmp
 *~
+
+# Claude Code session settings
+.claude/
+
+# Claude Code session settings (user-specific, not shared)
+.claude/

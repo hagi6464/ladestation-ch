@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "WebFetch(domain:www.ewb.ch)",
-      "WebFetch(domain:www.shell.ch)"
-    ]
-  }
-}
