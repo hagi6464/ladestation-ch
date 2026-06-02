@@ -7,6 +7,8 @@ import { FilterBar } from "@/components/FilterBar";
 import { StationSheet } from "@/components/StationSheet";
 import { SearchBox, type FlyTarget } from "@/components/SearchBox";
 import { InstallModal } from "@/components/InstallModal";
+import { GuideModal } from "@/components/GuideModal";
+import { LogoMenu } from "@/components/LogoMenu";
 import { useFavorites } from "@/lib/favorites";
 import type { Filters, StationFeatureCollection } from "@/lib/types";
 
@@ -48,6 +50,18 @@ export default function Page() {
   const [selectedEvseId, setSelectedEvseId] = useState<string | null>(null);
   const [flyTarget, setFlyTarget] = useState<FlyTarget | null>(null);
   const [installOpen, setInstallOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+
+  // Anleitung beim allerersten Besuch einmalig automatisch zeigen.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.localStorage.getItem("ladestation-guide-seen")) return;
+    const t = setTimeout(() => {
+      setGuideOpen(true);
+      window.localStorage.setItem("ladestation-guide-seen", "1");
+    }, 700);
+    return () => clearTimeout(t);
+  }, []);
 
   const debouncedBbox = useDebounced(bbox, 350);
 
@@ -101,14 +115,10 @@ export default function Page() {
       />
 
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col items-start gap-2 p-3 sm:flex-row sm:flex-wrap sm:items-start sm:gap-3">
-        <button
-          type="button"
-          onClick={() => setInstallOpen(true)}
-          title="Karte als App auf den Home-Bildschirm"
-          className="pointer-events-auto inline-flex items-center gap-1.5 rounded-xl bg-white/95 px-3 py-2 text-sm font-semibold text-zinc-900 shadow-md backdrop-blur transition-colors hover:bg-white dark:bg-zinc-900/90 dark:text-zinc-50 dark:hover:bg-zinc-900"
-        >
-          ⚡ Ladestation Schweiz
-        </button>
+        <LogoMenu
+          onOpenGuide={() => setGuideOpen(true)}
+          onOpenInstall={() => setInstallOpen(true)}
+        />
         <div className="pointer-events-auto w-full sm:w-auto">
           <SearchBox onLocate={(t) => setFlyTarget({ ...t })} />
         </div>
@@ -131,6 +141,8 @@ export default function Page() {
         open={installOpen}
         onClose={() => setInstallOpen(false)}
       />
+
+      <GuideModal open={guideOpen} onClose={() => setGuideOpen(false)} />
     </div>
   );
 }

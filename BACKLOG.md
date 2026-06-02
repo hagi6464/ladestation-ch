@@ -10,8 +10,10 @@ In einem Schwung umsetzen (~3 h total):
 
 1. ✅ **CPO-URLs reparieren** (erledigt 2026-06-02) — 7 tote URLs gefixt (Swisscharge, GOFAST, MOVE, Shell Recharge, Allego, EWZ, EWB). `check:cpo-urls` jetzt 13/16 OK (Rest = Anti-Bot-Fehlalarme).
 2. ✅ **Stecker-Typ-Filter** (erledigt 2026-06-02) — `Filters.plugType` (any/type2/ccs/chademo), Backend filtert per `unnest(s.plugs)` + Substring-`LIKE` (rohe OICP-Namen, kein exakter Overlap), UI-Buttons mit Plug-Icons in `FilterBar`. Taxonomie zentral in `lib/plugs.ts`. Real getestet: type2=374, ccs=96, chademo=41 von 428 (Zürich-bbox).
-3. **Sortierung "günstigste zuerst"** (30 Min) — im Detail-Sheet (`components/StationSheet.tsx`), Funktion `PointsList`: sortiere nach `dcPerKwh ?? acPerKwh` aufsteigend. Bonus: kleines "günstigste"-Badge am ersten Eintrag.
+3. ⏸ **Sortierung "günstigste zuerst"** — **auf unbestimmte Zeit verschoben** (2026-06-02). Wörtlich nicht umsetzbar: Preis hängt am Betreiber (`findCpoTariff(operatorName)`), nicht am Ladepunkt — alle Punkte einer Säule haben denselben Tarif, also nichts zu sortieren. Und "günstigste per kWh" würde irreführen (Startgebühr/Blockiergebühr/Abo nicht eingerechnet, 8/16 CPOs unverifiziert). Echte Kostenübersicht braucht zuerst Datenqualität + einen Session-Schätzer → siehe Abschnitt "Kosten-Übersicht / Session-Schätzer" unten.
 4. **Donation TWINT-QR** (1 h) — Variante A aus dem Backlog. Voraussetzung: User hat TWINT-QR-Code als PNG/SVG zur Hand. Neue `components/DonationButton.tsx` + `components/DonationModal.tsx`, klein im bottom-left Overlay neben Logo.
+
+**Zwischendrin erledigt (2026-06-02):** ✅ Kurz-Onboarding-Anleitung (`GuideModal`) + Logo-Menü (`LogoMenu`: Anleitung / Als App speichern). Anleitung öffnet beim Erststart einmalig automatisch (`localStorage["ladestation-guide-seen"]`), danach per Logo. Install-Toast dadurch ersetzt/entfernt.
 
 **Erwartetes Ergebnis nach dem Block:** spürbar bessere Datenqualität + direkter UX-Wert (Filter + Sortierung) + Spendenkanal aktiv. Push als ein Commit.
 
@@ -56,12 +58,16 @@ In einem Schwung umsetzen (~3 h total):
 
 **Aufwand:** ~1 h.
 
-### Sortierung "Günstigste zuerst" in der Karten-Liste
-**Warum:** wenn der User mehrere Säulen am gleichen Ort sieht, soll er die günstigste schnell finden.
+### Kosten-Übersicht / Session-Schätzer (ersetzt "Günstigste zuerst", verschoben)
+**Warum:** Der User soll vor dem Hinfahren abschätzen können, was *ihn* das Laden hier kostet.
 
-**Wie:** Im Detail-Sheet bei mehreren Ladepunkten — sortiere `PointsList` nach `dcPerKwh ?? acPerKwh` aufsteigend. Bonus: kleines "günstigste"-Label am ersten Eintrag.
+**Erkenntnis (2026-06-02):** Die ursprüngliche Idee "PointsList nach `dcPerKwh ?? acPerKwh` sortieren" ist sinnlos — Tarife hängen am Betreiber (`findCpoTariff(operatorName)`), nicht am Ladepunkt; alle Punkte einer Säule teilen denselben Tarif. Eine einzelne kWh-Zahl als "günstigste" würde zudem irreführen (Startgebühr & Leistungsstaffelung stecken nur im Freitext-`notes`, Blockiergebühr/Abo nicht eingerechnet, 8/16 CPOs unverifiziert).
 
-**Aufwand:** ~30 Min.
+**Wie (richtig):** Session-Schätzer im Detail-Sheet — "Was kostet das Laden hier?" mit wählbarer kWh-Menge, getrennt für günstigsten AC-/DC-Tarif, ehrliche CHF-Schätzung mit sichtbaren Annahmen (ad-hoc, ohne Abo) + Vorbehalt für nicht eingerechnete Gebühren. Voraussetzung für saubere Zahlen: **Datenqualität zuerst** (Startgebühr/`sessionFeeChf` strukturieren, DC-Leistungsstaffelung als Feld, 8 CPOs verifizieren).
+
+**Aufwand:** Schätzer ~2 h, plus Datenmodell-Erweiterung + CPO-Pflege ~2–3 h.
+
+**Echtes "günstigste zuerst"** (Cross-Station-Preisvergleich auf der Karte) ist ein separates, größeres Feature — durch dieselbe Datenlücke blockiert.
 
 ### Mobile-Sheet UX-Feinheiten + Lighthouse-Polish (Phase 4.2 alt)
 **Warum:** Mobile-Layout ist passabel, aber:
