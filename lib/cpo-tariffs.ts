@@ -73,7 +73,7 @@ export const CPO_TARIFFS: CpoTariff[] = [
     displayName: "Swisscharge",
     aliases: ["swisscharge"],
     websiteUrl: "https://swisscharge.ch",
-    pricingUrl: "https://swisscharge.ch/de/solutions/charging-prices/",
+    pricingUrl: "https://swisscharge.ch/de/ladelosungen/ladepreise/",
     tariffs: [
       {
         name: "Swisscharge AC",
