@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useFavorites } from "@/lib/favorites";
 import { PlugIcon, type PlugType } from "@/components/PlugIcon";
 import { PLUG_FILTER_LABELS } from "@/lib/plugs";
@@ -19,8 +20,14 @@ const PLUG_FILTER_ICON: Record<"type2" | "ccs" | "chademo", PlugType> = {
   chademo: "chademo",
 };
 
+const PILL_ACTIVE = "bg-blue-600 text-white";
+const PILL_IDLE =
+  "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700";
+
 export function FilterBar({ filters, onChange }: Props) {
   const { count: favoriteCount } = useFavorites();
+  const [plugsOpen, setPlugsOpen] = useState(false);
+
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-200 bg-white/95 px-3 py-2 text-sm shadow-md backdrop-blur dark:border-zinc-700 dark:bg-zinc-900/90">
       <span className="font-medium text-zinc-700 dark:text-zinc-200">
@@ -34,64 +41,10 @@ export function FilterBar({ filters, onChange }: Props) {
             type="button"
             onClick={() => onChange({ ...filters, current: c })}
             className={`rounded-full px-3 py-1 text-xs transition-colors ${
-              filters.current === c
-                ? "bg-blue-600 text-white"
-                : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+              filters.current === c ? PILL_ACTIVE : PILL_IDLE
             }`}
           >
             {c === "any" ? "Alle" : c.toUpperCase()}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-1">
-        <span className="text-xs text-zinc-600 dark:text-zinc-400">
-          ab kW:
-        </span>
-        {POWER_PRESETS.map((p) => (
-          <button
-            key={p}
-            type="button"
-            onClick={() => onChange({ ...filters, minPower: p })}
-            className={`rounded-full px-3 py-1 text-xs transition-colors ${
-              filters.minPower === p
-                ? "bg-blue-600 text-white"
-                : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
-            }`}
-          >
-            {p === 0 ? "alle" : `≥${p}`}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-1">
-        <span className="text-xs text-zinc-600 dark:text-zinc-400">
-          Stecker:
-        </span>
-        {(["any", "type2", "ccs", "chademo"] as const).map((pt) => (
-          <button
-            key={pt}
-            type="button"
-            onClick={() => onChange({ ...filters, plugType: pt })}
-            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-colors ${
-              filters.plugType === pt
-                ? "bg-blue-600 text-white"
-                : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
-            }`}
-          >
-            {pt === "any" ? (
-              "alle"
-            ) : (
-              <>
-                <PlugIcon
-                  type={PLUG_FILTER_ICON[pt]}
-                  width={13}
-                  height={13}
-                  aria-hidden="true"
-                />
-                {PLUG_FILTER_LABELS[pt]}
-              </>
-            )}
           </button>
         ))}
       </div>
@@ -110,9 +63,7 @@ export function FilterBar({ filters, onChange }: Props) {
               : "Nur Favoriten zeigen"
         }
         className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-          filters.favoritesOnly
-            ? "bg-amber-500 text-white"
-            : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+          filters.favoritesOnly ? "bg-amber-500 text-white" : PILL_IDLE
         }`}
       >
         <svg
@@ -135,6 +86,70 @@ export function FilterBar({ filters, onChange }: Props) {
           </span>
         )}
       </button>
+
+      <div className="flex items-center gap-1">
+        <span className="text-xs text-zinc-600 dark:text-zinc-400">ab kW:</span>
+        {POWER_PRESETS.map((p) => (
+          <button
+            key={p}
+            type="button"
+            onClick={() => onChange({ ...filters, minPower: p })}
+            className={`rounded-full px-3 py-1 text-xs transition-colors ${
+              filters.minPower === p ? PILL_ACTIVE : PILL_IDLE
+            }`}
+          >
+            {p === 0 ? "alle" : `≥${p}`}
+          </button>
+        ))}
+      </div>
+
+      {/* Stecker-Filter: eingeklappt hinter ▾, spart Platz (v.a. mobil).
+          Toggle wird blau, wenn ein Stecker-Filter aktiv ist. */}
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={() => setPlugsOpen((v) => !v)}
+          aria-expanded={plugsOpen}
+          aria-label="Stecker-Filter ein-/ausklappen"
+          className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-colors ${
+            filters.plugType !== "any" ? PILL_ACTIVE : PILL_IDLE
+          }`}
+        >
+          Stecker
+          <span
+            aria-hidden="true"
+            className={`text-[10px] transition-transform ${plugsOpen ? "rotate-180" : ""}`}
+          >
+            ▾
+          </span>
+        </button>
+
+        {plugsOpen &&
+          (["any", "type2", "ccs", "chademo"] as const).map((pt) => (
+            <button
+              key={pt}
+              type="button"
+              onClick={() => onChange({ ...filters, plugType: pt })}
+              className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-colors ${
+                filters.plugType === pt ? PILL_ACTIVE : PILL_IDLE
+              }`}
+            >
+              {pt === "any" ? (
+                "alle"
+              ) : (
+                <>
+                  <PlugIcon
+                    type={PLUG_FILTER_ICON[pt]}
+                    width={13}
+                    height={13}
+                    aria-hidden="true"
+                  />
+                  {PLUG_FILTER_LABELS[pt]}
+                </>
+              )}
+            </button>
+          ))}
+      </div>
     </div>
   );
 }

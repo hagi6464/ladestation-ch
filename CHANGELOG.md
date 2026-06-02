@@ -15,6 +15,8 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
   (WhatsApp, SMS, Mail …); am Desktop wird der Link in die Zwischenablage kopiert.
 
 ### Verbessert
+- **Filterleiste mobil kompakter**: „Favoriten" in die obere Zeile neben AC/DC verschoben;
+  der Stecker-Filter ist standardmäßig eingeklappt und per ▾ ausklappbar.
 - **PWA-Installation** von Banner auf ein dezentes Modal umgestellt; der Install-Hinweis
   in der Anleitung ist nun ein hervorgehobener Button, der den Dialog direkt öffnet.
 - **CPO-Tarif-Links**: 7 tote bzw. umgeleitete Preis-/Tarifseiten auf aktuelle URLs
