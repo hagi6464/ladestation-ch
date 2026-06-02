@@ -9,6 +9,7 @@ type Props = {
 
 export function LogoMenu({ onOpenGuide, onOpenInstall }: Props) {
   const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,6 +31,35 @@ export function LogoMenu({ onOpenGuide, onOpenInstall }: Props) {
   const choose = (fn: () => void) => {
     setOpen(false);
     fn();
+  };
+
+  // Native Teilen-Liste (WhatsApp/SMS/…) auf dem Handy, sonst Link kopieren.
+  const handleShare = async () => {
+    const url = window.location.origin;
+    const shareData = {
+      title: "Ladestation Schweiz",
+      text: "Alle öffentlichen Ladesäulen der Schweiz mit Preisvergleich:",
+      url,
+    };
+    if (navigator.share) {
+      setOpen(false);
+      try {
+        await navigator.share(shareData);
+      } catch {
+        // Teilen abgebrochen oder fehlgeschlagen — bewusst ignorieren
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => {
+        setCopied(false);
+        setOpen(false);
+      }, 1500);
+    } catch {
+      setOpen(false);
+    }
   };
 
   return (
@@ -72,6 +102,14 @@ export function LogoMenu({ onOpenGuide, onOpenInstall }: Props) {
             className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800"
           >
             📲 Als App speichern
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={handleShare}
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          >
+            {copied ? "✓ Link kopiert" : "📤 Weiterempfehlen"}
           </button>
         </div>
       )}
