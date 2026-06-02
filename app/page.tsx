@@ -21,6 +21,7 @@ async function fetchStations(
     current: filters.current,
   });
   if (filters.minPower > 0) params.set("minPower", String(filters.minPower));
+  if (filters.plugType !== "any") params.set("plugType", filters.plugType);
   const res = await fetch(`/api/stations?${params}`);
   if (!res.ok) throw new Error(`stations failed: ${res.status}`);
   return res.json();
@@ -40,6 +41,7 @@ export default function Page() {
   const [filters, setFilters] = useState<Filters>({
     minPower: 0,
     current: "any",
+    plugType: "any",
     favoritesOnly: false,
   });
   const { ids: favoriteIds } = useFavorites();
@@ -49,10 +51,10 @@ export default function Page() {
 
   const debouncedBbox = useDebounced(bbox, 350);
 
-  const { minPower, current } = filters;
+  const { minPower, current, plugType } = filters;
   const queryKey = useMemo(
-    () => ["stations", debouncedBbox, minPower, current] as const,
-    [debouncedBbox, minPower, current],
+    () => ["stations", debouncedBbox, minPower, current, plugType] as const,
+    [debouncedBbox, minPower, current, plugType],
   );
 
   const { data: rawData } = useQuery({

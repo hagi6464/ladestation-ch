@@ -1,3 +1,5 @@
+import type { PlugFilter } from "./plugs";
+
 export type StationFeatureProperties = {
   evseId: string;
   name: string | null;
@@ -54,5 +56,6 @@ export type StationDetail = {
 export type Filters = {
   minPower: number;
   current: "any" | "ac" | "dc";
+  plugType: PlugFilter;
   favoritesOnly: boolean;
 };

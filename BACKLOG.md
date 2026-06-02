@@ -9,7 +9,7 @@ Liste von Features/Ideen für später. Pro Eintrag: was, warum, Aufwand-Schätzu
 In einem Schwung umsetzen (~3 h total):
 
 1. ✅ **CPO-URLs reparieren** (erledigt 2026-06-02) — 7 tote URLs gefixt (Swisscharge, GOFAST, MOVE, Shell Recharge, Allego, EWZ, EWB). `check:cpo-urls` jetzt 13/16 OK (Rest = Anti-Bot-Fehlalarme).
-2. **Stecker-Typ-Filter** (1 h) — `Filters` um `plugType?: "type2" | "ccs" | "chademo"` erweitern. Backend `app/api/stations/route.ts` filtert per Postgres Array-Operator auf `stations.plugs`. UI in `components/FilterBar.tsx` mit Plug-Type-Buttons.
+2. ✅ **Stecker-Typ-Filter** (erledigt 2026-06-02) — `Filters.plugType` (any/type2/ccs/chademo), Backend filtert per `unnest(s.plugs)` + Substring-`LIKE` (rohe OICP-Namen, kein exakter Overlap), UI-Buttons mit Plug-Icons in `FilterBar`. Taxonomie zentral in `lib/plugs.ts`. Real getestet: type2=374, ccs=96, chademo=41 von 428 (Zürich-bbox).
 3. **Sortierung "günstigste zuerst"** (30 Min) — im Detail-Sheet (`components/StationSheet.tsx`), Funktion `PointsList`: sortiere nach `dcPerKwh ?? acPerKwh` aufsteigend. Bonus: kleines "günstigste"-Badge am ersten Eintrag.
 4. **Donation TWINT-QR** (1 h) — Variante A aus dem Backlog. Voraussetzung: User hat TWINT-QR-Code als PNG/SVG zur Hand. Neue `components/DonationButton.tsx` + `components/DonationModal.tsx`, klein im bottom-left Overlay neben Logo.
 

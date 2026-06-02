@@ -1,6 +1,8 @@
 "use client";
 
 import { useFavorites } from "@/lib/favorites";
+import { PlugIcon, type PlugType } from "@/components/PlugIcon";
+import { PLUG_FILTER_LABELS } from "@/lib/plugs";
 import type { Filters } from "@/lib/types";
 
 type Props = {
@@ -9,6 +11,13 @@ type Props = {
 };
 
 const POWER_PRESETS = [0, 22, 50, 150];
+
+// Repräsentatives Icon je Filter-Kategorie (CCS → Combo-2-Variante)
+const PLUG_FILTER_ICON: Record<"type2" | "ccs" | "chademo", PlugType> = {
+  type2: "type2",
+  ccs: "ccs2",
+  chademo: "chademo",
+};
 
 export function FilterBar({ filters, onChange }: Props) {
   const { count: favoriteCount } = useFavorites();
@@ -51,6 +60,38 @@ export function FilterBar({ filters, onChange }: Props) {
             }`}
           >
             {p === 0 ? "alle" : `≥${p}`}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-1">
+        <span className="text-xs text-zinc-600 dark:text-zinc-400">
+          Stecker:
+        </span>
+        {(["any", "type2", "ccs", "chademo"] as const).map((pt) => (
+          <button
+            key={pt}
+            type="button"
+            onClick={() => onChange({ ...filters, plugType: pt })}
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-colors ${
+              filters.plugType === pt
+                ? "bg-blue-600 text-white"
+                : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+            }`}
+          >
+            {pt === "any" ? (
+              "alle"
+            ) : (
+              <>
+                <PlugIcon
+                  type={PLUG_FILTER_ICON[pt]}
+                  width={13}
+                  height={13}
+                  aria-hidden="true"
+                />
+                {PLUG_FILTER_LABELS[pt]}
+              </>
+            )}
           </button>
         ))}
       </div>

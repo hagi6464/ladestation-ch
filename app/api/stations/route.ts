@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { PLUG_FILTER_NEEDLES } from "@/lib/plugs";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,6 +18,7 @@ const querySchema = z.object({
     ),
   minPower: z.coerce.number().min(0).optional(),
   current: z.enum(["ac", "dc", "any"]).default("any"),
+  plugType: z.enum(["any", "type2", "ccs", "chademo"]).default("any"),
 });
 
 type Feature = {
@@ -51,7 +53,7 @@ export async function GET(req: NextRequest) {
       { status: 400 },
     );
   }
-  const { bbox, minPower, current } = parsed.data;
+  const { bbox, minPower, current, plugType } = parsed.data;
   const [west, south, east, north] = bbox;
 
   const filters = [
@@ -61,6 +63,17 @@ export async function GET(req: NextRequest) {
   if (minPower != null) filters.push(sql`s.max_power_kw >= ${minPower}`);
   if (current === "ac") filters.push(sql`s.is_ac = true`);
   if (current === "dc") filters.push(sql`s.is_dc = true`);
+  if (plugType !== "any") {
+    // Stecker-Namen sind Freitext (z.B. "CCS Combo 2 Plug") — daher Substring-
+    // Matching pro Array-Element statt exaktem Array-Overlap.
+    const likes = sql.join(
+      PLUG_FILTER_NEEDLES[plugType].map((n) => sql`lower(p) LIKE ${`%${n}%`}`),
+      sql` OR `,
+    );
+    filters.push(
+      sql`EXISTS (SELECT 1 FROM unnest(s.plugs) AS p WHERE ${likes})`,
+    );
+  }
   const whereClause = sql.join(filters, sql` AND `);
 
   const rows = (await db.execute(sql`
