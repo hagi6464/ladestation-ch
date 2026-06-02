@@ -73,7 +73,7 @@ export const CPO_TARIFFS: CpoTariff[] = [
     displayName: "Swisscharge",
     aliases: ["swisscharge"],
     websiteUrl: "https://swisscharge.ch",
-    pricingUrl: "https://swisscharge.ch/de/solutions/ladepreise/",
+    pricingUrl: "https://swisscharge.ch/de/solutions/charging-prices/",
     tariffs: [
       {
         name: "Swisscharge AC",
@@ -97,7 +97,7 @@ export const CPO_TARIFFS: CpoTariff[] = [
     displayName: "GOFAST",
     aliases: ["gofast", "go fast"],
     websiteUrl: "https://gofast.swiss",
-    pricingUrl: "https://gofast.swiss/de/preise/",
+    pricingUrl: "https://www.gofast.swiss/schnellladen",
     tariffs: [
       {
         name: "GOFAST Direkttarif",
@@ -114,7 +114,7 @@ export const CPO_TARIFFS: CpoTariff[] = [
     displayName: "MOVE Mobility",
     aliases: ["move mobility", "move.ch", "alpiq move"],
     websiteUrl: "https://move.ch",
-    pricingUrl: "https://www.move.ch/de/private/public-charging/",
+    pricingUrl: "https://support.move.ch/help/de-de/22-abonnemente-und-tarife",
     tariffs: [
       {
         name: "MOVE basic (mit Abo)",
@@ -275,8 +275,8 @@ export const CPO_TARIFFS: CpoTariff[] = [
     cpoId: "shellrecharge",
     displayName: "Shell Recharge",
     aliases: ["shell recharge", "shell"],
-    websiteUrl: "https://www.shellrecharge.com/de-ch",
-    pricingUrl: "https://www.shellrecharge.com/de-ch/tarife",
+    websiteUrl: "https://www.shell.ch/de_ch/laden.html",
+    pricingUrl: "https://www.shell.ch/de_ch/laden/ladetarife-fuer-ihr-elektroauto.html",
     tariffs: [
       {
         name: "Shell Recharge Direkt",
@@ -292,7 +292,7 @@ export const CPO_TARIFFS: CpoTariff[] = [
     displayName: "Allego",
     aliases: ["allego"],
     websiteUrl: "https://www.allego.eu",
-    pricingUrl: "https://www.allego.eu/de/preise",
+    pricingUrl: "https://www.allego.eu/pricing/",
     tariffs: [
       {
         name: "Allego Direkt",
@@ -308,7 +308,8 @@ export const CPO_TARIFFS: CpoTariff[] = [
     displayName: "EWZ (Elektrizitätswerk Zürich)",
     aliases: ["ewz", "elektrizitätswerk"],
     websiteUrl: "https://www.ewz.ch",
-    pricingUrl: "https://www.ewz.ch/de/private/e-mobilitaet/laden-unterwegs.html",
+    pricingUrl:
+      "https://www.ewz.ch/de/private/elektromobilitaet-privatkunden/unterwegs-laden/unser-ladenetz.html",
     tariffs: [
       {
         name: "EWZ Direkttarif",
@@ -339,7 +340,8 @@ export const CPO_TARIFFS: CpoTariff[] = [
     displayName: "Energie Wasser Bern (EWB)",
     aliases: ["energie wasser bern", "ewb", "bernmobil"],
     websiteUrl: "https://www.ewb.ch",
-    pricingUrl: "https://www.ewb.ch/strom/elektromobilitaet",
+    pricingUrl:
+      "https://www.ewb.ch/angebot/energieloesungen/mobilitaet/elektromobilitaet/oeffentliche-ladestationen.php",
     tariffs: [
       {
         name: "EWB Direkttarif",
