@@ -51,6 +51,22 @@ In einem Schwung umsetzen (~3 h total):
 
 ## UX / Polish
 
+### App des Betreibers öffnen / Laden starten  ⭐ (Idee 2026-06-02)
+**Warum:** Schliesst die Lücke von „Säule finden" → „tatsächlich laden". Aus dem Detail-Sheet heraus die passende Lade-App des Betreibers öffnen bzw. den Ladevorgang anstossen.
+
+**Tücken / zu klären:**
+- **Deep-Links sind selten öffentlich:** Die wenigsten CPO-Apps (Swisscharge, MOVE, GOFAST, evpass, Shell Recharge …) haben dokumentierte URL-Schemes / Universal Links zum „Laden an EVSE X starten". Realistisch ist meist nur „App öffnen", nicht „Session direkt starten".
+- **Fallback-Kette nötig:** App per Scheme/Universal-Link öffnen → wenn nicht installiert → App-/Play-Store-Seite → sonst Betreiber-Website.
+- **Roaming:** User lädt evtl. mit einer Roaming-App (z. B. MOVE-Abo an GOFAST-Säule), nicht mit der Betreiber-eigenen App. „Die eine richtige App" gibt es also nicht immer — ggf. Betreiber-App anbieten + Hinweis, dass Roaming-Apps auch gehen.
+- **Ad-hoc ohne App:** Viele CH-Säulen erlauben Ad-hoc-Zahlung per QR/Web-Link oder Kartenterminal — falls eine Ad-hoc-URL vorliegt, ist das der app-freie Weg.
+
+**Wie (realistischer MVP):**
+- `CpoTariff` (`lib/cpo-tariffs.ts`) um Felder erweitern: `appStore?: { ios?: string; android?: string }`, optional `appScheme?` / `deepLinkTemplate?`, optional `adhocUrl?`. Pro CPO kuratieren.
+- Im Detail-Sheet Button „Laden-App öffnen": Plattform erkennen (iOS/Android), Scheme versuchen, sonst Store-Link, sonst Website. Desktop: nur Website/Store-Hinweis.
+- Store-/Scheme-Links manuell recherchieren (wie die CPO-Tarife) — per OICP/BFE nicht verfügbar.
+
+**Aufwand:** Grundgerüst ~2–3 h; der eigentliche Aufwand ist die laufende Pflege der App-/Store-Links pro CPO. Echte „Session starten"-Deep-Links nur dort, wo der CPO sie öffentlich anbietet.
+
 ### Stecker-Typ-Filter
 **Warum:** User mit CCS-Auto interessiert sich nicht für CHAdeMO-Säulen. Aktuelle Filter sind nur AC/DC + kW.
 
