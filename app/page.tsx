@@ -6,6 +6,7 @@ import { Map } from "@/components/Map";
 import { FilterBar } from "@/components/FilterBar";
 import { StationSheet } from "@/components/StationSheet";
 import { SearchBox, type FlyTarget } from "@/components/SearchBox";
+import { InstallModal } from "@/components/InstallModal";
 import { useFavorites } from "@/lib/favorites";
 import type { Filters, StationFeatureCollection } from "@/lib/types";
 
@@ -44,6 +45,7 @@ export default function Page() {
   const { ids: favoriteIds } = useFavorites();
   const [selectedEvseId, setSelectedEvseId] = useState<string | null>(null);
   const [flyTarget, setFlyTarget] = useState<FlyTarget | null>(null);
+  const [installOpen, setInstallOpen] = useState(false);
 
   const debouncedBbox = useDebounced(bbox, 350);
 
@@ -97,9 +99,14 @@ export default function Page() {
       />
 
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col items-start gap-2 p-3 sm:flex-row sm:flex-wrap sm:items-start sm:gap-3">
-        <div className="pointer-events-auto rounded-xl bg-white/95 px-3 py-2 text-sm font-semibold text-zinc-900 shadow-md backdrop-blur dark:bg-zinc-900/90 dark:text-zinc-50">
+        <button
+          type="button"
+          onClick={() => setInstallOpen(true)}
+          title="Karte als App auf den Home-Bildschirm"
+          className="pointer-events-auto inline-flex items-center gap-1.5 rounded-xl bg-white/95 px-3 py-2 text-sm font-semibold text-zinc-900 shadow-md backdrop-blur transition-colors hover:bg-white dark:bg-zinc-900/90 dark:text-zinc-50 dark:hover:bg-zinc-900"
+        >
           ⚡ Ladestation Schweiz
-        </div>
+        </button>
         <div className="pointer-events-auto w-full sm:w-auto">
           <SearchBox onLocate={(t) => setFlyTarget({ ...t })} />
         </div>
@@ -116,6 +123,11 @@ export default function Page() {
       <StationSheet
         evseId={selectedEvseId}
         onClose={() => setSelectedEvseId(null)}
+      />
+
+      <InstallModal
+        open={installOpen}
+        onClose={() => setInstallOpen(false)}
       />
     </div>
   );
