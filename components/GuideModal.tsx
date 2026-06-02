@@ -7,24 +7,20 @@ type Props = {
   onClose: () => void;
 };
 
-const STEPS: Array<{ icon: string; title: string; desc: string }> = [
+const STEPS: Array<{ title: string; desc: string }> = [
   {
-    icon: "🔍",
     title: "Suchen",
     desc: "Ort oder Adresse eingeben — die Karte springt hin.",
   },
   {
-    icon: "🎛️",
     title: "Filtern",
     desc: "Nach AC/DC, Leistung (kW) und Stecker-Typ eingrenzen.",
   },
   {
-    icon: "📍",
     title: "Säule antippen",
     desc: "Verfügbarkeit, Stecker, Tarife und Navigation im Detail.",
   },
   {
-    icon: "⭐",
     title: "Favoriten",
     desc: "Säulen merken und mit „nur Favoriten“ schnell wiederfinden.",
   },
@@ -84,14 +80,14 @@ export function GuideModal({ open, onClose }: Props) {
           </button>
         </div>
 
-        <ul className="space-y-3">
-          {STEPS.map((s) => (
+        <ol className="space-y-3">
+          {STEPS.map((s, i) => (
             <li key={s.title} className="flex items-start gap-3">
               <span
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-base dark:bg-zinc-800"
+                className="shrink-0 text-sm font-semibold tabular-nums text-emerald-600 dark:text-emerald-400"
                 aria-hidden="true"
               >
-                {s.icon}
+                {i + 1}.
               </span>
               <div className="text-sm">
                 <div className="font-medium text-zinc-900 dark:text-zinc-50">
@@ -101,11 +97,11 @@ export function GuideModal({ open, onClose }: Props) {
               </div>
             </li>
           ))}
-        </ul>
+        </ol>
 
         <p className="mt-4 rounded-lg bg-zinc-50 px-3 py-2 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-          💡 Tipp: Über das Logo-Menü kannst du die App mit „Als App speichern“
-          auf den Home-Bildschirm legen.
+          <strong className="font-medium">Tipp:</strong> Über das Logo-Menü
+          kannst du die App mit „Als App speichern“ auf den Home-Bildschirm legen.
         </p>
 
         <div className="mt-5 flex justify-end">
