@@ -142,7 +142,14 @@ export default function Page() {
         onClose={() => setInstallOpen(false)}
       />
 
-      <GuideModal open={guideOpen} onClose={() => setGuideOpen(false)} />
+      <GuideModal
+        open={guideOpen}
+        onClose={() => setGuideOpen(false)}
+        onInstall={() => {
+          setGuideOpen(false);
+          setInstallOpen(true);
+        }}
+      />
     </div>
   );
 }

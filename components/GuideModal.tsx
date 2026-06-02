@@ -5,6 +5,7 @@ import { useEffect } from "react";
 type Props = {
   open: boolean;
   onClose: () => void;
+  onInstall: () => void;
 };
 
 const STEPS: Array<{ title: string; desc: string }> = [
@@ -26,7 +27,7 @@ const STEPS: Array<{ title: string; desc: string }> = [
   },
 ];
 
-export function GuideModal({ open, onClose }: Props) {
+export function GuideModal({ open, onClose, onInstall }: Props) {
   useEffect(() => {
     if (!open) return;
     const onEsc = (e: KeyboardEvent) => {
@@ -99,16 +100,27 @@ export function GuideModal({ open, onClose }: Props) {
           ))}
         </ol>
 
-        <p className="mt-4 rounded-lg bg-zinc-50 px-3 py-2 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-          <strong className="font-medium">Tipp:</strong> Über das Logo-Menü
-          kannst du die App mit „Als App speichern“ auf den Home-Bildschirm legen.
-        </p>
+        <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-800 dark:bg-emerald-950">
+          <div className="text-sm font-medium text-emerald-900 dark:text-emerald-100">
+            Diese App aufs Handy?
+          </div>
+          <p className="mt-0.5 text-xs text-emerald-800 dark:text-emerald-300">
+            Direkt auf den Home-Bildschirm — kein App-Store, keine Werbung.
+          </p>
+          <button
+            type="button"
+            onClick={onInstall}
+            className="mt-2 w-full rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-500"
+          >
+            Als App speichern
+          </button>
+        </div>
 
-        <div className="mt-5 flex justify-end">
+        <div className="mt-3 flex justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md bg-emerald-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-emerald-500"
+            className="rounded-md px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
             Los geht’s
           </button>
