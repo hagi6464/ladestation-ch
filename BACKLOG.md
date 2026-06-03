@@ -135,6 +135,47 @@ In einem Schwung umsetzen (~3 h total):
 
 ---
 
+## Analytics, Feedback & Wachstum (niedrige Prio)
+
+Ideen rund um Nutzungsmessung, Feedback und Reichweite. Bewusst niedrige Prio.
+
+### 1. Bewertungs-/Feedback-System
+**Warum:** Ohne App-Store (PWA/Web) gibt es keine Store-Reviews — ein Feedback-Kanal müsste selbst gebaut werden.
+**Recherche/Optionen:**
+- In-App: kleines Sterne-/Daumen-Widget + optionales Kommentarfeld → in Postgres speichern (`feedback`-Tabelle). Volle Kontrolle, kein Drittanbieter.
+- Extern/leichtgewichtig: Google Form / Tally verlinken, oder Feedback-Tool (Canny, Featurebase) einbetten.
+- Öffentliches „Rating" (wie Store-Sterne) ist heikel ohne Login (Mehrfach-Abstimmen, Abuse) — eher internes Feedback als öffentliches Rating.
+**Aufwand:** In-App-Feedback einfach ~2–3 h; öffentliches Rating-System deutlich mehr.
+
+### 2. Benutzer-Counter / Besucherzahlen
+**Frage „sehe ich das auf Vercel?" → Ja:** **Vercel Web Analytics** zeigt Besucher, Page-Views, Referrer, Geräte, Länder (datenschutzfreundlich, ohne Cookies). Auf dem **Hobby-Abo verfügbar, aber mit Event-Limit pro Monat**. Aktivieren: Paket `@vercel/analytics` + `<Analytics/>` im Layout + im Dashboard einschalten.
+**Eigener Counter** nur nötig für eine präzise/öffentliche Live-Zahl → kleiner Postgres-Zähler. Sonst reicht Vercel Analytics.
+**Aufwand:** Vercel Analytics ~15 Min; eigener Counter ~1 h.
+
+### 3. Wiederkehrende Geräte erkennen?
+**Mit der jetzigen Umgebung begrenzt ja:**
+- Einfachster Weg: anonyme ID (UUID) im `localStorage` beim Erstbesuch → „neu vs. wiederkehrend" pro Browser-Profil; optional an Postgres loggen.
+- Grenzen: zählt pro Browser/Profil, nicht echtes Gerät; reset bei Storage-Löschen / Inkognito / anderem Browser.
+- **Device-Fingerprinting** (Canvas/UA) wäre geräte-näher, ist aber datenschutzinvasiv, fragil und passt **nicht** zur werbefrei-/Privacy-Linie → bewusst vermeiden.
+- Vercel Analytics zählt Uniques aggregiert (rotierender Hash) — keine Einzelgeräte-Identität für dich.
+**Aufwand:** anon-ID ~1 h.
+
+### 4. Weitere Nutzungsmetriken
+**Warum:** zeigt, welche Features wirklich genutzt werden → Priorisierung.
+**Ideen:** Anzahl Suchen, geöffnete Detail-Sheets, genutzte Filter (AC/DC/kW/Stecker), gesetzte Favoriten, PWA-Installationen, Teilen-Klicks.
+**Wie:** Vercel Analytics Custom Events, oder eigene `/api/event`-Route → Postgres. Datensparsam halten.
+**Aufwand:** ~1–2 h für ein paar Schlüssel-Events.
+
+### 5. Kampagnen-Link für Foren — mit Not-Aus
+**Warum:** Link in E-Auto-Foren streuen, Herkunft messen, und bei Überlast das **Vercel-Hobby-Kontingent schützen**.
+**Wie:**
+- Trackbarer Link: UTM-Parameter (`?ref=forum-xy`) oder eigene Redirect-Route (`/f/<slug>` → Hauptseite); Herkunft via Analytics auswerten.
+- **Kill-Switch:** Feature-Flag (ENV-Variable oder Postgres-Flag), das den Kampagnen-Einstieg deaktiviert bzw. die App in einen „aktuell stark nachgefragt"-Modus schaltet, falls Hobby-Limits (Bandbreite, Function-Invocations, Analytics-Events) zu überschreiten drohen.
+- Hinweis: Vercel **Hobby ist für nicht-kommerzielle Nutzung** gedacht; bei echtem Andrang ggf. Pro-Abo nötig.
+**Aufwand:** Link + Tracking ~1 h; Kill-Switch ~1–2 h.
+
+---
+
 ## Monetarisierung
 
 ### Donation-Button (TWINT)
