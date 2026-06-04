@@ -105,6 +105,24 @@ export default function ImpressumPage() {
         der bereitgestellten Informationen entstehen, wird im gesetzlich
         zulässigen Umfang ausgeschlossen.
       </p>
+
+      <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+        Datenschutz
+      </h2>
+      <p className="mt-2 text-sm leading-relaxed">
+        Diese App setzt keine Tracking- oder Analyse-Dienste ein und erhebt keine
+        personenbezogenen Daten. Einige Einstellungen — etwa gespeicherte
+        Favoriten und der Hinweis, dass die Kurzanleitung bereits angezeigt wurde
+        — werden ausschliesslich lokal im Browser (localStorage) gespeichert und
+        nicht an Dritte übermittelt.
+      </p>
+      <p className="mt-3 text-sm leading-relaxed">
+        Für die Auslieferung der App und die Anzeige der Karte werden technisch
+        notwendige Anfragen an den Hosting-Anbieter sowie an die genannten Karten-
+        und Datendienste gestellt; dabei können technische Verbindungsdaten wie
+        die IP-Adresse verarbeitet werden. Bei einer Trinkgeld-Zahlung gelten
+        zusätzlich die Datenschutzbestimmungen von Payrexx.
+      </p>
     </main>
   );
 }
