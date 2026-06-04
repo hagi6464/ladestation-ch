@@ -7,7 +7,7 @@ type Props = {
   onClose: () => void;
 };
 
-// Gehostete Payrexx-Spendenseite (öffentliche URL, kein Secret).
+// Gehostete Payrexx-Trinkgeldseite (öffentliche URL, kein Secret).
 const DONATION_URL = "https://ladestation-ch.payrexx.com/pay?tid=1f8259df";
 const isPlaceholder = DONATION_URL.includes("PLATZHALTER");
 
@@ -66,13 +66,13 @@ export function DonationModal({ open, onClose }: Props) {
         </div>
 
         <p className="text-sm text-zinc-700 dark:text-zinc-200">
-          Wenn dir die Ladestation-Karte hilft, freue ich mich über eine kleine,
-          freiwillige Spende — bezahlbar mit TWINT oder Karte. Vielen Dank! 🔌
+          Wenn dir die Ladestation-Karte hilft, freue ich mich über ein kleines,
+          freiwilliges Trinkgeld — mit TWINT oder Karte. Vielen Dank! 🔌
         </p>
 
         {isPlaceholder ? (
           <div className="mt-4 rounded-md bg-zinc-100 px-4 py-2.5 text-center text-sm text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-            Spendenlink wird in Kürze aktiviert.
+            Trinkgeld-Link wird in Kürze aktiviert.
           </div>
         ) : (
           <a
@@ -81,7 +81,7 @@ export function DonationModal({ open, onClose }: Props) {
             rel="noopener noreferrer"
             className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-500"
           >
-            ❤️ Spenden via TWINT oder Karte
+            ❤️ Trinkgeld senden
           </a>
         )}
 

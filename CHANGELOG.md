@@ -7,8 +7,8 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 ## 2026-06-04
 
 ### Neu
-- **Spenden-Funktion**: „❤️ Spenden" im Logo-Menü öffnet ein kurzes Dank-Fenster mit
-  Spenden-Button (TWINT & Karte via Payrexx, öffnet im neuen Tab).
+- **Trinkgeld-Funktion**: „❤️ Trinkgeld senden" im Logo-Menü öffnet ein kurzes Dank-Fenster
+  mit Button (TWINT & Karte via Payrexx, öffnet im neuen Tab).
 
 ## 2026-06-02
 

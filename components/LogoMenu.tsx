@@ -118,7 +118,7 @@ export function LogoMenu({ onOpenGuide, onOpenInstall, onOpenDonate }: Props) {
             onClick={() => choose(onOpenDonate)}
             className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800"
           >
-            ❤️ Spenden
+            ❤️ Trinkgeld senden
           </button>
         </div>
       )}
