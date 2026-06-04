@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Impressum — Ladestation Schweiz",
   description:
-    "Impressum, Angebot und Datenschutz der App Ladestation Schweiz.",
+    "Impressum, Angebot und rechtliche Hinweise der App Ladestation Schweiz.",
 };
 
 export default function ImpressumPage() {
@@ -21,8 +21,10 @@ export default function ImpressumPage() {
         Impressum
       </h1>
 
-      <section className="mt-6 space-y-1 text-sm">
-        <p className="font-medium text-zinc-900 dark:text-zinc-50">Betreiber</p>
+      <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+        Betreiber
+      </h2>
+      <div className="mt-2 space-y-1 text-sm">
         <p>Marek Hagmann</p>
         <p>2540 Grenchen, Schweiz</p>
         <p>
@@ -34,61 +36,74 @@ export default function ImpressumPage() {
             ladestation-ch.relock425@passmail.com
           </a>
         </p>
-      </section>
+      </div>
 
       <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
         Über die App
       </h2>
       <p className="mt-2 text-sm leading-relaxed">
-        „Ladestation Schweiz“ ist eine kostenlose, werbefreie Web-App
-        (interaktive Karte) mit allen öffentlichen Elektroauto-Ladestationen der
-        Schweiz — inklusive Standort, Verfügbarkeit und Vergleich der
-        Betreiber-Tarife. Es handelt sich um ein privates, nicht-kommerzielles
-        Hobby-Projekt; es werden keine Produkte oder Dienstleistungen verkauft.
+        „Ladestation Schweiz“ ist eine kostenlose und werbefreie Web-App zur
+        Anzeige öffentlicher Elektroauto-Ladestationen in der Schweiz. Die App
+        bietet Informationen zu Standorten, Verfügbarkeit sowie einen Vergleich
+        der Tarife verschiedener Betreiber.
+      </p>
+      <p className="mt-3 text-sm leading-relaxed">
+        Das Projekt wird privat und ohne kommerzielle Absichten betrieben. Es
+        werden keine Produkte oder Dienstleistungen verkauft.
       </p>
 
       <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-        Trinkgeld / Unterstützung
+        Freiwillige Unterstützung
       </h2>
       <p className="mt-2 text-sm leading-relaxed">
-        Wer das Projekt freiwillig unterstützen möchte, kann über den Button
-        „Trinkgeld senden“ einen frei wählbaren Betrag per TWINT oder Karte
-        überweisen (abgewickelt über Payrexx). Die Zahlung ist rein freiwillig,
-        einmalig und ohne Gegenleistung — kein Abo, keine Kaufpflicht.
+        Wer das Projekt unterstützen möchte, kann freiwillig ein Trinkgeld über
+        den Button „Trinkgeld senden“ überweisen. Die Zahlung kann per TWINT oder
+        Kredit-/Debitkarte erfolgen.
+      </p>
+      <p className="mt-3 text-sm leading-relaxed">
+        Die Unterstützung ist freiwillig, einmalig und erfolgt ohne
+        Gegenleistung. Es besteht weder eine Kaufpflicht noch ein Abonnement oder
+        Mitgliedschaftsverhältnis.
+      </p>
+      <p className="mt-3 text-sm leading-relaxed">
+        Die Zahlungsabwicklung erfolgt durch Payrexx. Es gelten die Datenschutz-
+        und Nutzungsbedingungen des jeweiligen Zahlungsdienstleisters.
       </p>
 
       <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
         Datenquellen
       </h2>
       <p className="mt-2 text-sm leading-relaxed">
-        Ladestationsdaten: offene Daten des Bundesamts für Energie (BFE,
-        ich-tanke-strom.ch). Kartenmaterial: OpenStreetMap / OpenFreeMap.
+        Die Ladestationsdaten stammen aus den öffentlich zugänglichen Daten von
+        ich-tanke-strom.ch des Bundesamts für Energie (BFE).
+      </p>
+      <p className="mt-3 text-sm leading-relaxed">
+        Das Kartenmaterial basiert auf Daten von OpenStreetMap sowie den
+        zugehörigen Kartendiensten.
       </p>
 
       <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
         Haftungsausschluss
       </h2>
       <p className="mt-2 text-sm leading-relaxed">
-        Alle Angaben — insbesondere Verfügbarkeit und Tarife — erfolgen ohne
-        Gewähr und können veraltet oder unvollständig sein. Verbindlich sind
-        stets die Informationen des jeweiligen Ladestations-Betreibers. Für
-        Schäden aus der Nutzung der App wird keine Haftung übernommen.
+        Die Inhalte dieser App werden mit grösstmöglicher Sorgfalt erstellt und
+        aktualisiert. Dennoch kann keine Gewähr für die Richtigkeit,
+        Vollständigkeit, Aktualität oder Verfügbarkeit der bereitgestellten
+        Informationen übernommen werden.
       </p>
-
-      <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-        Datenschutz
-      </h2>
-      <p className="mt-2 text-sm leading-relaxed">
-        Die App setzt keine Tracking- oder Analyse-Tools ein und sammelt keine
-        personenbezogenen Daten. Einige Einstellungen (z. B. Favoriten und der
-        Hinweis „Anleitung gesehen“) werden ausschliesslich lokal im Browser
-        (localStorage) gespeichert und nicht an Dritte übermittelt. Bei einer
-        Trinkgeld-Zahlung gelten zusätzlich die Datenschutzbestimmungen von
-        Payrexx.
+      <p className="mt-3 text-sm leading-relaxed">
+        Insbesondere Angaben zu Verfügbarkeit, Betriebsstatus, technischen
+        Eigenschaften, Preisen oder Tarifen von Ladestationen können sich
+        jederzeit ändern oder von den tatsächlichen Gegebenheiten abweichen.
       </p>
-
-      <p className="mt-10 text-xs text-zinc-500 dark:text-zinc-400">
-        Stand: Juni 2026
+      <p className="mt-3 text-sm leading-relaxed">
+        Verbindlich sind ausschliesslich die Informationen der jeweiligen
+        Ladestationsbetreiber.
+      </p>
+      <p className="mt-3 text-sm leading-relaxed">
+        Jegliche Haftung für direkte oder indirekte Schäden, die aus der Nutzung
+        der bereitgestellten Informationen entstehen, wird im gesetzlich
+        zulässigen Umfang ausgeschlossen.
       </p>
     </main>
   );
