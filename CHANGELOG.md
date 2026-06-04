@@ -7,6 +7,12 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 ## 2026-06-04
 
 ### Neu
+- **Anbieter-App öffnen**: Im Detail einer Ladesäule erscheint – sofern der Betreiber eine
+  eigene Lade-App hat – ein „📱 App öffnen"-Button. Er öffnet die App im App Store (iPhone)
+  bzw. Play Store (Android) und startet sie, falls installiert. Kuratiert für 11 Betreiber
+  (u. a. Swisscharge, MOVE, evpass, IONITY, Tesla, M-Charge, Plug'n Roll, EnBW, eCarUp).
+- **Standort auf der Karte**: Der 📍-Button zeigt nun zusätzlich einen blauen Punkt mit
+  Genauigkeitskreis, der anzeigt, wo man sich gerade befindet.
 - **Trinkgeld-Funktion**: „❤️ Trinkgeld senden" im Logo-Menü öffnet ein kurzes Dank-Fenster
   mit Button (TWINT & Karte via Payrexx, öffnet im neuen Tab).
 - **Impressum-Seite** (`/impressum`) mit Angebot, Datenquellen, Haftung und Datenschutz;

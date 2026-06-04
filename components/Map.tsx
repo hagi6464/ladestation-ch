@@ -9,17 +9,54 @@ import type { FlyTarget } from "@/components/SearchBox";
 const STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
 
 const SOURCE_ID = "stations";
+const USER_ACCURACY_ID = "user-accuracy";
+
+type UserLocation = { lat: number; lon: number; accuracy: number };
+
+/**
+ * GeoJSON-Polygon, das einen Kreis mit `meters` Radius um den Punkt approximiert.
+ * Als echte Geometrie (Meter) skaliert er korrekt mit dem Zoom — anders als ein
+ * pixelbasierter circle-Radius.
+ */
+function accuracyCircle(
+  lat: number,
+  lon: number,
+  meters: number,
+  steps = 48,
+): GeoJSON.Feature<GeoJSON.Polygon> {
+  const coords: [number, number][] = [];
+  const earth = 6378137; // Erdradius in m
+  const dLat = (meters / earth) * (180 / Math.PI);
+  const dLon = dLat / Math.cos((lat * Math.PI) / 180);
+  for (let i = 0; i <= steps; i++) {
+    const a = (i / steps) * 2 * Math.PI;
+    coords.push([lon + dLon * Math.cos(a), lat + dLat * Math.sin(a)]);
+  }
+  return {
+    type: "Feature",
+    geometry: { type: "Polygon", coordinates: [coords] },
+    properties: {},
+  };
+}
 
 type Props = {
   data: StationFeatureCollection | undefined;
   flyTo: FlyTarget | null;
+  userLocation: UserLocation | null;
   onBboxChange: (bbox: [number, number, number, number]) => void;
   onSelect: (evseId: string) => void;
 };
 
-export function Map({ data, flyTo, onBboxChange, onSelect }: Props) {
+export function Map({
+  data,
+  flyTo,
+  userLocation,
+  onBboxChange,
+  onSelect,
+}: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapInstance | null>(null);
+  const userMarkerRef = useRef<maplibregl.Marker | null>(null);
   const onBboxRef = useRef(onBboxChange);
   const onSelectRef = useRef(onSelect);
 
@@ -57,6 +94,25 @@ export function Map({ data, flyTo, onBboxChange, onSelect }: Props) {
     };
 
     map.on("load", () => {
+      // Genauigkeitskreis des Standorts — unter den Stationen, damit deren
+      // Marker oben bleiben.
+      map.addSource(USER_ACCURACY_ID, {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+      map.addLayer({
+        id: "user-accuracy-fill",
+        type: "fill",
+        source: USER_ACCURACY_ID,
+        paint: { "fill-color": "#3b82f6", "fill-opacity": 0.12 },
+      });
+      map.addLayer({
+        id: "user-accuracy-outline",
+        type: "line",
+        source: USER_ACCURACY_ID,
+        paint: { "line-color": "#3b82f6", "line-opacity": 0.35, "line-width": 1 },
+      });
+
       map.addSource(SOURCE_ID, {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
@@ -215,6 +271,59 @@ export function Map({ data, flyTo, onBboxChange, onSelect }: Props) {
       speed: 1.6,
     });
   }, [flyTo]);
+
+  // Standort: blauer Punkt (DOM-Marker) …
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (!userLocation) {
+      userMarkerRef.current?.remove();
+      userMarkerRef.current = null;
+      return;
+    }
+    if (!userMarkerRef.current) {
+      const el = document.createElement("div");
+      el.style.pointerEvents = "none";
+      el.innerHTML = `
+        <span class="relative flex h-3.5 w-3.5">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-60"></span>
+          <span class="relative inline-flex h-3.5 w-3.5 rounded-full border-2 border-white bg-blue-600 shadow-md"></span>
+        </span>`;
+      userMarkerRef.current = new maplibregl.Marker({ element: el })
+        .setLngLat([userLocation.lon, userLocation.lat])
+        .addTo(map);
+    } else {
+      userMarkerRef.current.setLngLat([userLocation.lon, userLocation.lat]);
+    }
+  }, [userLocation]);
+
+  // … und transluzenter Genauigkeitskreis (Karten-Layer).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const apply = () => {
+      const src = map.getSource(USER_ACCURACY_ID) as
+        | maplibregl.GeoJSONSource
+        | undefined;
+      if (!src) return;
+      src.setData(
+        userLocation
+          ? {
+              type: "FeatureCollection",
+              features: [
+                accuracyCircle(
+                  userLocation.lat,
+                  userLocation.lon,
+                  userLocation.accuracy,
+                ),
+              ],
+            }
+          : { type: "FeatureCollection", features: [] },
+      );
+    };
+    if (map.isStyleLoaded()) apply();
+    else map.once("load", apply);
+  }, [userLocation]);
 
   return <div ref={containerRef} className="h-full w-full" />;
 }

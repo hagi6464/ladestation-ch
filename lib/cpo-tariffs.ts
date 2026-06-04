@@ -32,6 +32,13 @@ export type CpoTariff = {
   websiteUrl: string;
   pricingUrl?: string;
   /**
+   * App des Betreibers zum Laden-Starten. Nur gesetzt, wo eine echte Lade-App
+   * existiert und die Store-Links verifiziert wurden (Stand 2026-06). Die
+   * Store-Seite öffnet die App, falls installiert, sonst die Installation.
+   * `name` ist das Button-Label (sonst `displayName`).
+   */
+  app?: { name?: string; ios?: string; android?: string };
+  /**
    * Plattformen ohne einheitlichen Tarif (z. B. eCarUp): Säulenbesitzer setzen
    * Preise individuell. Wenn gesetzt, ersetzt diese Notiz den Standard-Disclaimer
    * und `tariffs` kann leer sein. `headline` und `body` als Info-Block,
@@ -54,6 +61,11 @@ export const CPO_TARIFFS: CpoTariff[] = [
     websiteUrl: "https://www.energie360.ch",
     pricingUrl:
       "https://www.energie360.ch/de/leistungen/mobilitaet/easycharge/",
+    app: {
+      name: "easycharge",
+      ios: "https://apps.apple.com/ch/app/easycharge-energie-360/id1252588156",
+      android: "https://play.google.com/store/apps/details?id=cs.energie360",
+    },
     tariffs: [
       {
         name: "easycharge Ad-hoc",
@@ -74,6 +86,11 @@ export const CPO_TARIFFS: CpoTariff[] = [
     aliases: ["swisscharge"],
     websiteUrl: "https://swisscharge.ch",
     pricingUrl: "https://swisscharge.ch/de/ladelosungen/ladepreise/",
+    app: {
+      name: "Swisscharge",
+      ios: "https://apps.apple.com/ch/app/swisscharge-your-charging-app/id965094336",
+      android: "https://play.google.com/store/apps/details?id=cs.swisscharge",
+    },
     tariffs: [
       {
         name: "Swisscharge AC",
@@ -115,6 +132,11 @@ export const CPO_TARIFFS: CpoTariff[] = [
     aliases: ["move mobility", "move.ch", "alpiq move"],
     websiteUrl: "https://move.ch",
     pricingUrl: "https://support.move.ch/help/de-de/22-abonnemente-und-tarife",
+    app: {
+      name: "MOVE",
+      ios: "https://apps.apple.com/ch/app/move-recharge-your-car/id1318630021",
+      android: "https://play.google.com/store/apps/details?id=ch.Move.EvApp",
+    },
     tariffs: [
       {
         name: "MOVE basic (mit Abo)",
@@ -136,6 +158,11 @@ export const CPO_TARIFFS: CpoTariff[] = [
     aliases: ["evpass", "ev pass", "groupe e"],
     websiteUrl: "https://www.evpass.ch",
     pricingUrl: "https://acs.evpass.ch/Pricing",
+    app: {
+      name: "evpass",
+      ios: "https://apps.apple.com/ch/app/evpass/id1084716333",
+      android: "https://play.google.com/store/apps/details?id=ch.evpass.evpass",
+    },
     tariffs: [
       {
         name: "evpass Direkttarif",
@@ -155,6 +182,11 @@ export const CPO_TARIFFS: CpoTariff[] = [
     websiteUrl: "https://www.migrol.ch",
     pricingUrl:
       "https://www.migrol.ch/de/rund-ums-fahrzeug/e-ladestationen/oeffentliche-ladestationen/",
+    app: {
+      name: "M-Charge",
+      ios: "https://apps.apple.com/ch/app/m-charge/id6469030309",
+      android: "https://play.google.com/store/apps/details?id=ch.migrol.mcharge",
+    },
     tariffs: [
       {
         name: "M-Charge AC",
@@ -177,6 +209,12 @@ export const CPO_TARIFFS: CpoTariff[] = [
     aliases: ["ionity"],
     websiteUrl: "https://ionity.eu",
     pricingUrl: "https://support.ionity.eu/faqs/how-much-does-it-cost-to-charge-at-ionity",
+    app: {
+      name: "IONITY",
+      ios: "https://apps.apple.com/ch/app/ionity/id1551448692",
+      android:
+        "https://play.google.com/store/apps/details?id=com.cleevio.ionity.android.app",
+    },
     tariffs: [
       {
         name: "IONITY Direkt",
@@ -200,6 +238,11 @@ export const CPO_TARIFFS: CpoTariff[] = [
     aliases: ["tesla"],
     websiteUrl: "https://www.tesla.com/de_CH/supercharger",
     pricingUrl: "https://www.tesla.com/de_CH/findus/list/superchargers/Switzerland",
+    app: {
+      name: "Tesla",
+      ios: "https://apps.apple.com/ch/app/tesla/id582007913",
+      android: "https://play.google.com/store/apps/details?id=com.teslamotors.tesla",
+    },
     tariffs: [
       {
         name: "Tesla-Fahrer",
@@ -224,6 +267,11 @@ export const CPO_TARIFFS: CpoTariff[] = [
     aliases: ["tcs"],
     websiteUrl: "https://www.tcs.ch",
     pricingUrl: "https://www.tcs.ch/de/produkte/rund-ums-auto/e-charge/",
+    app: {
+      name: "TCS eCharge",
+      ios: "https://apps.apple.com/ch/app/tcs-echarge/id1445571412",
+      android: "https://play.google.com/store/apps/details?id=fi.virta.tcs",
+    },
     tariffs: [
       {
         name: "TCS eCharge",
@@ -242,6 +290,11 @@ export const CPO_TARIFFS: CpoTariff[] = [
     aliases: ["plug n roll", "plug'n roll", "plug-n-roll", "plugnroll", "repower"],
     websiteUrl: "https://www.plugnroll.com",
     pricingUrl: "https://www.plugnroll.com/de/preise",
+    app: {
+      name: "Plug'n Roll",
+      ios: "https://apps.apple.com/ch/app/plugn-roll/id1122979339",
+      android: "https://play.google.com/store/apps/details?id=com.repower.plugnroll",
+    },
     tariffs: [
       {
         name: "Plug'n Roll Direkt",
@@ -260,6 +313,11 @@ export const CPO_TARIFFS: CpoTariff[] = [
     aliases: ["enbw"],
     websiteUrl: "https://www.enbw.com/elektromobilitaet",
     pricingUrl: "https://www.enbw.com/elektromobilitaet/produkte/ladetarife",
+    app: {
+      name: "EnBW mobility+",
+      ios: "https://apps.apple.com/ch/app/enbw-mobility-e-auto-laden/id1232210521",
+      android: "https://play.google.com/store/apps/details?id=com.enbw.ev",
+    },
     tariffs: [
       {
         name: "Standard",
@@ -327,6 +385,11 @@ export const CPO_TARIFFS: CpoTariff[] = [
     aliases: ["ecarup", "ecar up", "ecar-up"],
     websiteUrl: "https://www.ecarup.com",
     pricingUrl: "https://web.ecarup.com/e-auto-lade-app/",
+    app: {
+      name: "eCarUp",
+      ios: "https://apps.apple.com/ch/app/ecarup/id1235434854",
+      android: "https://play.google.com/store/apps/details?id=com.ecarup",
+    },
     platformNote: {
       headline: "Privat betriebene Ladesäule",
       body: "eCarUp bietet private Ladesäulen mit oft günstigeren Preisen als grosse Ladenetzwerke. Eigentümer legt Preis fest. Tarifanzeige per App oder QR-Code, Bezahlung ohne Abo via Kreditkarte, Apple Pay oder Google Pay.",

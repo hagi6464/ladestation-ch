@@ -54,6 +54,11 @@ export default function Page() {
   const [installOpen, setInstallOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [donateOpen, setDonateOpen] = useState(false);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lon: number;
+    accuracy: number;
+  } | null>(null);
 
   // Anleitung beim allerersten Besuch einmalig automatisch zeigen.
   useEffect(() => {
@@ -113,6 +118,7 @@ export default function Page() {
       <Map
         data={data}
         flyTo={flyTarget}
+        userLocation={userLocation}
         onBboxChange={handleBboxChange}
         onSelect={setSelectedEvseId}
       />
@@ -124,7 +130,10 @@ export default function Page() {
           onOpenDonate={() => setDonateOpen(true)}
         />
         <div className="pointer-events-auto w-full sm:w-auto">
-          <SearchBox onLocate={(t) => setFlyTarget({ ...t })} />
+          <SearchBox
+            onLocate={(t) => setFlyTarget({ ...t })}
+            onUserLocation={setUserLocation}
+          />
         </div>
         <div className="pointer-events-auto">
           <FilterBar filters={filters} onChange={setFilters} />

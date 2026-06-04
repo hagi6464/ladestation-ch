@@ -8,9 +8,10 @@ type GeocodeResult = FlyTarget & { label: string };
 
 type Props = {
   onLocate: (target: FlyTarget) => void;
+  onUserLocation?: (loc: { lat: number; lon: number; accuracy: number }) => void;
 };
 
-export function SearchBox({ onLocate }: Props) {
+export function SearchBox({ onLocate, onUserLocation }: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -94,13 +95,14 @@ export function SearchBox({ onLocate }: Props) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setBusy(false);
-        const { latitude, longitude } = pos.coords;
+        const { latitude, longitude, accuracy } = pos.coords;
         if (!isInServiceArea(latitude, longitude)) {
           setError(
             "Dein Standort liegt ausserhalb des abgedeckten Gebiets (Schweiz/Liechtenstein). Keine Ladesäulen-Daten verfügbar.",
           );
           return;
         }
+        onUserLocation?.({ lat: latitude, lon: longitude, accuracy });
         onLocate({ lat: latitude, lon: longitude, zoom: 14 });
       },
       (err) => {

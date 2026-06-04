@@ -23,6 +23,7 @@ type CpoTariff = {
   displayName: string;
   websiteUrl: string;
   pricingUrl?: string;
+  app?: { name?: string; ios?: string; android?: string };
   platformNote?: { headline: string; body: string; tip?: string };
   tariffs: CpoTariffEntry[];
   lastUpdated: string;
@@ -78,6 +79,28 @@ const NAV_APPS: NavApp[] = [
       `https://www.openstreetmap.org/directions?to=${lat},${lon}`,
   },
 ];
+
+/**
+ * Passende Store-Seite zur erkannten Plattform. Die Store-Seite öffnet die App,
+ * falls installiert — sonst bietet sie die Installation an. Desktop/unbekannt:
+ * erste vorhandene Store-Seite, sonst die Anbieter-Website.
+ */
+function pickStoreUrl(
+  app: { ios?: string; android?: string },
+  websiteUrl: string,
+): string {
+  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+  const isIos =
+    /iPad|iPhone|iPod/.test(ua) ||
+    // iPadOS meldet sich als „Macintosh" mit Touch
+    (/Macintosh/.test(ua) &&
+      typeof document !== "undefined" &&
+      "ontouchend" in document);
+  const isAndroid = /Android/.test(ua);
+  if (isIos && app.ios) return app.ios;
+  if (isAndroid && app.android) return app.android;
+  return app.ios ?? app.android ?? websiteUrl;
+}
 
 type Props = {
   evseId: string | null;
@@ -355,6 +378,10 @@ export function StationSheet({ evseId, onClose }: Props) {
 
   if (!evseId) return null;
 
+  const appCpo =
+    tariff.data && tariff.data.ok ? tariff.data.cpoStandardTariff : null;
+  const stationApp = appCpo?.app ?? null;
+
   return (
     <aside
       className="pointer-events-auto fixed inset-x-0 bottom-0 z-30 max-h-[70vh] overflow-y-auto rounded-t-2xl border border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:top-20 sm:max-h-none sm:w-96 sm:rounded-2xl"
@@ -586,6 +613,28 @@ export function StationSheet({ evseId, onClose }: Props) {
                   </a>
                 ))}
               </div>
+            </div>
+          )}
+
+          {appCpo && stationApp && (
+            <div>
+              <button
+                type="button"
+                onClick={() =>
+                  window.open(
+                    pickStoreUrl(stationApp, appCpo.websiteUrl),
+                    "_blank",
+                    "noopener,noreferrer",
+                  )
+                }
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900"
+              >
+                <span aria-hidden="true">📱</span>
+                {stationApp.name ?? appCpo.displayName} öffnen
+              </button>
+              <p className="mt-1 text-center text-[11px] text-zinc-500 dark:text-zinc-400">
+                Öffnet die App im Store – startet sie, falls installiert.
+              </p>
             </div>
           )}
 

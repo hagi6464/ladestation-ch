@@ -51,7 +51,11 @@ In einem Schwung umsetzen (~3 h total):
 
 ## UX / Polish
 
-### App des Betreibers öffnen / Laden starten  ⭐ (Idee 2026-06-02)
+### App des Betreibers öffnen / Laden starten  ⭐ (Idee 2026-06-02) — ✅ teil-erledigt 2026-06-04
+**Erledigt (2026-06-04):** „📱 App öffnen"-Button im Detail-Sheet, wenn der Betreiber eine verifizierte Lade-App hat. `CpoTariff.app = { name, ios, android }` für **11 CPOs** kuratiert (easycharge/Energie 360°, Swisscharge, MOVE, evpass, M-Charge/Migrol, IONITY, Tesla, TCS eCharge, Plug'n Roll, EnBW, eCarUp). Plattform-Erkennung via `pickStoreUrl` in `StationSheet` (iOS→App Store, Android→Play Store, Desktop→Store-Webseite). Öffnet die **Store-Seite** (startet die installierte App bzw. bietet die Installation) — bewusst **kein** Auto-Session-Start.
+
+**Noch offen:** echter „Session an EVSE X starten"-Deep-Link (nur wo ein CPO ihn öffentlich anbietet — selten); App-Links für GOFAST / Shell Recharge / Allego / EWZ / EWB (keine eigenständige CH-App verifizierbar bzw. in Sammel-App migriert).
+
 **Warum:** Schliesst die Lücke von „Säule finden" → „tatsächlich laden". Aus dem Detail-Sheet heraus die passende Lade-App des Betreibers öffnen bzw. den Ladevorgang anstossen.
 
 **Tücken / zu klären:**
@@ -66,6 +70,11 @@ In einem Schwung umsetzen (~3 h total):
 - Store-/Scheme-Links manuell recherchieren (wie die CPO-Tarife) — per OICP/BFE nicht verfügbar.
 
 **Aufwand:** Grundgerüst ~2–3 h; der eigentliche Aufwand ist die laufende Pflege der App-/Store-Links pro CPO. Echte „Session starten"-Deep-Links nur dort, wo der CPO sie öffentlich anbietet.
+
+### Standort-Marker auf der Karte — ✅ erledigt 2026-06-04
+**Erledigt:** Der bestehende 📍-Button (Suchleiste) setzt zusätzlich einen blauen Standort-Punkt + transluzenten Genauigkeitskreis. `SearchBox.onUserLocation` → `page.userLocation` → `Map` (`maplibregl.Marker` mit `animate-ping`-Punkt + GeoJSON-Fill-Layer; `accuracyCircle()`-Polygon skaliert metergenau mit dem Zoom). Kein zweiter Button, kein Live-Tracking (aktualisiert bei jedem Antippen).
+
+**Baustein für:** den **Reichweiten-Filter** (Abschnitt „Daten & Auswertung") — der braucht denselben Standort + ein Kreis-Overlay und kann darauf aufsetzen.
 
 ### Stecker-Typ-Filter
 **Warum:** User mit CCS-Auto interessiert sich nicht für CHAdeMO-Säulen. Aktuelle Filter sind nur AC/DC + kW.
