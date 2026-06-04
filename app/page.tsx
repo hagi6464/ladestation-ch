@@ -8,6 +8,7 @@ import { StationSheet } from "@/components/StationSheet";
 import { SearchBox, type FlyTarget } from "@/components/SearchBox";
 import { InstallModal } from "@/components/InstallModal";
 import { GuideModal } from "@/components/GuideModal";
+import { DonationModal } from "@/components/DonationModal";
 import { LogoMenu } from "@/components/LogoMenu";
 import { useFavorites } from "@/lib/favorites";
 import type { Filters, StationFeatureCollection } from "@/lib/types";
@@ -51,6 +52,7 @@ export default function Page() {
   const [flyTarget, setFlyTarget] = useState<FlyTarget | null>(null);
   const [installOpen, setInstallOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [donateOpen, setDonateOpen] = useState(false);
 
   // Anleitung beim allerersten Besuch einmalig automatisch zeigen.
   useEffect(() => {
@@ -118,6 +120,7 @@ export default function Page() {
         <LogoMenu
           onOpenGuide={() => setGuideOpen(true)}
           onOpenInstall={() => setInstallOpen(true)}
+          onOpenDonate={() => setDonateOpen(true)}
         />
         <div className="pointer-events-auto w-full sm:w-auto">
           <SearchBox onLocate={(t) => setFlyTarget({ ...t })} />
@@ -149,6 +152,11 @@ export default function Page() {
           setGuideOpen(false);
           setInstallOpen(true);
         }}
+      />
+
+      <DonationModal
+        open={donateOpen}
+        onClose={() => setDonateOpen(false)}
       />
     </div>
   );

@@ -4,6 +4,12 @@ Notiert die nutzerseitig sichtbaren Änderungen der App — neueste zuoberst.
 Locker angelehnt an [Keep a Changelog](https://keepachangelog.com/de/); Versionierung
 per Datum, da die App kontinuierlich auf Vercel deployt wird.
 
+## 2026-06-04
+
+### Neu
+- **Spenden-Funktion**: „❤️ Spenden" im Logo-Menü öffnet ein kurzes Dank-Fenster mit
+  Spenden-Button (TWINT & Karte via Payrexx, öffnet im neuen Tab).
+
 ## 2026-06-02
 
 ### Neu

@@ -5,9 +5,10 @@ import { useEffect, useRef, useState } from "react";
 type Props = {
   onOpenGuide: () => void;
   onOpenInstall: () => void;
+  onOpenDonate: () => void;
 };
 
-export function LogoMenu({ onOpenGuide, onOpenInstall }: Props) {
+export function LogoMenu({ onOpenGuide, onOpenInstall, onOpenDonate }: Props) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -69,7 +70,7 @@ export function LogoMenu({ onOpenGuide, onOpenInstall }: Props) {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        title="Menü: Anleitung & App speichern"
+        title="Menü"
         className="inline-flex items-center gap-1.5 rounded-xl bg-white/95 px-3 py-2 text-sm font-semibold text-zinc-900 shadow-md backdrop-blur transition-colors hover:bg-white dark:bg-zinc-900/90 dark:text-zinc-50 dark:hover:bg-zinc-900"
       >
         ⚡ Ladestation Schweiz
@@ -110,6 +111,14 @@ export function LogoMenu({ onOpenGuide, onOpenInstall }: Props) {
             className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800"
           >
             {copied ? "✓ Link kopiert" : "📤 Weiterempfehlen"}
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => choose(onOpenDonate)}
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          >
+            ❤️ Spenden
           </button>
         </div>
       )}
