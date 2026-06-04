@@ -20,8 +20,8 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 
 ### Verbessert
 - **Detail-Ansicht einer Säule aufgeräumt**: Betreiber und „App öffnen" zusammengefasst,
-  die Stecker-Typen in die „Ladepunkte"-Überschrift integriert und Adresse, „Zahlung & Zugang"
-  sowie die Navigation zu einer Gruppe zusammengezogen.
+  die Stecker-Typen in die „Ladepunkte"-Überschrift integriert, den Navigations-Button neben
+  die Adresse gestellt und „Zahlung & Zugang" mitgruppiert.
 
 ## 2026-06-02
 

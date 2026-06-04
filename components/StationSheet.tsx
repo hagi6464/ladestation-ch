@@ -562,11 +562,65 @@ export function StationSheet({ evseId, onClose }: Props) {
 
           <div>
             <div className="text-xs uppercase text-zinc-500">Adresse</div>
-            <div>
-              {data.street ?? "—"}
-              <br />
-              {data.postalCode ?? ""} {data.city ?? ""}
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                {data.street ?? "—"}
+                <br />
+                {data.postalCode ?? ""} {data.city ?? ""}
+              </div>
+              {!showNav && (
+                <button
+                  type="button"
+                  onClick={() => setShowNav(true)}
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polygon points="3 11 22 2 13 21 11 13 3 11" />
+                  </svg>
+                  Navigation
+                </button>
+              )}
             </div>
+            {showNav && (
+              <div className="mt-2 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs uppercase text-zinc-500">
+                    Mit welcher App?
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowNav(false)}
+                    className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                  >
+                    Abbrechen
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {NAV_APPS.map((app) => (
+                    <a
+                      key={app.id}
+                      href={app.build(data.lat, data.lon)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setShowNav(false)}
+                      className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-center text-sm font-medium text-zinc-700 transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:border-blue-700 dark:hover:bg-blue-950 dark:hover:text-blue-300"
+                    >
+                      {app.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {(data.authModes.length > 0 ||
@@ -592,58 +646,6 @@ export function StationSheet({ evseId, onClose }: Props) {
                   ))}
                 </div>
               )}
-            </div>
-          )}
-
-          {!showNav ? (
-            <button
-              type="button"
-              onClick={() => setShowNav(true)}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <polygon points="3 11 22 2 13 21 11 13 3 11" />
-              </svg>
-              Navigation starten
-            </button>
-          ) : (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="text-xs uppercase text-zinc-500">
-                  Mit welcher App?
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowNav(false)}
-                  className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
-                >
-                  Abbrechen
-                </button>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {NAV_APPS.map((app) => (
-                  <a
-                    key={app.id}
-                    href={app.build(data.lat, data.lon)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setShowNav(false)}
-                    className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-center text-sm font-medium text-zinc-700 transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:border-blue-700 dark:hover:bg-blue-950 dark:hover:text-blue-300"
-                  >
-                    {app.label}
-                  </a>
-                ))}
-              </div>
             </div>
           )}
 
