@@ -9,6 +9,8 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 ### Neu
 - **Trinkgeld-Funktion**: „❤️ Trinkgeld senden" im Logo-Menü öffnet ein kurzes Dank-Fenster
   mit Button (TWINT & Karte via Payrexx, öffnet im neuen Tab).
+- **Impressum-Seite** (`/impressum`) mit Angebot, Datenquellen, Haftung und Datenschutz;
+  dezenter Link unten links auf der Karte.
 
 ## 2026-06-02
 

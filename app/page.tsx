@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Map } from "@/components/Map";
 import { FilterBar } from "@/components/FilterBar";
@@ -158,6 +159,13 @@ export default function Page() {
         open={donateOpen}
         onClose={() => setDonateOpen(false)}
       />
+
+      <Link
+        href="/impressum"
+        className="pointer-events-auto absolute bottom-1 left-1 z-20 rounded bg-white/70 px-1.5 py-0.5 text-[10px] text-zinc-600 backdrop-blur transition-colors hover:bg-white hover:text-zinc-900 dark:bg-zinc-900/70 dark:text-zinc-400 dark:hover:text-zinc-100"
+      >
+        Impressum
+      </Link>
     </div>
   );
 }
