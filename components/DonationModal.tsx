@@ -8,8 +8,7 @@ type Props = {
 };
 
 // Gehostete Payrexx-Spendenseite (öffentliche URL, kein Secret).
-// TODO: Platzhalter durch den echten Payrexx-Spendenlink ersetzen.
-const DONATION_URL = "https://PLATZHALTER.payrexx.com/de/pay";
+const DONATION_URL = "https://ladestation-ch.payrexx.com/pay?tid=1f8259df";
 const isPlaceholder = DONATION_URL.includes("PLATZHALTER");
 
 export function DonationModal({ open, onClose }: Props) {
