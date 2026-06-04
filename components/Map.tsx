@@ -285,10 +285,7 @@ export function Map({
       const el = document.createElement("div");
       el.style.pointerEvents = "none";
       el.innerHTML = `
-        <span class="relative flex h-3.5 w-3.5">
-          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-60"></span>
-          <span class="relative inline-flex h-3.5 w-3.5 rounded-full border-2 border-white bg-blue-600 shadow-md"></span>
-        </span>`;
+        <span class="block h-3.5 w-3.5 rounded-full border-2 border-white bg-blue-600 shadow-md"></span>`;
       userMarkerRef.current = new maplibregl.Marker({ element: el })
         .setLngLat([userLocation.lon, userLocation.lat])
         .addTo(map);

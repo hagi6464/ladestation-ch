@@ -8,7 +8,7 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 
 ### Neu
 - **Anbieter-App öffnen**: Im Detail einer Ladesäule erscheint – sofern der Betreiber eine
-  eigene Lade-App hat – ein „📱 App öffnen"-Button. Er öffnet die App im App Store (iPhone)
+  eigene Lade-App hat – ein „App öffnen"-Button. Er öffnet die App im App Store (iPhone)
   bzw. Play Store (Android) und startet sie, falls installiert. Kuratiert für 11 Betreiber
   (u. a. Swisscharge, MOVE, evpass, IONITY, Tesla, M-Charge, Plug'n Roll, EnBW, eCarUp).
 - **Standort auf der Karte**: Der 📍-Button zeigt nun zusätzlich einen blauen Punkt mit
@@ -17,6 +17,11 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
   mit Button (TWINT & Karte via Payrexx, öffnet im neuen Tab).
 - **Impressum-Seite** (`/impressum`) mit Angebot, Datenquellen, Haftung und Datenschutz;
   dezenter Link unten links auf der Karte.
+
+### Verbessert
+- **Detail-Ansicht einer Säule aufgeräumt**: Betreiber und „App öffnen" zusammengefasst,
+  die Stecker-Typen in die „Ladepunkte"-Überschrift integriert und Adresse, „Zahlung & Zugang"
+  sowie die Navigation zu einer Gruppe zusammengezogen.
 
 ## 2026-06-02
 

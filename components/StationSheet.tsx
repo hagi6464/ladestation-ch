@@ -323,10 +323,40 @@ function pointStatus(status: string | null) {
 }
 
 function PointsList({ points }: { points: StationPoint[] }) {
+  const plugTypes = Array.from(
+    new Map(
+      points
+        .flatMap((p) => p.plugs)
+        .map((pl) => {
+          const c = classifyPlug(pl);
+          return [c.type, c] as const;
+        }),
+    ).values(),
+  );
   return (
     <div>
-      <div className="text-xs uppercase text-zinc-500">
-        Ladepunkte ({points.length})
+      <div className="flex items-center justify-between gap-2">
+        <div className="text-xs uppercase text-zinc-500">
+          Ladepunkte ({points.length})
+        </div>
+        {plugTypes.length > 0 && (
+          <div className="flex flex-wrap items-center justify-end gap-1.5">
+            {plugTypes.map(({ type, label }) => (
+              <span
+                key={type}
+                title={label}
+                className="inline-flex items-center gap-1 rounded-md bg-zinc-100 px-1.5 py-0.5 text-[11px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+              >
+                <PlugIcon
+                  type={type}
+                  className="h-5 w-5 shrink-0"
+                  aria-hidden="true"
+                />
+                {label}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
       <ul className="mt-1 space-y-1">
         {points.map((p) => {
@@ -466,6 +496,70 @@ export function StationSheet({ evseId, onClose }: Props) {
             </span>
           </div>
 
+          {(data.operatorName || data.hotline) && (
+            <div>
+              <div className="text-xs uppercase text-zinc-500">Betreiber</div>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  {data.operatorName && <div>{data.operatorName}</div>}
+                  {data.hotline && (
+                    <a
+                      href={`tel:${data.hotline.replace(/\s/g, "")}`}
+                      className="mt-0.5 inline-flex items-center gap-1.5 text-blue-600 hover:underline"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z" />
+                      </svg>
+                      {data.hotline}
+                    </a>
+                  )}
+                </div>
+                {appCpo && stationApp && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      window.open(
+                        pickStoreUrl(stationApp, appCpo.websiteUrl),
+                        "_blank",
+                        "noopener,noreferrer",
+                      )
+                    }
+                    title="Öffnet die App im Store – startet sie, falls installiert."
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-emerald-500"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                      <line x1="12" y1="18" x2="12.01" y2="18" />
+                    </svg>
+                    App öffnen
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          <PointsList points={data.points} />
+
           <div>
             <div className="text-xs uppercase text-zinc-500">Adresse</div>
             <div>
@@ -474,69 +568,6 @@ export function StationSheet({ evseId, onClose }: Props) {
               {data.postalCode ?? ""} {data.city ?? ""}
             </div>
           </div>
-
-          {(data.operatorName || data.hotline) && (
-            <div>
-              <div className="text-xs uppercase text-zinc-500">Betreiber</div>
-              {data.operatorName && <div>{data.operatorName}</div>}
-              {data.hotline && (
-                <a
-                  href={`tel:${data.hotline.replace(/\s/g, "")}`}
-                  className="mt-0.5 inline-flex items-center gap-1.5 text-blue-600 hover:underline"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z" />
-                  </svg>
-                  {data.hotline}
-                </a>
-              )}
-            </div>
-          )}
-
-          {(() => {
-            const plugTypes = Array.from(
-              new Map(
-                data.points
-                  .flatMap((p) => p.plugs)
-                  .map((pl) => {
-                    const c = classifyPlug(pl);
-                    return [c.type, c] as const;
-                  }),
-              ).values(),
-            );
-            return plugTypes.length > 0 ? (
-              <div>
-                <div className="text-xs uppercase text-zinc-500">Stecker</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {plugTypes.map(({ type, label }) => (
-                    <span
-                      key={type}
-                      className="inline-flex items-center gap-1.5 rounded-md bg-zinc-100 px-2 py-1 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
-                    >
-                      <PlugIcon
-                        type={type}
-                        className="h-8 w-8 shrink-0"
-                        aria-hidden="true"
-                      />
-                      {label}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ) : null;
-          })()}
-
-          <PointsList points={data.points} />
 
           {(data.authModes.length > 0 ||
             labelAccessibility(data.accessibility)) && (
@@ -613,28 +644,6 @@ export function StationSheet({ evseId, onClose }: Props) {
                   </a>
                 ))}
               </div>
-            </div>
-          )}
-
-          {appCpo && stationApp && (
-            <div>
-              <button
-                type="button"
-                onClick={() =>
-                  window.open(
-                    pickStoreUrl(stationApp, appCpo.websiteUrl),
-                    "_blank",
-                    "noopener,noreferrer",
-                  )
-                }
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900"
-              >
-                <span aria-hidden="true">📱</span>
-                {stationApp.name ?? appCpo.displayName} öffnen
-              </button>
-              <p className="mt-1 text-center text-[11px] text-zinc-500 dark:text-zinc-400">
-                Öffnet die App im Store – startet sie, falls installiert.
-              </p>
             </div>
           )}
 
