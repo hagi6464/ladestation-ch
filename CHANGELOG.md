@@ -22,6 +22,10 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 - **Detail-Ansicht einer Säule aufgeräumt**: Betreiber und „App öffnen" zusammengefasst,
   die Stecker-Typen in die „Ladepunkte"-Überschrift integriert, den Navigations-Button neben
   die Adresse gestellt und „Zahlung & Zugang" mitgruppiert.
+- **Ladepunkte-Liste entschlackt**: identische Ladepunkte werden als „N×" zusammengefasst,
+  und der Stecker-Text je Zeile entfällt, wenn alle Punkte denselben Stecker haben.
+- **„100% erneuerbar"** als kräftigeres grünes Badge hervorgehoben.
+- Die Navigations-App-Auswahl schliesst sich nun automatisch beim Wechsel auf eine andere Säule.
 
 ## 2026-06-02
 

@@ -333,6 +333,44 @@ function PointsList({ points }: { points: StationPoint[] }) {
         }),
     ).values(),
   );
+  // Stecker-Text je Zeile nur bei gemischten Steckern zeigen — bei einheitlichem
+  // Stecker steht der Typ schon in der Überschrift.
+  const showPlugPerRow = plugTypes.length > 1;
+
+  // Identische Punkte (Leistung + Stecker + Status) zu einer Zeile mit Anzahl bündeln.
+  const groups = Array.from(
+    points
+      .reduce(
+        (map, p) => {
+          const plugLabels = Array.from(
+            new Set(p.plugs.map((pl) => classifyPlug(pl).label)),
+          );
+          const key = `${p.maxPowerKw ?? ""}|${plugLabels.join(",")}|${p.status ?? ""}`;
+          const existing = map.get(key);
+          if (existing) existing.count += 1;
+          else
+            map.set(key, {
+              key,
+              count: 1,
+              maxPowerKw: p.maxPowerKw,
+              plugLabels,
+              status: p.status,
+            });
+          return map;
+        },
+        new Map<
+          string,
+          {
+            key: string;
+            count: number;
+            maxPowerKw: number | null;
+            plugLabels: string[];
+            status: string | null;
+          }
+        >(),
+      )
+      .values(),
+  );
   return (
     <div>
       <div className="flex items-center justify-between gap-2">
@@ -359,14 +397,11 @@ function PointsList({ points }: { points: StationPoint[] }) {
         )}
       </div>
       <ul className="mt-1 space-y-1">
-        {points.map((p) => {
-          const st = pointStatus(p.status);
-          const plugLabels = Array.from(
-            new Set(p.plugs.map((pl) => classifyPlug(pl).label)),
-          );
+        {groups.map((g) => {
+          const st = pointStatus(g.status);
           return (
             <li
-              key={p.evseId}
+              key={g.key}
               className="flex items-center gap-2 rounded-md bg-zinc-50 px-2 py-1 text-xs dark:bg-zinc-800/60"
             >
               <span
@@ -374,13 +409,22 @@ function PointsList({ points }: { points: StationPoint[] }) {
                 title={st.label}
                 aria-label={st.label}
               />
+              {g.count > 1 && (
+                <span className="shrink-0 font-medium tabular-nums text-zinc-500">
+                  {g.count}×
+                </span>
+              )}
               <span className="font-medium tabular-nums">
-                {p.maxPowerKw ? `${p.maxPowerKw} kW` : "–"}
+                {g.maxPowerKw ? `${g.maxPowerKw} kW` : "–"}
               </span>
-              <span className="text-zinc-400">·</span>
-              <span className="truncate text-zinc-600 dark:text-zinc-300">
-                {plugLabels.join(", ") || "—"}
-              </span>
+              {showPlugPerRow && (
+                <>
+                  <span className="text-zinc-400">·</span>
+                  <span className="truncate text-zinc-600 dark:text-zinc-300">
+                    {g.plugLabels.join(", ") || "—"}
+                  </span>
+                </>
+              )}
               <span className="ml-auto shrink-0 text-zinc-500">
                 {st.label}
               </span>
@@ -405,6 +449,14 @@ export function StationSheet({ evseId, onClose }: Props) {
     enabled: !!evseId,
     staleTime: 5 * 60_000,
   });
+
+  // Navigations-Auswahl schliessen, wenn eine andere Säule geöffnet wird
+  // (State-Reset beim Säulenwechsel ohne Effekt — empfohlenes React-Muster).
+  const [prevEvseId, setPrevEvseId] = useState(evseId);
+  if (evseId !== prevEvseId) {
+    setPrevEvseId(evseId);
+    setShowNav(false);
+  }
 
   if (!evseId) return null;
 
@@ -475,7 +527,7 @@ export function StationSheet({ evseId, onClose }: Props) {
             {data.renewableEnergy && (
               <span
                 title="100% erneuerbare Energie"
-                className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700"
+                className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white shadow-sm"
               >
                 🌱 100% erneuerbar
               </span>
