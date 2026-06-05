@@ -4,6 +4,13 @@ Notiert die nutzerseitig sichtbaren Änderungen der App — neueste zuoberst.
 Locker angelehnt an [Keep a Changelog](https://keepachangelog.com/de/); Versionierung
 per Datum, da die App kontinuierlich auf Vercel deployt wird.
 
+## 2026-06-05
+
+### Neu
+- **Reichweiten-Filter**: „Reichweite ▾" in der Filterleiste zeichnet einen Kreis um den
+  eigenen Standort (50 / 75 / 100 / 200 km); Säulen ausserhalb der Reichweite werden
+  ausgegraut. Voraussetzung: Standort per 📍-Button setzen.
+
 ## 2026-06-04
 
 ### Neu

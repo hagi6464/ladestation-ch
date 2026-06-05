@@ -9,9 +9,11 @@ import type { Filters } from "@/lib/types";
 type Props = {
   filters: Filters;
   onChange: (next: Filters) => void;
+  hasLocation: boolean;
 };
 
 const POWER_PRESETS = [0, 22, 50, 150];
+const RANGE_PRESETS = [0, 50, 75, 100, 200];
 
 // Repräsentatives Icon je Filter-Kategorie (CCS → Combo-2-Variante)
 const PLUG_FILTER_ICON: Record<"type2" | "ccs" | "chademo", PlugType> = {
@@ -24,9 +26,10 @@ const PILL_ACTIVE = "bg-blue-600 text-white";
 const PILL_IDLE =
   "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700";
 
-export function FilterBar({ filters, onChange }: Props) {
+export function FilterBar({ filters, onChange, hasLocation }: Props) {
   const { count: favoriteCount } = useFavorites();
   const [plugsOpen, setPlugsOpen] = useState(false);
+  const [rangeOpen, setRangeOpen] = useState(false);
 
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-xl border border-zinc-200 bg-white/95 px-3 py-2 text-sm shadow-md backdrop-blur dark:border-zinc-700 dark:bg-zinc-900/90">
@@ -148,6 +151,48 @@ export function FilterBar({ filters, onChange }: Props) {
                 </>
               )}
             </button>
+          ))}
+      </div>
+
+      {/* Reichweiten-Filter: Kreis um den Standort, Säulen ausserhalb gedimmt.
+          Eingeklappt hinter ▾; Toggle wird blau, wenn aktiv. */}
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={() => setRangeOpen((v) => !v)}
+          aria-expanded={rangeOpen}
+          aria-label="Reichweiten-Filter ein-/ausklappen"
+          className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs transition-colors ${
+            filters.rangeKm > 0 ? PILL_ACTIVE : PILL_IDLE
+          }`}
+        >
+          Reichweite
+          <span
+            aria-hidden="true"
+            className={`text-[10px] transition-transform ${rangeOpen ? "rotate-180" : ""}`}
+          >
+            ▾
+          </span>
+        </button>
+
+        {rangeOpen &&
+          (hasLocation ? (
+            RANGE_PRESETS.map((km) => (
+              <button
+                key={km}
+                type="button"
+                onClick={() => onChange({ ...filters, rangeKm: km })}
+                className={`rounded-full px-3 py-1 text-xs transition-colors ${
+                  filters.rangeKm === km ? PILL_ACTIVE : PILL_IDLE
+                }`}
+              >
+                {km === 0 ? "aus" : `${km} km`}
+              </button>
+            ))
+          ) : (
+            <span className="text-xs text-zinc-500 dark:text-zinc-400">
+              📍 Zuerst Standort setzen
+            </span>
           ))}
       </div>
     </div>

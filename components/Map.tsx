@@ -10,6 +10,7 @@ const STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
 
 const SOURCE_ID = "stations";
 const USER_ACCURACY_ID = "user-accuracy";
+const USER_RANGE_ID = "user-range";
 
 type UserLocation = { lat: number; lon: number; accuracy: number };
 
@@ -43,6 +44,7 @@ type Props = {
   data: StationFeatureCollection | undefined;
   flyTo: FlyTarget | null;
   userLocation: UserLocation | null;
+  rangeKm: number;
   onBboxChange: (bbox: [number, number, number, number]) => void;
   onSelect: (evseId: string) => void;
 };
@@ -51,6 +53,7 @@ export function Map({
   data,
   flyTo,
   userLocation,
+  rangeKm,
   onBboxChange,
   onSelect,
 }: Props) {
@@ -111,6 +114,29 @@ export function Map({
         type: "line",
         source: USER_ACCURACY_ID,
         paint: { "line-color": "#3b82f6", "line-opacity": 0.35, "line-width": 1 },
+      });
+
+      // Reichweiten-Kreis — gestrichelte Outline + sehr leichter Fill, unter den Stationen.
+      map.addSource(USER_RANGE_ID, {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+      map.addLayer({
+        id: "user-range-fill",
+        type: "fill",
+        source: USER_RANGE_ID,
+        paint: { "fill-color": "#2563eb", "fill-opacity": 0.05 },
+      });
+      map.addLayer({
+        id: "user-range-outline",
+        type: "line",
+        source: USER_RANGE_ID,
+        paint: {
+          "line-color": "#2563eb",
+          "line-opacity": 0.5,
+          "line-width": 1.5,
+          "line-dasharray": [2, 2],
+        },
       });
 
       map.addSource(SOURCE_ID, {
@@ -201,6 +227,19 @@ export function Map({
             ["get", "isDc"],
             2.5,
             1.5,
+          ],
+          // Reichweiten-Filter: Säulen ausserhalb (inRange === false) ausgrauen.
+          "circle-opacity": [
+            "case",
+            ["==", ["get", "inRange"], false],
+            0.25,
+            1,
+          ],
+          "circle-stroke-opacity": [
+            "case",
+            ["==", ["get", "inRange"], false],
+            0.25,
+            1,
           ],
         },
       });
@@ -321,6 +360,34 @@ export function Map({
     if (map.isStyleLoaded()) apply();
     else map.once("load", apply);
   }, [userLocation]);
+
+  // Reichweiten-Kreis um den Standort (Radius = rangeKm).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const apply = () => {
+      const src = map.getSource(USER_RANGE_ID) as
+        | maplibregl.GeoJSONSource
+        | undefined;
+      if (!src) return;
+      src.setData(
+        userLocation && rangeKm > 0
+          ? {
+              type: "FeatureCollection",
+              features: [
+                accuracyCircle(
+                  userLocation.lat,
+                  userLocation.lon,
+                  rangeKm * 1000,
+                ),
+              ],
+            }
+          : { type: "FeatureCollection", features: [] },
+      );
+    };
+    if (map.isStyleLoaded()) apply();
+    else map.once("load", apply);
+  }, [userLocation, rangeKm]);
 
   return <div ref={containerRef} className="h-full w-full" />;
 }

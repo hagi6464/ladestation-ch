@@ -10,6 +10,8 @@ export type StationFeatureProperties = {
   total: number;
   available: number;
   hasStatus: boolean;
+  /** Client-seitig vom Reichweiten-Filter gesetzt; fehlt, wenn der Filter aus ist. */
+  inRange?: boolean;
 };
 
 export type StationFeature = {
@@ -58,4 +60,6 @@ export type Filters = {
   current: "any" | "ac" | "dc";
   plugType: PlugFilter;
   favoritesOnly: boolean;
+  /** Reichweiten-Filter in km um den GPS-Standort; 0 = aus. */
+  rangeKm: number;
 };

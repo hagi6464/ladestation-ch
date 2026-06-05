@@ -12,6 +12,7 @@ import { GuideModal } from "@/components/GuideModal";
 import { DonationModal } from "@/components/DonationModal";
 import { LogoMenu } from "@/components/LogoMenu";
 import { useFavorites } from "@/lib/favorites";
+import { haversineKm } from "@/lib/geo";
 import type { Filters, StationFeatureCollection } from "@/lib/types";
 
 type Bbox = [number, number, number, number];
@@ -47,6 +48,7 @@ export default function Page() {
     current: "any",
     plugType: "any",
     favoritesOnly: false,
+    rangeKm: 0,
   });
   const { ids: favoriteIds } = useFavorites();
   const [selectedEvseId, setSelectedEvseId] = useState<string | null>(null);
@@ -88,14 +90,28 @@ export default function Page() {
 
   const data = useMemo<StationFeatureCollection | undefined>(() => {
     if (!rawData) return rawData;
-    if (!filters.favoritesOnly) return rawData;
-    return {
-      ...rawData,
-      features: rawData.features.filter((f) =>
-        favoriteIds.has(f.properties.evseId),
-      ),
-    };
-  }, [rawData, filters.favoritesOnly, favoriteIds]);
+    let features = rawData.features;
+    if (filters.favoritesOnly) {
+      features = features.filter((f) => favoriteIds.has(f.properties.evseId));
+    }
+    if (filters.rangeKm > 0 && userLocation) {
+      features = features.map((f) => {
+        const [lon, lat] = f.geometry.coordinates;
+        const inRange =
+          haversineKm(userLocation.lat, userLocation.lon, lat, lon) <=
+          filters.rangeKm;
+        return { ...f, properties: { ...f.properties, inRange } };
+      });
+    }
+    if (features === rawData.features) return rawData;
+    return { ...rawData, features };
+  }, [
+    rawData,
+    filters.favoritesOnly,
+    filters.rangeKm,
+    favoriteIds,
+    userLocation,
+  ]);
 
   const lastBboxRef = useRef<Bbox | null>(null);
   const handleBboxChange = (next: Bbox) => {
@@ -119,6 +135,7 @@ export default function Page() {
         data={data}
         flyTo={flyTarget}
         userLocation={userLocation}
+        rangeKm={filters.rangeKm}
         onBboxChange={handleBboxChange}
         onSelect={setSelectedEvseId}
       />
@@ -136,7 +153,11 @@ export default function Page() {
           />
         </div>
         <div className="pointer-events-auto">
-          <FilterBar filters={filters} onChange={setFilters} />
+          <FilterBar
+            filters={filters}
+            onChange={setFilters}
+            hasLocation={!!userLocation}
+          />
         </div>
         {data?.truncated && (
           <div className="pointer-events-auto rounded-xl bg-amber-100 px-3 py-2 text-xs text-amber-800 shadow-md">
