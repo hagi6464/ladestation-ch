@@ -7,6 +7,9 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 ## 2026-06-05
 
 ### Neu
+- **Säule teilen**: Der Teilen-Button im Detail-Fenster (oben rechts) erzeugt einen Link, der
+  die App direkt zu dieser Säule führt und das Detail öffnet — teilbar per WhatsApp, SMS, Mail
+  … (am Desktop wird der Link in die Zwischenablage kopiert).
 - **Reichweiten-Filter**: „Reichweite ▾" in der Filterleiste zeichnet einen Kreis um den
   eigenen Standort (50 / 75 / 100 / 200 km); Säulen und Cluster ausserhalb der Reichweite
   werden grau dargestellt. Distanz als Luftlinie gemessen (Hinweis bei aktivem Filter).

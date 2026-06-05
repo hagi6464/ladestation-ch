@@ -65,11 +65,38 @@ export default function Page() {
   // Anleitung beim allerersten Besuch einmalig automatisch zeigen.
   useEffect(() => {
     if (typeof window === "undefined") return;
+    // Bei einem Deep-Link (geteilte Säule) keine Anleitung — Fokus ist die Säule.
+    const sp = new URLSearchParams(window.location.search);
+    if (sp.has("fly") || sp.has("open")) return;
     if (window.localStorage.getItem("ladestation-guide-seen")) return;
     const t = setTimeout(() => {
       setGuideOpen(true);
       window.localStorage.setItem("ladestation-guide-seen", "1");
     }, 700);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Deep-Link verarbeiten: ?fly=lat,lon&open=evseId → hinfliegen + Säule öffnen.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const fly = params.get("fly");
+    const open = params.get("open");
+    if (!fly && !open) return;
+    // URL säubern, damit Reload den Deep-Link nicht erneut auslöst.
+    window.history.replaceState(null, "", window.location.pathname);
+    // Nach dem Mount anwenden, damit die Karte bereit ist.
+    const t = setTimeout(() => {
+      if (fly) {
+        const [latStr, lonStr] = fly.split(",");
+        const lat = Number(latStr);
+        const lon = Number(lonStr);
+        if (Number.isFinite(lat) && Number.isFinite(lon)) {
+          setFlyTarget({ lat, lon, zoom: 15 });
+        }
+      }
+      if (open) setSelectedEvseId(decodeURIComponent(open));
+    }, 0);
     return () => clearTimeout(t);
   }, []);
 

@@ -438,6 +438,7 @@ function PointsList({ points }: { points: StationPoint[] }) {
 
 export function StationSheet({ evseId, onClose }: Props) {
   const [showNav, setShowNav] = useState(false);
+  const [shared, setShared] = useState(false);
   const { data, isPending, error } = useQuery({
     queryKey: ["station", evseId],
     queryFn: () => fetchStation(evseId!),
@@ -464,6 +465,35 @@ export function StationSheet({ evseId, onClose }: Props) {
     tariff.data && tariff.data.ok ? tariff.data.cpoStandardTariff : null;
   const stationApp = appCpo?.app ?? null;
 
+  // Diese Säule teilen: Deep-Link, der die App auf die Säule fliegen lässt
+  // und das Detail öffnet. Native Teilen-Liste, sonst Link kopieren.
+  async function handleShare() {
+    if (!data) return;
+    const label = data.name ?? "Ladestation";
+    const url = `${window.location.origin}/?fly=${data.lat},${data.lon}&open=${encodeURIComponent(
+      data.evseId,
+    )}`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: label,
+          text: `${label} – Ladestation Schweiz`,
+          url,
+        });
+      } catch {
+        // Teilen abgebrochen — bewusst ignorieren
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setShared(true);
+      setTimeout(() => setShared(false), 1500);
+    } catch {
+      // Zwischenablage nicht verfügbar — ignorieren
+    }
+  }
+
   return (
     <aside
       className="pointer-events-auto fixed inset-x-0 bottom-0 z-30 max-h-[70vh] overflow-y-auto rounded-t-2xl border border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:top-20 sm:max-h-none sm:w-96 sm:rounded-2xl"
@@ -474,6 +504,49 @@ export function StationSheet({ evseId, onClose }: Props) {
           {data?.name ?? "Ladestation"}
         </h2>
         <div className="flex shrink-0 items-center gap-1">
+          {data && (
+            <button
+              type="button"
+              onClick={handleShare}
+              aria-label="Säule teilen"
+              title={shared ? "Link kopiert" : "Diese Säule teilen"}
+              className="rounded-full p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+            >
+              {shared ? (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              ) : (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
+              )}
+            </button>
+          )}
           <FavoriteButton evseId={evseId} />
           <button
             type="button"
