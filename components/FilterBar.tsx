@@ -195,6 +195,30 @@ export function FilterBar({ filters, onChange, hasLocation }: Props) {
             </span>
           ))}
       </div>
+
+      {filters.rangeKm > 0 && (
+        <div className="flex w-full items-start gap-1 text-[11px] leading-snug text-zinc-500 dark:text-zinc-400">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className="mt-0.5 shrink-0"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+          <span>
+            Distanz als Luftlinie gemessen — die reale Fahrstrecke ist länger.
+          </span>
+        </div>
+      )}
     </div>
   );
 }

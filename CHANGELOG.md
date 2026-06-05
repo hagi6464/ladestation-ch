@@ -8,8 +8,9 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 
 ### Neu
 - **Reichweiten-Filter**: „Reichweite ▾" in der Filterleiste zeichnet einen Kreis um den
-  eigenen Standort (50 / 75 / 100 / 200 km); Säulen ausserhalb der Reichweite werden
-  ausgegraut. Voraussetzung: Standort per 📍-Button setzen.
+  eigenen Standort (50 / 75 / 100 / 200 km); Säulen und Cluster ausserhalb der Reichweite
+  werden grau dargestellt. Distanz als Luftlinie gemessen (Hinweis bei aktivem Filter).
+  Voraussetzung: Standort per 📍-Button setzen.
 
 ## 2026-06-04
 
