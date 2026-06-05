@@ -110,8 +110,11 @@ export default function ImpressumPage() {
         Datenschutz
       </h2>
       <p className="mt-2 text-sm leading-relaxed">
-        Diese App setzt keine Tracking- oder Analyse-Dienste ein und erhebt keine
-        personenbezogenen Daten. Einige Einstellungen — etwa gespeicherte
+        Diese App nutzt Vercel Web Analytics, um anonyme Nutzungsstatistiken (z. B.
+        Seitenaufrufe, ungefähre Herkunft, Gerätetyp) zu erfassen. Dieser Dienst
+        arbeitet ohne Cookies, ohne geräteübergreifende Wiedererkennung und ohne
+        personenbezogene Profile. Darüber hinaus werden keine weiteren
+        Tracking-Dienste eingesetzt. Einige Einstellungen — etwa gespeicherte
         Favoriten und der Hinweis, dass die Kurzanleitung bereits angezeigt wurde
         — werden ausschliesslich lokal im Browser (localStorage) gespeichert und
         nicht an Dritte übermittelt.

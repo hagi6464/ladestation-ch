@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { RegisterSW } from "@/components/RegisterSW";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,6 +47,7 @@ export default function RootLayout({
       <body className="h-full">
         <Providers>{children}</Providers>
         <RegisterSW />
+        <Analytics />
       </body>
     </html>
   );

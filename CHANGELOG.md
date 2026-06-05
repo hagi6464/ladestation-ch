@@ -14,6 +14,8 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
   eigenen Standort (50 / 75 / 100 / 200 km); Säulen und Cluster ausserhalb der Reichweite
   werden grau dargestellt. Distanz als Luftlinie gemessen (Hinweis bei aktivem Filter).
   Voraussetzung: Standort per 📍-Button setzen.
+- **Anonyme Besuchsstatistik** via Vercel Web Analytics (cookielos, ohne
+  geräteübergreifende Wiedererkennung); Datenschutz-Hinweis im Impressum entsprechend ergänzt.
 
 ## 2026-06-04
 
