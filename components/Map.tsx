@@ -145,6 +145,15 @@ export function Map({
         cluster: true,
         clusterRadius: 50,
         clusterMaxZoom: 13,
+        // Reichweiten-Filter: je Cluster zählen, wie viele Punkte in- bzw.
+        // ausserhalb der Reichweite liegen (inRange true/false; fehlt = Filter aus).
+        clusterProperties: {
+          inRangeCount: ["+", ["case", ["==", ["get", "inRange"], true], 1, 0]],
+          outRangeCount: [
+            "+",
+            ["case", ["==", ["get", "inRange"], false], 1, 0],
+          ],
+        },
       });
 
       map.addLayer({
@@ -173,6 +182,27 @@ export function Map({
           ],
           "circle-stroke-color": "#fff",
           "circle-stroke-width": 2,
+          // Cluster ausgrauen, wenn KEIN enthaltener Punkt in Reichweite liegt.
+          "circle-opacity": [
+            "case",
+            [
+              "all",
+              ["==", ["get", "inRangeCount"], 0],
+              [">", ["get", "outRangeCount"], 0],
+            ],
+            0.25,
+            1,
+          ],
+          "circle-stroke-opacity": [
+            "case",
+            [
+              "all",
+              ["==", ["get", "inRangeCount"], 0],
+              [">", ["get", "outRangeCount"], 0],
+            ],
+            0.25,
+            1,
+          ],
         },
       });
 
@@ -186,7 +216,19 @@ export function Map({
           "text-size": 13,
           "text-font": ["Noto Sans Regular"],
         },
-        paint: { "text-color": "#ffffff" },
+        paint: {
+          "text-color": "#ffffff",
+          "text-opacity": [
+            "case",
+            [
+              "all",
+              ["==", ["get", "inRangeCount"], 0],
+              [">", ["get", "outRangeCount"], 0],
+            ],
+            0.4,
+            1,
+          ],
+        },
       });
 
       map.addLayer({
