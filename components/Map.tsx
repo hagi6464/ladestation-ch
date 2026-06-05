@@ -163,13 +163,23 @@ export function Map({
         filter: ["has", "point_count"],
         paint: {
           "circle-color": [
-            "step",
-            ["get", "point_count"],
-            "#60a5fa",
-            25,
-            "#3b82f6",
-            100,
-            "#1d4ed8",
+            "case",
+            // Reichweiten-Filter: kein Punkt erreichbar → grau statt blau.
+            [
+              "all",
+              ["==", ["get", "inRangeCount"], 0],
+              [">", ["get", "outRangeCount"], 0],
+            ],
+            "#9ca3af",
+            [
+              "step",
+              ["get", "point_count"],
+              "#60a5fa",
+              25,
+              "#3b82f6",
+              100,
+              "#1d4ed8",
+            ],
           ],
           "circle-radius": [
             "step",
@@ -182,7 +192,6 @@ export function Map({
           ],
           "circle-stroke-color": "#fff",
           "circle-stroke-width": 2,
-          // Cluster ausgrauen, wenn KEIN enthaltener Punkt in Reichweite liegt.
           "circle-opacity": [
             "case",
             [
@@ -190,7 +199,7 @@ export function Map({
               ["==", ["get", "inRangeCount"], 0],
               [">", ["get", "outRangeCount"], 0],
             ],
-            0.25,
+            0.7,
             1,
           ],
           "circle-stroke-opacity": [
@@ -200,7 +209,7 @@ export function Map({
               ["==", ["get", "inRangeCount"], 0],
               [">", ["get", "outRangeCount"], 0],
             ],
-            0.25,
+            0.7,
             1,
           ],
         },
@@ -216,19 +225,7 @@ export function Map({
           "text-size": 13,
           "text-font": ["Noto Sans Regular"],
         },
-        paint: {
-          "text-color": "#ffffff",
-          "text-opacity": [
-            "case",
-            [
-              "all",
-              ["==", ["get", "inRangeCount"], 0],
-              [">", ["get", "outRangeCount"], 0],
-            ],
-            0.4,
-            1,
-          ],
-        },
+        paint: { "text-color": "#ffffff" },
       });
 
       map.addLayer({
@@ -239,6 +236,9 @@ export function Map({
         paint: {
           "circle-color": [
             "case",
+            // Reichweiten-Filter: ausserhalb → grau (überschreibt Verfügbarkeitsfarbe).
+            ["==", ["get", "inRange"], false],
+            "#9ca3af",
             [">=", ["get", "available"], 1],
             "#10b981",
             ["get", "hasStatus"],
@@ -274,13 +274,13 @@ export function Map({
           "circle-opacity": [
             "case",
             ["==", ["get", "inRange"], false],
-            0.25,
+            0.7,
             1,
           ],
           "circle-stroke-opacity": [
             "case",
             ["==", ["get", "inRange"], false],
-            0.25,
+            0.7,
             1,
           ],
         },
