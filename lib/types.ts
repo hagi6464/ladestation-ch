@@ -63,3 +63,20 @@ export type Filters = {
   /** Reichweiten-Filter in km um den GPS-Standort; 0 = aus. */
   rangeKm: number;
 };
+
+/** Fahrroute des Reiseplaners (von OpenRouteService via /api/route). */
+export type TripRoute = {
+  geometry: { type: "LineString"; coordinates: [number, number][] };
+  distanceKm: number;
+  durationMin: number;
+};
+
+/** Ladesäule im Routen-Korridor, angereichert für die Stopp-Auswahl. */
+export type CorridorStation = StationFeature & {
+  /** Position entlang der Route in km (für Reihenfolge + „ab hier laden"). */
+  alongKm: number;
+  /** Luftlinien-Abstand zur Route in km. */
+  detourKm: number;
+  /** true, wenn mit der errechneten Reichweite (minus Puffer) erreichbar. */
+  reachable: boolean;
+};

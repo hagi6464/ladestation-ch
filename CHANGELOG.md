@@ -4,6 +4,20 @@ Notiert die nutzerseitig sichtbaren Änderungen der App — neueste zuoberst.
 Locker angelehnt an [Keep a Changelog](https://keepachangelog.com/de/); Versionierung
 per Datum, da die App kontinuierlich auf Vercel deployt wird.
 
+## 2026-06-06
+
+### Neu
+- **Reiseplaner (Beta)**: Über das Logo-Menü „Reise planen" ein Ziel eingeben — die
+  App zeichnet die Fahrroute, zeigt CCS-Schnelllader entlang der Strecke (mit Leistung,
+  ungefährer Ladezeit und Tarif) und markiert, ab wo nachgeladen werden sollte. Die
+  Reichweite wird aus dem Ladezustand (%) für ein Tesla Model Y (Long Range, Verbrauch
+  anpassbar) berechnet; Startpunkt ist der GPS-Standort.
+- **Route an Google Maps übergeben**: Ausgewählte Ladestopps werden als Wegpunkte
+  übernommen (auf dem Handy max. 3, am Desktop mehr). Apple Karten übernimmt technisch
+  bedingt nur den nächsten Stopp.
+- Hinweis: Der Reiseplaner ist eine grobe Orientierung ohne Gewähr — der reale
+  Verbrauch hängt von Tempo, Wetter und Höhenprofil ab.
+
 ## 2026-06-05
 
 ### Neu

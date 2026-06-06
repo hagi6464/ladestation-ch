@@ -6,9 +6,15 @@ type Props = {
   onOpenGuide: () => void;
   onOpenInstall: () => void;
   onOpenDonate: () => void;
+  onOpenTrip: () => void;
 };
 
-export function LogoMenu({ onOpenGuide, onOpenInstall, onOpenDonate }: Props) {
+export function LogoMenu({
+  onOpenGuide,
+  onOpenInstall,
+  onOpenDonate,
+  onOpenTrip,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -88,6 +94,14 @@ export function LogoMenu({ onOpenGuide, onOpenInstall, onOpenDonate }: Props) {
           aria-label="Menü"
           className="absolute left-0 top-full z-30 mt-1 min-w-52 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
         >
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => choose(onOpenTrip)}
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-medium text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-950"
+          >
+            🗺️ Reise planen
+          </button>
           <button
             type="button"
             role="menuitem"

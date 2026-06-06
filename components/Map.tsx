@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import maplibregl, { Map as MapInstance } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { StationFeatureCollection } from "@/lib/types";
+import type { LineCoords } from "@/lib/geo";
 import type { FlyTarget } from "@/components/SearchBox";
 
 const STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
@@ -11,6 +12,7 @@ const STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
 const SOURCE_ID = "stations";
 const USER_ACCURACY_ID = "user-accuracy";
 const USER_RANGE_ID = "user-range";
+const ROUTE_ID = "trip-route";
 
 type UserLocation = { lat: number; lon: number; accuracy: number };
 
@@ -45,6 +47,12 @@ type Props = {
   flyTo: FlyTarget | null;
   userLocation: UserLocation | null;
   rangeKm: number;
+  /** Reiseplaner: Fahrroute als [lon, lat]-Stützpunkte (oder null). */
+  route?: LineCoords | null;
+  /** Reiseplaner: Punkt, ab dem nachgeladen werden sollte. */
+  chargeFromPoint?: [number, number] | null;
+  /** Reiseplaner: Kartenausschnitt auf [west, süd, ost, nord] zoomen. */
+  fitBounds?: [number, number, number, number] | null;
   onBboxChange: (bbox: [number, number, number, number]) => void;
   onSelect: (evseId: string) => void;
 };
@@ -54,12 +62,16 @@ export function Map({
   flyTo,
   userLocation,
   rangeKm,
+  route,
+  chargeFromPoint,
+  fitBounds,
   onBboxChange,
   onSelect,
 }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapInstance | null>(null);
   const userMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const chargeMarkerRef = useRef<maplibregl.Marker | null>(null);
   const onBboxRef = useRef(onBboxChange);
   const onSelectRef = useRef(onSelect);
 
@@ -137,6 +149,26 @@ export function Map({
           "line-width": 1.5,
           "line-dasharray": [2, 2],
         },
+      });
+
+      // Reiseplaner-Route — kräftige Linie unter den Stationen.
+      map.addSource(ROUTE_ID, {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+      map.addLayer({
+        id: "trip-route-casing",
+        type: "line",
+        source: ROUTE_ID,
+        layout: { "line-cap": "round", "line-join": "round" },
+        paint: { "line-color": "#ffffff", "line-width": 8, "line-opacity": 0.8 },
+      });
+      map.addLayer({
+        id: "trip-route-line",
+        type: "line",
+        source: ROUTE_ID,
+        layout: { "line-cap": "round", "line-join": "round" },
+        paint: { "line-color": "#2563eb", "line-width": 5, "line-opacity": 0.9 },
       });
 
       map.addSource(SOURCE_ID, {
@@ -430,6 +462,67 @@ export function Map({
     if (map.isStyleLoaded()) apply();
     else map.once("load", apply);
   }, [userLocation, rangeKm]);
+
+  // Reiseplaner: Route-Linie.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const apply = () => {
+      const src = map.getSource(ROUTE_ID) as
+        | maplibregl.GeoJSONSource
+        | undefined;
+      if (!src) return;
+      src.setData(
+        route && route.length > 1
+          ? {
+              type: "Feature",
+              geometry: { type: "LineString", coordinates: route },
+              properties: {},
+            }
+          : { type: "FeatureCollection", features: [] },
+      );
+    };
+    if (map.isStyleLoaded()) apply();
+    else map.once("load", apply);
+  }, [route]);
+
+  // Reiseplaner: „ab hier laden"-Marker (DOM-Marker, amber + Blitz).
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (!chargeFromPoint) {
+      chargeMarkerRef.current?.remove();
+      chargeMarkerRef.current = null;
+      return;
+    }
+    if (!chargeMarkerRef.current) {
+      const el = document.createElement("div");
+      el.style.pointerEvents = "none";
+      el.innerHTML = `
+        <span class="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-amber-500 shadow-md">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+        </span>`;
+      chargeMarkerRef.current = new maplibregl.Marker({ element: el })
+        .setLngLat(chargeFromPoint)
+        .addTo(map);
+    } else {
+      chargeMarkerRef.current.setLngLat(chargeFromPoint);
+    }
+  }, [chargeFromPoint]);
+
+  // Reiseplaner: Kartenausschnitt auf die Route zoomen.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !fitBounds) return;
+    const [west, south, east, north] = fitBounds;
+    map.fitBounds(
+      [
+        [west, south],
+        [east, north],
+      ],
+      { padding: 60, duration: 800 },
+    );
+  }, [fitBounds]);
 
   return <div ref={containerRef} className="h-full w-full" />;
 }
