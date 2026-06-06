@@ -8,7 +8,7 @@ type Props = {
 };
 
 // Gehostete Payrexx-Trinkgeldseite (öffentliche URL, kein Secret).
-const DONATION_URL = "https://ladestation-ch.payrexx.com/pay?tid=1f8259df";
+const DONATION_URL = "https://ladestation-ch.payrexx.com/pay?tid=616b7704";
 const isPlaceholder = DONATION_URL.includes("PLATZHALTER");
 
 export function DonationModal({ open, onClose }: Props) {
