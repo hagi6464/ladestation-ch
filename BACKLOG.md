@@ -51,6 +51,22 @@ In einem Schwung umsetzen (~3 h total):
 
 ## UX / Polish
 
+### Reiseplaner-Eingaben: iOS-Auto-Zoom verhindern + Drehrad-Auswahl
+**Status:** Todo 2026-06-07 (beim iPhone-Test gefunden).
+
+**Problem:** Beim Antippen von „Verbrauch" / „Ankunft mit" (`<input type="number">` in `TripPlanner.tsx`) zoomt iOS Safari automatisch rein.
+
+**Ursache:** iOS zoomt auf Eingabefelder mit Schriftgröße < 16px.
+
+**Wie:**
+- **Auto-Zoom verhindern:** Eingaben auf Schriftgröße **≥ 16px** setzen (`text-base` / `text-[16px]`). **Kein** `maximum-scale=1` im Viewport (würde Pinch-Zoom global deaktivieren → schlecht für Accessibility).
+- **„Drehrad":** Zahleneingaben auf `<select>` umstellen (rendert auf iOS als nativer Picker/Drehrad) mit diskreten Optionen:
+  - **Verbrauch** 10–40 kWh/100km (Schritt 1, ggf. 0.5)
+  - **Ankunft mit** 15–80 % am Ziel (Schritt 5)
+- **Zu klären:** „alle Eingaben" — soll auch der Ladezustand-Slider (Range) auf Select/Drehrad umgestellt werden? (hat aktuell kein Zoom-Problem.)
+
+**Aufwand:** ~30–45 Min.
+
 ### Reiseplaner als Vollbild-Overlay
 **Status:** Idee 2026-06-07. Der Reiseplaner ist aktuell ein Bottom-Sheet / seitliches Panel (`TripPlanner.tsx`, `<aside>`), das Karte und andere Bedienelemente nur teilweise überdeckt.
 
@@ -88,6 +104,17 @@ In einem Schwung umsetzen (~3 h total):
 - Store-/Scheme-Links manuell recherchieren (wie die CPO-Tarife) — per OICP/BFE nicht verfügbar.
 
 **Aufwand:** Grundgerüst ~2–3 h; der eigentliche Aufwand ist die laufende Pflege der App-/Store-Links pro CPO. Echte „Session starten"-Deep-Links nur dort, wo der CPO sie öffentlich anbietet.
+
+### Ladevorgang direkt an Betreiber-App übergeben (Deep-Link zur konkreten Säule)
+**Status:** Todo 2026-06-07. Vertieft den „noch offenen" Teil von „App des Betreibers öffnen / Laden starten" (siehe oben): der Button öffnet aktuell nur die Store-/App-Seite, nicht die konkrete Säule.
+
+**Warum:** Lücke „Säule gefunden → tatsächlich laden" schließen — idealerweise öffnet die Betreiber-App direkt den richtigen Ladepunkt (EVSE-ID).
+
+**Wie:** Pro relevantem CPO prüfen, ob ein öffentlicher Deep-Link / URL-Scheme / Universal Link zum „Laden an EVSE X" existiert — dazu die **Betreiber-APIs bzw. App-Dokumentation prüfen** (Swisscharge, MOVE, evpass, IONITY, Tesla, M-Charge, Plug'n Roll, EnBW, eCarUp …). Wo vorhanden: Feld `deepLinkTemplate` in `lib/cpo-tariffs.ts` ergänzen und im `StationSheet` mit der EVSE-ID füllen (mit Fallback-Kette App→Store→Website wie heute).
+
+**Tücken:** Solche Deep-Links sind selten öffentlich dokumentiert; Roaming (User lädt mit anderer App als der Betreiber-App) macht „die eine richtige App" unsicher. Ergebnis der Recherche also offen.
+
+**Aufwand:** Recherche ~2–3 h (pro CPO API/Doku prüfen); Umsetzung je nach Trefferzahl.
 
 ### Standort-Marker auf der Karte — ✅ erledigt 2026-06-04
 **Erledigt:** Der bestehende 📍-Button (Suchleiste) setzt zusätzlich einen blauen Standort-Punkt + transluzenten Genauigkeitskreis. `SearchBox.onUserLocation` → `page.userLocation` → `Map` (`maplibregl.Marker` mit `animate-ping`-Punkt + GeoJSON-Fill-Layer; `accuracyCircle()`-Polygon skaliert metergenau mit dem Zoom). Kein zweiter Button, kein Live-Tracking (aktualisiert bei jedem Antippen).
@@ -192,6 +219,12 @@ Ideen rund um Nutzungsmessung, Feedback und Reichweite. Bewusst niedrige Prio.
 **Ideen:** Anzahl Suchen, geöffnete Detail-Sheets, genutzte Filter (AC/DC/kW/Stecker), gesetzte Favoriten, PWA-Installationen, Teilen-Klicks.
 **Wie:** Vercel Analytics Custom Events, oder eigene `/api/event`-Route → Postgres. Datensparsam halten.
 **Aufwand:** ~1–2 h für ein paar Schlüssel-Events.
+
+### Schweizer Foren für Promotion recherchieren
+**Status:** Todo 2026-06-07.
+**Warum:** Reichweite gewinnen — die App in passenden CH-Communities vorstellen.
+**Wie:** Liste relevanter Schweizer Foren/Communities zum Thema E-Mobilität/Laden zusammenstellen (z. B. EV-/Elektroauto-Foren, TCS-Community, Tesla-CH-Gruppen, Reddit r/Switzerland, einschlägige Facebook-Gruppen). Pro Forum die Regeln zu Eigenwerbung prüfen, dann gezielt posten — idealerweise mit dem Kampagnen-Link (UTM/Not-Aus, siehe Punkt 5) zur Herkunftsmessung.
+**Aufwand:** Recherche ~1 h.
 
 ### 5. Kampagnen-Link für Foren — mit Not-Aus
 **Warum:** Link in E-Auto-Foren streuen, Herkunft messen, und bei Überlast das **Vercel-Hobby-Kontingent schützen**.
