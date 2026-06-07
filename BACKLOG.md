@@ -51,8 +51,10 @@ In einem Schwung umsetzen (~3 h total):
 
 ## UX / Polish
 
-### Reiseplaner-Eingaben: iOS-Auto-Zoom verhindern + Drehrad-Auswahl
-**Status:** Todo 2026-06-07 (beim iPhone-Test gefunden).
+### Reiseplaner-Eingaben: iOS-Auto-Zoom verhindern + Drehrad-Auswahl — ✅ erledigt 2026-06-07
+**Erledigt:** Verbrauch (10–40) und „Ankunft mit" (15–80 %) sind jetzt `<select>` (nativer iOS-Drehrad, kein Zoom); Ziel-Textfeld auf 16px gesetzt (verhindert Auto-Zoom). Ladezustand bleibt Schieberegler (User-Entscheidung, kein Zoom-Problem). `text-base`=16px statt `text-sm`. Offen ggf. später: gleicher 16px-Fix auch in der Haupt-Suche (`SearchBox`), falls dort der Zoom stört.
+
+**Status (urspr.):** Todo 2026-06-07 (beim iPhone-Test gefunden).
 
 **Problem:** Beim Antippen von „Verbrauch" / „Ankunft mit" (`<input type="number">` in `TripPlanner.tsx`) zoomt iOS Safari automatisch rein.
 

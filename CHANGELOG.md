@@ -18,6 +18,9 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
   stärkste Säule darin ist als „Empfohlen" vorausgewählt.
 
 ### Verbessert (Reiseplaner)
+- **Eingaben** für Verbrauch und Ankunfts-Ladestand sind jetzt Auswahlräder
+  (Verbrauch 10–40 kWh/100 km, Ankunft 15–80 %); auf dem iPhone zoomt die Ansicht
+  beim Antippen der Eingabefelder nicht mehr ungewollt hinein.
 - Klarstellung der Distanzen: Strecke entlang der Route = Fahrstrecke, der Umweg
   „ab Route" = Luftlinie.
 

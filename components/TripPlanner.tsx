@@ -61,6 +61,10 @@ function formatDetour(km: number): string {
   return `${km.toFixed(1)} km`;
 }
 
+// Auswahlbereiche für die Drehrad-Eingaben (native <select> = iOS-Picker, kein Auto-Zoom).
+const CONSUMPTION_OPTIONS = Array.from({ length: 31 }, (_, i) => 10 + i); // 10–40 kWh/100 km
+const ARRIVAL_OPTIONS = Array.from({ length: 14 }, (_, i) => 15 + i * 5); // 15–80 %
+
 /** Günstigster hinterlegter DC-Preis eines Betreibers (kuratiert, ggf. veraltet). */
 function minDcPerKwh(cpo: CpoTariff): number | null {
   const prices = cpo.tariffs
@@ -205,7 +209,7 @@ export function TripPlanner({
               onFocus={() => results.length > 0 && setListOpen(true)}
               onBlur={() => setTimeout(() => setListOpen(false), 150)}
               placeholder="Zielort oder Adresse…"
-              className="min-w-0 flex-1 bg-transparent px-1 py-0.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 dark:text-zinc-50"
+              className="min-w-0 flex-1 bg-transparent px-1 py-0.5 text-base text-zinc-900 outline-none placeholder:text-zinc-400 dark:text-zinc-50"
               aria-label="Zielort"
               autoComplete="off"
             />
@@ -262,45 +266,45 @@ export function TripPlanner({
           </div>
         </div>
 
-        {/* Verbrauch + Puffer */}
+        {/* Verbrauch + Ankunft (Drehrad/Select — kein iOS-Auto-Zoom) */}
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
             <span className="mb-1 block text-xs uppercase text-zinc-500">
               Verbrauch
             </span>
-            <span className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-800">
-              <input
-                type="number"
-                min={8}
-                max={40}
-                step={0.5}
-                value={consumption}
-                onChange={(e) => onConsumptionChange(Number(e.target.value))}
-                className="min-w-0 flex-1 bg-transparent outline-none dark:text-zinc-50"
-                aria-label="Verbrauch in kWh pro 100 km"
-              />
-              <span className="shrink-0 text-[11px] text-zinc-500">
-                kWh/100&nbsp;km
-              </span>
+            <select
+              value={consumption}
+              onChange={(e) => onConsumptionChange(Number(e.target.value))}
+              className="w-full rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-base text-zinc-900 outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+              aria-label="Verbrauch in kWh pro 100 km"
+            >
+              {CONSUMPTION_OPTIONS.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+            <span className="mt-0.5 block text-[11px] text-zinc-500">
+              kWh/100&nbsp;km
             </span>
           </label>
           <label className="block">
             <span className="mb-1 block text-xs uppercase text-zinc-500">
               Ankunft mit
             </span>
-            <span className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-800">
-              <input
-                type="number"
-                min={0}
-                max={50}
-                step={5}
-                value={arrivalSoc}
-                onChange={(e) => onArrivalSocChange(Number(e.target.value))}
-                className="min-w-0 flex-1 bg-transparent outline-none dark:text-zinc-50"
-                aria-label="Gewünschter Ladestand bei Ankunft in Prozent"
-              />
-              <span className="shrink-0 text-[11px] text-zinc-500">% am Ziel</span>
-            </span>
+            <select
+              value={arrivalSoc}
+              onChange={(e) => onArrivalSocChange(Number(e.target.value))}
+              className="w-full rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-base text-zinc-900 outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+              aria-label="Gewünschter Ladestand bei Ankunft in Prozent"
+            >
+              {ARRIVAL_OPTIONS.map((p) => (
+                <option key={p} value={p}>
+                  {p}%
+                </option>
+              ))}
+            </select>
+            <span className="mt-0.5 block text-[11px] text-zinc-500">am Ziel</span>
           </label>
         </div>
 
