@@ -1,4 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <rect width="512" height="512" rx="96" fill="#10b981"/>
-  <polygon points="298,64 128,277 234,277 213,448 384,234 277,234" fill="#ffffff"/>
+  <g transform="translate(256 256) scale(1.15) translate(-256 -256)">
+    <!-- Ladesaeule: Fuss -->
+    <rect x="158" y="384" width="196" height="30" rx="12" fill="#ffffff"/>
+    <!-- Ladesaeule: Koerper -->
+    <rect x="178" y="104" width="156" height="288" rx="34" fill="#ffffff"/>
+    <!-- Kabel + Stecker (rechts) -->
+    <path d="M334 250 C374 250 374 312 350 330" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+    <rect x="332" y="320" width="34" height="26" rx="9" fill="#ffffff"/>
+    <!-- Display mit Schweizerkreuz (Flaggen-Proportion 6:20) -->
+    <rect x="200" y="126" width="112" height="110" rx="20" fill="#DA291C"/>
+    <rect x="245.5" y="146" width="21" height="70" fill="#ffffff"/>
+    <rect x="221" y="170.5" width="70" height="21" fill="#ffffff"/>
+    <!-- gruener Blitz -->
+    <polygon points="264,264 216,324 246,324 240,372 288,312 258,312" fill="#10b981"/>
+  </g>
 </svg>

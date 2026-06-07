@@ -1,0 +1,18 @@
+<!-- BACKUP: App-Icon-Variante B (Ladestecker + Schweizerkreuz). Nicht im Build verwendet.
+     Aktiv ist Variante A (public/icon-512.svg, app/icon.svg). Stand 2026-06-08. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="96" fill="#10b981"/>
+  <g transform="translate(256 256) scale(1.15) translate(-256 -256)">
+    <!-- Stecker-Pins -->
+    <rect x="200" y="92" width="36" height="92" rx="18" fill="#ffffff"/>
+    <rect x="276" y="92" width="36" height="92" rx="18" fill="#ffffff"/>
+    <!-- Kabel -->
+    <path d="M256 356 C256 402 330 398 330 426" fill="none" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+    <!-- Stecker-Koerper -->
+    <rect x="156" y="176" width="200" height="180" rx="44" fill="#ffffff"/>
+    <!-- Schweizerkreuz, zentriert auf Koerper-Mitte (256,266), Flaggen-Proportion 6:20 -->
+    <rect x="196" y="206" width="120" height="120" rx="22" fill="#DA291C"/>
+    <rect x="245" y="228.5" width="22" height="75" fill="#ffffff"/>
+    <rect x="218.5" y="255" width="75" height="22" fill="#ffffff"/>
+  </g>
+</svg>
