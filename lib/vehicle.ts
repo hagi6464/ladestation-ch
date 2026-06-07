@@ -33,6 +33,25 @@ export const MODEL_Y: Vehicle = {
   plug: "ccs",
 };
 
+/** Bevorzugte Lade-Position entlang der Reichweite aus dem aktuellen Ladestand. */
+export type ChargePref = "start" | "middle" | "end";
+
+/**
+ * Entfernungsfenster ab Start [km] für die gewählte Lade-Position, relativ zur
+ * Reichweite `rangeKm` aus dem aktuellen Ladestand:
+ * - start  = erstes Drittel der Reichweite (0–33 %)
+ * - middle = Mitte der Reichweite (50 % ± 10 Prozentpunkte → 40–60 %)
+ * - end    = später Abschnitt der Reichweite (70–90 %)
+ */
+export function chargeWindowKm(
+  pref: ChargePref,
+  rangeKm: number,
+): [number, number] {
+  if (pref === "start") return [0, rangeKm / 3];
+  if (pref === "end") return [rangeKm * 0.7, rangeKm * 0.9];
+  return [rangeKm * 0.4, rangeKm * 0.6];
+}
+
 /** Reichweite [km] aus Ladezustand (%), Verbrauch und nutzbarer Batterie. */
 export function estimateRangeKm(
   socPercent: number,

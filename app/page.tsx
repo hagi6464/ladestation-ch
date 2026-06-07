@@ -18,7 +18,7 @@ import {
 } from "@/components/TripPlanner";
 import { useFavorites } from "@/lib/favorites";
 import { haversineKm, distanceToRouteKm, pointAtKm } from "@/lib/geo";
-import { MODEL_Y, estimateRangeKm } from "@/lib/vehicle";
+import { MODEL_Y, estimateRangeKm, chargeWindowKm } from "@/lib/vehicle";
 import type {
   Filters,
   StationFeatureCollection,
@@ -123,7 +123,7 @@ export default function Page() {
   const [soc, setSoc] = useState(80);
   const [consumption, setConsumption] = useState(MODEL_Y.consumptionKwh100);
   // Gewünschter Ladestand bei Ankunft (%) — ersetzt den früheren km-Puffer.
-  const [arrivalSoc, setArrivalSoc] = useState(10);
+  const [arrivalSoc, setArrivalSoc] = useState(25);
   const [highwayOnly, setHighwayOnly] = useState(false);
   const [chargePref, setChargePref] = useState<ChargePref>("middle");
   const [selectedStopIds, setSelectedStopIds] = useState<string[]>([]);
@@ -256,10 +256,11 @@ export default function Page() {
 
   // Auf den Korridor filtern (≤ CORRIDOR_KM zur Route) + alongKm/reachable annotieren.
   // Autobahn-Modus: nur Säulen praktisch ohne Umweg und ≥ 100 kW.
+  // Lade-Position: nur Säulen im Entfernungsfenster ab Start (relativ zur Reichweite).
   const corridorStops = useMemo<CorridorStation[]>(() => {
     if (!tripRoute || !corridorQuery.data) return [];
     const line = tripRoute.geometry.coordinates;
-    const reach = tripRangeKm - reserveKm;
+    const [winLo, winHi] = chargeWindowKm(chargePref, tripRangeKm);
     const out: CorridorStation[] = [];
     for (const f of corridorQuery.data.features) {
       const [lon, lat] = f.geometry.coordinates;
@@ -270,11 +271,13 @@ export default function Page() {
         if (km > HIGHWAY_DETOUR_KM) continue;
         if (power == null || power < HIGHWAY_MIN_POWER_KW) continue;
       }
-      out.push({ ...f, alongKm, detourKm: km, reachable: alongKm <= reach });
+      if (alongKm < winLo || alongKm > winHi) continue;
+      // erreichbar = mit aktuellem Ladestand physisch anfahrbar (vor Reichweiten-Ende).
+      out.push({ ...f, alongKm, detourKm: km, reachable: alongKm <= tripRangeKm });
     }
     out.sort((a, b) => a.alongKm - b.alongKm);
     return out;
-  }, [tripRoute, corridorQuery.data, tripRangeKm, reserveKm, highwayOnly]);
+  }, [tripRoute, corridorQuery.data, tripRangeKm, highwayOnly, chargePref]);
 
   // „ab hier laden"-Punkt entlang der Route (Reichweite minus Ankunfts-Reserve).
   const chargeFromPoint = useMemo<[number, number] | null>(() => {
@@ -284,30 +287,17 @@ export default function Page() {
     return pointAtKm(tripRoute.geometry.coordinates, reach);
   }, [tripRoute, tripRangeKm, reserveKm]);
 
-  // Sanfte Vorauswahl: ein empfohlener Stopp im gewünschten Reise-Drittel.
-  // Kandidaten = erreichbare Stopps; im Drittel der höchsten Leistung (dann kleinster
-  // Umweg). Greift nur, wenn überhaupt nachgeladen werden muss.
+  // Empfehlung = stärkste Säule (dann kleinster Umweg) im gewählten Abschnitt.
   const suggestedStopId = useMemo<string | null>(() => {
-    if (!tripRoute) return null;
-    const reach = tripRangeKm - reserveKm;
-    if (reach >= tripRoute.distanceKm) return null; // ohne Nachladen erreichbar
-    const candidates = corridorStops.filter((s) => s.reachable);
-    if (candidates.length === 0) return null;
-    const d = tripRoute.distanceKm;
-    const inThird = (s: CorridorStation) => {
-      if (chargePref === "start") return s.alongKm < d / 3;
-      if (chargePref === "end") return s.alongKm >= (2 * d) / 3;
-      return s.alongKm >= d / 3 && s.alongKm < (2 * d) / 3;
-    };
-    const pool = candidates.filter(inThird);
-    const pick = (pool.length > 0 ? pool : candidates).slice().sort((a, b) => {
+    if (corridorStops.length === 0) return null;
+    const pick = corridorStops.slice().sort((a, b) => {
       const pa = a.properties.maxPowerKw ?? 0;
       const pb = b.properties.maxPowerKw ?? 0;
       if (pb !== pa) return pb - pa;
       return a.detourKm - b.detourKm;
     })[0];
     return pick?.properties.evseId ?? null;
-  }, [tripRoute, tripRangeKm, reserveKm, corridorStops, chargePref]);
+  }, [corridorStops]);
 
   // Empfehlung einmalig als Vorauswahl übernehmen, wenn sie sich ändert (neue Route /
   // geänderte Vorliebe). Manuelle Auswahl danach bleibt unangetastet.

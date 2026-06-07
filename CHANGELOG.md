@@ -12,9 +12,10 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
   Aus-/Einfahrt). Der seitliche Umweg jeder Säule wird transparent angezeigt.
 - **Ankunfts-Ladestand**: Statt eines festen km-Puffers gibst du jetzt an, mit wie viel
   Prozent du am Ziel ankommen möchtest; die nötige Reserve wird daraus berechnet.
-- **Lade-Position**: Vorliebe „Anfang / Mitte / Ende" — der Planer schlägt einen
-  passenden Stopp im gewünschten Reise-Drittel vor (als „Empfohlen" markiert); alle
-  anderen Säulen bleiben weiterhin wählbar.
+- **Lade-Position**: Vorliebe „Anfang / Mitte / Ende" zeigt gezielt die Schnelllader im
+  passenden Reichweiten-Abschnitt ab Start — Anfang = erstes Drittel, Mitte = Mitte der
+  Reichweite, Ende = 70–90 % der Reichweite. Der angezeigte km-Abschnitt ist sichtbar; die
+  stärkste Säule darin ist als „Empfohlen" vorausgewählt.
 
 ### Verbessert (Reiseplaner)
 - Klarstellung der Distanzen: Strecke entlang der Route = Fahrstrecke, der Umweg

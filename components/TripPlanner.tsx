@@ -3,10 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import type { CorridorStation, TripRoute } from "@/lib/types";
 import { findCpoTariff, type CpoTariff } from "@/lib/cpo-tariffs";
-import { estimateChargeMinutes } from "@/lib/vehicle";
+import {
+  estimateChargeMinutes,
+  chargeWindowKm,
+  type ChargePref,
+} from "@/lib/vehicle";
 
+export type { ChargePref };
 export type TripDestination = { lat: number; lon: number; label: string };
-export type ChargePref = "start" | "middle" | "end";
 type GeocodeResult = { lat: number; lon: number; zoom: number; label: string };
 
 type Props = {
@@ -140,6 +144,9 @@ export function TripPlanner({
 
   const reachWithoutCharge =
     route != null && route.distanceKm <= rangeKm - reserveKm;
+
+  // Entfernungsfenster ab Start für die gewählte Lade-Position (relativ zur Reichweite).
+  const [winLo, winHi] = chargeWindowKm(chargePref, rangeKm);
 
   return (
     <aside
@@ -351,6 +358,13 @@ export function TripPlanner({
               </button>
             ))}
           </div>
+          <div className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+            Zeigt Säulen ≈{" "}
+            <span className="tabular-nums">
+              {Math.round(winLo)}–{Math.round(winHi)} km
+            </span>{" "}
+            ab Start (Reichweiten-Abschnitt).
+          </div>
         </div>
 
         {/* CTA */}
@@ -418,8 +432,11 @@ export function TripPlanner({
             </div>
           ) : (
             <div className="text-xs text-zinc-500 dark:text-zinc-400">
-              Nachladen nötig — Ladesäulen entlang der Route (grau = ausserhalb
-              der Reichweite):
+              Nachladen nötig — Schnelllader im Abschnitt{" "}
+              <span className="font-medium">
+                {CHARGE_PREF_LABELS[chargePref]}
+              </span>
+              :
             </div>
           )}
 
@@ -520,8 +537,8 @@ export function TripPlanner({
           {stops.length === 0 && !reachWithoutCharge && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
               {highwayOnly
-                ? "Keine Schnelllader (> 100 kW) direkt an der Route gefunden — Autobahn-Filter ausschalten für mehr Optionen."
-                : "Keine passenden CCS-Schnelllader direkt am Korridor gefunden."}
+                ? `Keine Schnelllader (> 100 kW) im Abschnitt „${CHARGE_PREF_LABELS[chargePref]}" gefunden — Autobahn-Filter ausschalten oder andere Lade-Position wählen.`
+                : `Keine Ladesäule im Abschnitt „${CHARGE_PREF_LABELS[chargePref]}" gefunden — andere Lade-Position wählen.`}
             </div>
           )}
 
