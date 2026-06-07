@@ -51,6 +51,24 @@ In einem Schwung umsetzen (~3 h total):
 
 ## UX / Polish
 
+### Reiseplaner als Vollbild-Overlay
+**Status:** Idee 2026-06-07. Der Reiseplaner ist aktuell ein Bottom-Sheet / seitliches Panel (`TripPlanner.tsx`, `<aside>`), das Karte und andere Bedienelemente nur teilweise überdeckt.
+
+**Warum:** Im Planungsmodus braucht es Fokus; Such-/Filterleiste und Logo-Menü daneben lenken ab.
+
+**Wie:** `TripPlanner` im offenen Zustand als **Vollfenster-Overlay** rendern (z. B. `fixed inset-0`, hoher z-index), das die übrigen Menüs (SearchBox, FilterBar, LogoMenu) verdeckt — entweder per höherem z-index oder indem die Top-Leiste bei `tripOpen` ausgeblendet wird. Schliessen-Button bleibt; Karte ggf. weiterhin im Hintergrund/als eigener Bereich sichtbar.
+
+**Aufwand:** ~1 h (Layout/z-index + Top-Leiste bei `tripOpen` ausblenden).
+
+### Kurzanleitung mit allen Funktionen aktualisieren (+ evtl. Untermenüs)
+**Status:** Idee 2026-06-07. Die `GuideModal`-Kurzanleitung deckt noch nicht alle Funktionen ab — u. a. Reiseplaner (inkl. Autobahn-Filter / Ankunfts-Ladestand / Lade-Position), Reichweiten-Filter, Säule teilen, Anbieter-App-Button, GPS-Standort-Marker, Trinkgeld.
+
+**Warum:** Mit wachsendem Funktionsumfang wird eine flache Anleitung schnell unübersichtlich.
+
+**Wie:** Anleitung pro Funktion gliedern; statt einer langen Liste evtl. **Untermenüs / Akkordeon je Funktion** (ein-/ausklappbar), damit es übersichtlich bleibt. Inhalte aus CHANGELOG.md ableiten und aktuell halten.
+
+**Aufwand:** ~1–2 h (Inhalte + Akkordeon-UI).
+
 ### App des Betreibers öffnen / Laden starten  ⭐ (Idee 2026-06-02) — ✅ teil-erledigt 2026-06-04
 **Erledigt (2026-06-04):** „📱 App öffnen"-Button im Detail-Sheet, wenn der Betreiber eine verifizierte Lade-App hat. `CpoTariff.app = { name, ios, android }` für **11 CPOs** kuratiert (easycharge/Energie 360°, Swisscharge, MOVE, evpass, M-Charge/Migrol, IONITY, Tesla, TCS eCharge, Plug'n Roll, EnBW, eCarUp). Plattform-Erkennung via `pickStoreUrl` in `StationSheet` (iOS→App Store, Android→Play Store, Desktop→Store-Webseite). Öffnet die **Store-Seite** (startet die installierte App bzw. bietet die Installation) — bewusst **kein** Auto-Session-Start.
 
