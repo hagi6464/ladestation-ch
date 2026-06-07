@@ -6,6 +6,7 @@ import { findCpoTariff, type CpoTariff } from "@/lib/cpo-tariffs";
 import { estimateChargeMinutes } from "@/lib/vehicle";
 
 export type TripDestination = { lat: number; lon: number; label: string };
+export type ChargePref = "start" | "middle" | "end";
 type GeocodeResult = { lat: number; lon: number; zoom: number; label: string };
 
 type Props = {
@@ -18,8 +19,18 @@ type Props = {
   onSocChange: (n: number) => void;
   consumption: number;
   onConsumptionChange: (n: number) => void;
-  bufferKm: number;
-  onBufferChange: (n: number) => void;
+  /** Gewünschter Ladestand bei Ankunft (%). */
+  arrivalSoc: number;
+  onArrivalSocChange: (n: number) => void;
+  /** Reserve-km, die für den Ankunfts-Ladestand zurückgehalten werden (vom Parent). */
+  reserveKm: number;
+  /** Nur Schnelllader (>100 kW) praktisch ohne Umweg an der Route. */
+  highwayOnly: boolean;
+  onHighwayOnlyChange: (b: boolean) => void;
+  chargePref: ChargePref;
+  onChargePrefChange: (p: ChargePref) => void;
+  /** Empfohlener Stopp (sanfte Vorauswahl) für das gewählte Reise-Drittel. */
+  suggestedStopId: string | null;
   /** Live errechnete Reichweite (vom Parent aus SoC/Verbrauch). */
   rangeKm: number;
   onPlan: (destination: TripDestination) => void;
@@ -33,6 +44,18 @@ type Props = {
   onOpenInMaps: () => void;
   onOpenInApple: () => void;
 };
+
+const CHARGE_PREF_LABELS: Record<ChargePref, string> = {
+  start: "Anfang",
+  middle: "Mitte",
+  end: "Ende",
+};
+
+/** Seitlicher Umweg kompakt: < 1 km in Metern, sonst in km. */
+function formatDetour(km: number): string {
+  if (km < 1) return `${Math.round(km * 1000)} m`;
+  return `${km.toFixed(1)} km`;
+}
 
 /** Günstigster hinterlegter DC-Preis eines Betreibers (kuratiert, ggf. veraltet). */
 function minDcPerKwh(cpo: CpoTariff): number | null {
@@ -51,8 +74,14 @@ export function TripPlanner({
   onSocChange,
   consumption,
   onConsumptionChange,
-  bufferKm,
-  onBufferChange,
+  arrivalSoc,
+  onArrivalSocChange,
+  reserveKm,
+  highwayOnly,
+  onHighwayOnlyChange,
+  chargePref,
+  onChargePrefChange,
+  suggestedStopId,
   rangeKm,
   onPlan,
   onClear,
@@ -110,7 +139,7 @@ export function TripPlanner({
   if (!open) return null;
 
   const reachWithoutCharge =
-    route != null && route.distanceKm <= rangeKm - bufferKm;
+    route != null && route.distanceKm <= rangeKm - reserveKm;
 
   return (
     <aside
@@ -222,7 +251,7 @@ export function TripPlanner({
             <span className="font-semibold tabular-nums">
               {Math.round(rangeKm)} km
             </span>{" "}
-            (Puffer {bufferKm} km)
+            (Reserve ≈ {Math.round(reserveKm)} km für {arrivalSoc}% am Ziel)
           </div>
         </div>
 
@@ -250,22 +279,78 @@ export function TripPlanner({
           </label>
           <label className="block">
             <span className="mb-1 block text-xs uppercase text-zinc-500">
-              Puffer
+              Ankunft mit
             </span>
             <span className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-800">
               <input
                 type="number"
                 min={0}
-                max={100}
+                max={50}
                 step={5}
-                value={bufferKm}
-                onChange={(e) => onBufferChange(Number(e.target.value))}
+                value={arrivalSoc}
+                onChange={(e) => onArrivalSocChange(Number(e.target.value))}
                 className="min-w-0 flex-1 bg-transparent outline-none dark:text-zinc-50"
-                aria-label="Sicherheitspuffer in km"
+                aria-label="Gewünschter Ladestand bei Ankunft in Prozent"
               />
-              <span className="shrink-0 text-[11px] text-zinc-500">km</span>
+              <span className="shrink-0 text-[11px] text-zinc-500">% am Ziel</span>
             </span>
           </label>
+        </div>
+
+        {/* Autobahn-Filter */}
+        <button
+          type="button"
+          role="switch"
+          aria-checked={highwayOnly}
+          onClick={() => onHighwayOnlyChange(!highwayOnly)}
+          className={`flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2 text-left text-sm transition-colors ${
+            highwayOnly
+              ? "border-emerald-400 bg-emerald-50 text-emerald-800 dark:border-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-200"
+              : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+          }`}
+        >
+          <span className="min-w-0">
+            <span className="block font-medium">🛣️ Nur an der Autobahn</span>
+            <span className="block text-[11px] text-zinc-500 dark:text-zinc-400">
+              Schnelllader &gt; 100 kW praktisch ohne Umweg
+            </span>
+          </span>
+          <span
+            aria-hidden="true"
+            className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
+              highwayOnly ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-600"
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${
+                highwayOnly ? "left-[18px]" : "left-0.5"
+              }`}
+            />
+          </span>
+        </button>
+
+        {/* Lade-Position */}
+        <div>
+          <span className="mb-1 block text-xs uppercase text-zinc-500">
+            Laden bevorzugt
+          </span>
+          <div className="grid grid-cols-3 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
+            {(["start", "middle", "end"] as const).map((p) => (
+              <button
+                key={p}
+                type="button"
+                aria-pressed={chargePref === p}
+                onClick={() => onChargePrefChange(p)}
+                className={`rounded-md px-2 py-1.5 text-sm font-medium transition-colors ${
+                  chargePref === p
+                    ? "bg-white text-emerald-700 shadow-sm dark:bg-zinc-900 dark:text-emerald-300"
+                    : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50"
+                }`}
+              >
+                {CHARGE_PREF_LABELS[p]}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* CTA */}
@@ -328,7 +413,8 @@ export function TripPlanner({
 
           {reachWithoutCharge ? (
             <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">
-              ✓ Ziel ohne Nachladen erreichbar (Reichweite minus Puffer reicht).
+              ✓ Ziel ohne Nachladen erreichbar — mit ca. {arrivalSoc}% Restladung am
+              Ziel.
             </div>
           ) : (
             <div className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -341,6 +427,7 @@ export function TripPlanner({
             <ul className="space-y-1.5">
               {stops.map((s) => {
                 const selected = selectedStopIds.includes(s.properties.evseId);
+                const suggested = s.properties.evseId === suggestedStopId;
                 const cpo = findCpoTariff(s.properties.operatorName);
                 const dc = cpo ? minDcPerKwh(cpo) : null;
                 const chargeMin = Math.round(
@@ -382,8 +469,15 @@ export function TripPlanner({
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="flex items-baseline justify-between gap-2">
-                          <span className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">
-                            {s.properties.name ?? "Ladestation"}
+                          <span className="flex min-w-0 items-center gap-1.5">
+                            <span className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                              {s.properties.name ?? "Ladestation"}
+                            </span>
+                            {suggested && (
+                              <span className="shrink-0 rounded bg-emerald-600 px-1 text-[10px] font-semibold text-white">
+                                Empfohlen
+                              </span>
+                            )}
                           </span>
                           <span className="shrink-0 text-[11px] tabular-nums text-zinc-500">
                             nach {Math.round(s.alongKm)} km
@@ -397,6 +491,10 @@ export function TripPlanner({
                           )}
                           <span className="text-zinc-400">·</span>
                           <span>≈ {chargeMin} min</span>
+                          <span className="text-zinc-400">·</span>
+                          <span className="tabular-nums">
+                            {formatDetour(s.detourKm)} ab Route
+                          </span>
                           {dc != null && (
                             <>
                               <span className="text-zinc-400">·</span>
@@ -421,7 +519,9 @@ export function TripPlanner({
 
           {stops.length === 0 && !reachWithoutCharge && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
-              Keine passenden CCS-Schnelllader direkt am Korridor gefunden.
+              {highwayOnly
+                ? "Keine Schnelllader (> 100 kW) direkt an der Route gefunden — Autobahn-Filter ausschalten für mehr Optionen."
+                : "Keine passenden CCS-Schnelllader direkt am Korridor gefunden."}
             </div>
           )}
 
@@ -456,8 +556,9 @@ export function TripPlanner({
 
           <p className="text-[11px] leading-relaxed text-zinc-400">
             Grobe Orientierung ohne Gewähr — Verbrauch/Reichweite je nach Tempo,
-            Wetter und Höhe verschieden. Google Maps übernimmt auf dem Handy max.
-            3 Zwischenstopps; Apple Karten nur den nächsten Stopp.
+            Wetter und Höhe verschieden. Distanzen entlang der Route = Fahrstrecke,
+            der seitliche Umweg ab Route = Luftlinie. Google Maps übernimmt auf dem
+            Handy max. 3 Zwischenstopps; Apple Karten nur den nächsten Stopp.
           </p>
         </div>
       )}

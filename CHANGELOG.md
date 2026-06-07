@@ -4,6 +4,22 @@ Notiert die nutzerseitig sichtbaren Änderungen der App — neueste zuoberst.
 Locker angelehnt an [Keep a Changelog](https://keepachangelog.com/de/); Versionierung
 per Datum, da die App kontinuierlich auf Vercel deployt wird.
 
+## 2026-06-07
+
+### Neu (Reiseplaner)
+- **Autobahn-Filter**: Schalter „🛣️ Nur an der Autobahn" zeigt nur Schnelllader über
+  100 kW, die praktisch ohne Umweg an der Route liegen (Raststätte / direkt an der
+  Aus-/Einfahrt). Der seitliche Umweg jeder Säule wird transparent angezeigt.
+- **Ankunfts-Ladestand**: Statt eines festen km-Puffers gibst du jetzt an, mit wie viel
+  Prozent du am Ziel ankommen möchtest; die nötige Reserve wird daraus berechnet.
+- **Lade-Position**: Vorliebe „Anfang / Mitte / Ende" — der Planer schlägt einen
+  passenden Stopp im gewünschten Reise-Drittel vor (als „Empfohlen" markiert); alle
+  anderen Säulen bleiben weiterhin wählbar.
+
+### Verbessert (Reiseplaner)
+- Klarstellung der Distanzen: Strecke entlang der Route = Fahrstrecke, der Umweg
+  „ab Route" = Luftlinie.
+
 ## 2026-06-06
 
 ### Neu

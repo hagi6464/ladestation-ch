@@ -11,7 +11,11 @@ import { InstallModal } from "@/components/InstallModal";
 import { GuideModal } from "@/components/GuideModal";
 import { DonationModal } from "@/components/DonationModal";
 import { LogoMenu } from "@/components/LogoMenu";
-import { TripPlanner, type TripDestination } from "@/components/TripPlanner";
+import {
+  TripPlanner,
+  type TripDestination,
+  type ChargePref,
+} from "@/components/TripPlanner";
 import { useFavorites } from "@/lib/favorites";
 import { haversineKm, distanceToRouteKm, pointAtKm } from "@/lib/geo";
 import { MODEL_Y, estimateRangeKm } from "@/lib/vehicle";
@@ -26,6 +30,12 @@ type Bbox = [number, number, number, number];
 
 // Maximaler Luftlinien-Abstand einer Säule zur Route, um als Korridor-Stopp zu gelten.
 const CORRIDOR_KM = 4;
+
+// Autobahn-Modus: praktisch kein Umweg (Raststätte / unmittelbar an Aus-/Einfahrt) und
+// schnell. Die Route IST auf einer Autobahnfahrt die Autobahn → minimaler Umweg = an der
+// Autobahn. Reiner Proxy aus den vorhandenen Daten (kein „Raststätte"-Feld im Datensatz).
+const HIGHWAY_DETOUR_KM = 0.6;
+const HIGHWAY_MIN_POWER_KW = 100;
 
 async function fetchStations(
   bbox: Bbox,
@@ -112,8 +122,12 @@ export default function Page() {
     useState<TripDestination | null>(null);
   const [soc, setSoc] = useState(80);
   const [consumption, setConsumption] = useState(MODEL_Y.consumptionKwh100);
-  const [bufferKm, setBufferKm] = useState(20);
+  // Gewünschter Ladestand bei Ankunft (%) — ersetzt den früheren km-Puffer.
+  const [arrivalSoc, setArrivalSoc] = useState(10);
+  const [highwayOnly, setHighwayOnly] = useState(false);
+  const [chargePref, setChargePref] = useState<ChargePref>("middle");
   const [selectedStopIds, setSelectedStopIds] = useState<string[]>([]);
+  const appliedSuggestionRef = useRef<string | null>(null);
 
   // Anleitung beim allerersten Besuch einmalig automatisch zeigen.
   useEffect(() => {
@@ -196,6 +210,8 @@ export default function Page() {
   // ---- Reiseplaner ------------------------------------------------------
   // Fahrzeug-Reichweite aus Ladezustand/Verbrauch (Model-Y-Referenz).
   const tripRangeKm = estimateRangeKm(soc, consumption, MODEL_Y.usableKwh);
+  // Reserve = Reichweite, die für den gewünschten Ankunfts-Ladestand nötig ist.
+  const reserveKm = estimateRangeKm(arrivalSoc, consumption, MODEL_Y.usableKwh);
 
   // Fahrroute (OpenRouteService via /api/route) — Start = GPS, Ziel = Geocode.
   const routeQuery = useQuery<TripRoute, Error>({
@@ -239,28 +255,70 @@ export default function Page() {
   });
 
   // Auf den Korridor filtern (≤ CORRIDOR_KM zur Route) + alongKm/reachable annotieren.
+  // Autobahn-Modus: nur Säulen praktisch ohne Umweg und ≥ 100 kW.
   const corridorStops = useMemo<CorridorStation[]>(() => {
     if (!tripRoute || !corridorQuery.data) return [];
     const line = tripRoute.geometry.coordinates;
-    const reach = tripRangeKm - bufferKm;
+    const reach = tripRangeKm - reserveKm;
     const out: CorridorStation[] = [];
     for (const f of corridorQuery.data.features) {
       const [lon, lat] = f.geometry.coordinates;
       const { km, alongKm } = distanceToRouteKm(lat, lon, line);
       if (km > CORRIDOR_KM) continue;
+      if (highwayOnly) {
+        const power = f.properties.maxPowerKw;
+        if (km > HIGHWAY_DETOUR_KM) continue;
+        if (power == null || power < HIGHWAY_MIN_POWER_KW) continue;
+      }
       out.push({ ...f, alongKm, detourKm: km, reachable: alongKm <= reach });
     }
     out.sort((a, b) => a.alongKm - b.alongKm);
     return out;
-  }, [tripRoute, corridorQuery.data, tripRangeKm, bufferKm]);
+  }, [tripRoute, corridorQuery.data, tripRangeKm, reserveKm, highwayOnly]);
 
-  // „ab hier laden"-Punkt entlang der Route (Reichweite minus Puffer).
+  // „ab hier laden"-Punkt entlang der Route (Reichweite minus Ankunfts-Reserve).
   const chargeFromPoint = useMemo<[number, number] | null>(() => {
     if (!tripRoute) return null;
-    const reach = tripRangeKm - bufferKm;
+    const reach = tripRangeKm - reserveKm;
     if (reach <= 0 || reach >= tripRoute.distanceKm) return null;
     return pointAtKm(tripRoute.geometry.coordinates, reach);
-  }, [tripRoute, tripRangeKm, bufferKm]);
+  }, [tripRoute, tripRangeKm, reserveKm]);
+
+  // Sanfte Vorauswahl: ein empfohlener Stopp im gewünschten Reise-Drittel.
+  // Kandidaten = erreichbare Stopps; im Drittel der höchsten Leistung (dann kleinster
+  // Umweg). Greift nur, wenn überhaupt nachgeladen werden muss.
+  const suggestedStopId = useMemo<string | null>(() => {
+    if (!tripRoute) return null;
+    const reach = tripRangeKm - reserveKm;
+    if (reach >= tripRoute.distanceKm) return null; // ohne Nachladen erreichbar
+    const candidates = corridorStops.filter((s) => s.reachable);
+    if (candidates.length === 0) return null;
+    const d = tripRoute.distanceKm;
+    const inThird = (s: CorridorStation) => {
+      if (chargePref === "start") return s.alongKm < d / 3;
+      if (chargePref === "end") return s.alongKm >= (2 * d) / 3;
+      return s.alongKm >= d / 3 && s.alongKm < (2 * d) / 3;
+    };
+    const pool = candidates.filter(inThird);
+    const pick = (pool.length > 0 ? pool : candidates).slice().sort((a, b) => {
+      const pa = a.properties.maxPowerKw ?? 0;
+      const pb = b.properties.maxPowerKw ?? 0;
+      if (pb !== pa) return pb - pa;
+      return a.detourKm - b.detourKm;
+    })[0];
+    return pick?.properties.evseId ?? null;
+  }, [tripRoute, tripRangeKm, reserveKm, corridorStops, chargePref]);
+
+  // Empfehlung einmalig als Vorauswahl übernehmen, wenn sie sich ändert (neue Route /
+  // geänderte Vorliebe). Manuelle Auswahl danach bleibt unangetastet.
+  useEffect(() => {
+    if (suggestedStopId && suggestedStopId !== appliedSuggestionRef.current) {
+      appliedSuggestionRef.current = suggestedStopId;
+      setSelectedStopIds([suggestedStopId]);
+    } else if (!suggestedStopId) {
+      appliedSuggestionRef.current = null;
+    }
+  }, [suggestedStopId]);
 
   const tripActive = tripOpen && !!tripRoute;
 
@@ -430,8 +488,14 @@ export default function Page() {
         onSocChange={setSoc}
         consumption={consumption}
         onConsumptionChange={setConsumption}
-        bufferKm={bufferKm}
-        onBufferChange={setBufferKm}
+        arrivalSoc={arrivalSoc}
+        onArrivalSocChange={setArrivalSoc}
+        reserveKm={reserveKm}
+        highwayOnly={highwayOnly}
+        onHighwayOnlyChange={setHighwayOnly}
+        chargePref={chargePref}
+        onChargePrefChange={setChargePref}
+        suggestedStopId={suggestedStopId}
         rangeKm={tripRangeKm}
         onPlan={handlePlan}
         onClear={handleClearTrip}
