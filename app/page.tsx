@@ -333,6 +333,15 @@ export default function Page() {
     };
   }, [tripActive, data, corridorStops]);
 
+  // Gewählte Ladestopps als [lon, lat] für den eigenen Karten-Marker.
+  const selectedStopPoints = useMemo<[number, number][]>(
+    () =>
+      corridorStops
+        .filter((cs) => selectedStopIds.includes(cs.properties.evseId))
+        .map((cs) => cs.geometry.coordinates),
+    [corridorStops, selectedStopIds],
+  );
+
   const toggleStop = (id: string) =>
     setSelectedStopIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
@@ -415,6 +424,7 @@ export default function Page() {
         rangeKm={filters.rangeKm}
         route={tripActive ? (tripRoute?.geometry.coordinates ?? null) : null}
         chargeFromPoint={tripActive ? chargeFromPoint : null}
+        selectedStops={tripActive ? selectedStopPoints : null}
         fitBounds={tripActive ? routeBbox : null}
         onBboxChange={handleBboxChange}
         onSelect={setSelectedEvseId}

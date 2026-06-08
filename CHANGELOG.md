@@ -16,7 +16,11 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 - **Kompakteres Layout**: Fahrzeug-/Verbrauchshinweis auf einer Zeile; der
   „Nur an der Autobahn"-Schalter sitzt nun platzsparend neben Anfang/Mitte/Ende.
 - **Klarere Distanzen je Ladestopp**: „Ab Start: … km" (Fahrstrecke bis zur Säule) und
-  „Nach Laden: … km" (von der Säule bis zum Ziel).
+  „Nach Laden noch … km zum Ziel".
+- **Gewählte Ladesäule auf der Karte**: empfohlene bzw. ausgewählte Stopps werden mit
+  einem eigenen Säulen-Icon (Abwandlung des App-Icons) markiert.
+- **Querformat-Tipp**: auf dem Handy im Hochformat weist ein Hinweis darauf hin, das Gerät
+  zu drehen, damit Karte und Planer nebeneinander sichtbar sind.
 
 ## 2026-06-07
 

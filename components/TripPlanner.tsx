@@ -138,6 +138,15 @@ export function TripPlanner({
         </button>
       </div>
 
+      {/* Nur auf dem Handy im Hochformat: Hinweis aufs Querformat. */}
+      <div className="mb-3 flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200 sm:hidden landscape:hidden">
+        <span aria-hidden="true" className="text-sm">
+          📱↻
+        </span>
+        Tipp: Gerät um 90° drehen (Querformat), damit Karte und Planer
+        nebeneinander sichtbar sind.
+      </div>
+
       {!canPlan && (
         <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
           Standort wird automatisch abgefragt — oder oben einen Start eingeben.
@@ -457,8 +466,9 @@ export function TripPlanner({
                           </span>
                         </span>
                         <span className="mt-0.5 block text-[11px] tabular-nums text-zinc-500 dark:text-zinc-400">
-                          Ab Start: {Math.round(s.alongKm)} km · Nach Laden:{" "}
+                          Ab Start: {Math.round(s.alongKm)} km · Nach Laden noch{" "}
                           {Math.max(0, Math.round(route.distanceKm - s.alongKm))} km
+                          zum Ziel
                         </span>
                         <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-zinc-600 dark:text-zinc-300">
                           {s.properties.maxPowerKw != null && (

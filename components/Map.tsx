@@ -14,6 +14,20 @@ const USER_ACCURACY_ID = "user-accuracy";
 const USER_RANGE_ID = "user-range";
 const ROUTE_ID = "trip-route";
 
+// Marker für gewählte/empfohlene Ladestopps im Reiseplaner — Abwandlung des
+// App-Icons (Ladesäule + Schweizerkreuz) auf einem Emerald-Badge.
+const SELECTED_STOP_MARKER_HTML = `
+  <div class="flex h-8 w-8 items-center justify-center rounded-lg border-2 border-white bg-emerald-600 shadow-lg">
+    <svg width="20" height="20" viewBox="0 0 512 512" aria-hidden="true">
+      <rect x="158" y="384" width="196" height="30" rx="12" fill="#ffffff"/>
+      <rect x="178" y="104" width="156" height="288" rx="34" fill="#ffffff"/>
+      <rect x="200" y="126" width="112" height="110" rx="20" fill="#DA291C"/>
+      <rect x="245.5" y="146" width="21" height="70" fill="#ffffff"/>
+      <rect x="221" y="170.5" width="70" height="21" fill="#ffffff"/>
+      <polygon points="264,264 216,324 246,324 240,372 288,312 258,312" fill="#10b981"/>
+    </svg>
+  </div>`;
+
 type UserLocation = { lat: number; lon: number; accuracy: number };
 
 /**
@@ -51,6 +65,8 @@ type Props = {
   route?: LineCoords | null;
   /** Reiseplaner: Punkt, ab dem nachgeladen werden sollte. */
   chargeFromPoint?: [number, number] | null;
+  /** Reiseplaner: gewählte/empfohlene Ladestopps als [lon, lat] (eigenes Icon). */
+  selectedStops?: [number, number][] | null;
   /** Reiseplaner: Kartenausschnitt auf [west, süd, ost, nord] zoomen. */
   fitBounds?: [number, number, number, number] | null;
   onBboxChange: (bbox: [number, number, number, number]) => void;
@@ -64,6 +80,7 @@ export function Map({
   rangeKm,
   route,
   chargeFromPoint,
+  selectedStops,
   fitBounds,
   onBboxChange,
   onSelect,
@@ -72,6 +89,7 @@ export function Map({
   const mapRef = useRef<MapInstance | null>(null);
   const userMarkerRef = useRef<maplibregl.Marker | null>(null);
   const chargeMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const selectedMarkersRef = useRef<maplibregl.Marker[]>([]);
   const onBboxRef = useRef(onBboxChange);
   const onSelectRef = useRef(onSelect);
 
@@ -509,6 +527,23 @@ export function Map({
       chargeMarkerRef.current.setLngLat(chargeFromPoint);
     }
   }, [chargeFromPoint]);
+
+  // Reiseplaner: gewählte/empfohlene Ladestopps mit eigenem Säulen-Icon markieren.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    for (const m of selectedMarkersRef.current) m.remove();
+    selectedMarkersRef.current = [];
+    if (!selectedStops || selectedStops.length === 0) return;
+    for (const point of selectedStops) {
+      const el = document.createElement("div");
+      el.style.pointerEvents = "none";
+      el.innerHTML = SELECTED_STOP_MARKER_HTML;
+      selectedMarkersRef.current.push(
+        new maplibregl.Marker({ element: el }).setLngLat(point).addTo(map),
+      );
+    }
+  }, [selectedStops]);
 
   // Reiseplaner: Kartenausschnitt auf die Route zoomen.
   useEffect(() => {
