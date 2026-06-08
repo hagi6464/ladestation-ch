@@ -4,6 +4,13 @@ Notiert die nutzerseitig sichtbaren Änderungen der App — neueste zuoberst.
 Locker angelehnt an [Keep a Changelog](https://keepachangelog.com/de/); Versionierung
 per Datum, da die App kontinuierlich auf Vercel deployt wird.
 
+## 2026-06-09
+
+### Verbessert (Reiseplaner)
+- **Empfehlung nach Fahrtseite**: Die empfohlene Ladesäule liegt jetzt auf der Seite, die
+  man in Fahrtrichtung ohne Kreuzen erreicht (rechts der Fahrtrichtung). Säulen auf der
+  Gegenfahrbahn werden mit „↔ Gegenfahrbahn" markiert und nicht mehr empfohlen.
+
 ## 2026-06-08
 
 ### Neu

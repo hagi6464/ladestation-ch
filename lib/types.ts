@@ -77,6 +77,8 @@ export type CorridorStation = StationFeature & {
   alongKm: number;
   /** Luftlinien-Abstand zur Route in km. */
   detourKm: number;
+  /** Seite relativ zur Fahrtrichtung; „right" = in CH ohne Kreuzen anfahrbar. */
+  side: "left" | "right";
   /** true, wenn mit der errechneten Reichweite (minus Puffer) erreichbar. */
   reachable: boolean;
 };

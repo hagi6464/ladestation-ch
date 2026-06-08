@@ -271,7 +271,7 @@ export default function Page() {
     const out: CorridorStation[] = [];
     for (const f of corridorQuery.data.features) {
       const [lon, lat] = f.geometry.coordinates;
-      const { km, alongKm } = distanceToRouteKm(lat, lon, line);
+      const { km, alongKm, side } = distanceToRouteKm(lat, lon, line);
       if (km > CORRIDOR_KM) continue;
       if (highwayOnly) {
         const power = f.properties.maxPowerKw;
@@ -280,7 +280,13 @@ export default function Page() {
       }
       if (alongKm < winLo || alongKm > winHi) continue;
       // erreichbar = mit aktuellem Ladestand physisch anfahrbar (vor Reichweiten-Ende).
-      out.push({ ...f, alongKm, detourKm: km, reachable: alongKm <= tripRangeKm });
+      out.push({
+        ...f,
+        alongKm,
+        detourKm: km,
+        side,
+        reachable: alongKm <= tripRangeKm,
+      });
     }
     out.sort((a, b) => a.alongKm - b.alongKm);
     return out;
@@ -295,15 +301,19 @@ export default function Page() {
   }, [tripRoute, tripRangeKm, reserveKm]);
 
   // Empfehlung = stärkste Säule (dann kleinster Umweg) im gewählten Abschnitt.
+  // Säulen auf der richtigen Fahrtseite (rechts) werden bevorzugt; nur wenn es dort
+  // keine gibt, wird auf die Gegenfahrbahn zurückgegriffen.
   const suggestedStopId = useMemo<string | null>(() => {
     if (corridorStops.length === 0) return null;
-    const pick = corridorStops.slice().sort((a, b) => {
+    const byQuality = (a: CorridorStation, b: CorridorStation) => {
       const pa = a.properties.maxPowerKw ?? 0;
       const pb = b.properties.maxPowerKw ?? 0;
       if (pb !== pa) return pb - pa;
       return a.detourKm - b.detourKm;
-    })[0];
-    return pick?.properties.evseId ?? null;
+    };
+    const rightSide = corridorStops.filter((s) => s.side === "right");
+    const pool = rightSide.length > 0 ? rightSide : corridorStops;
+    return pool.slice().sort(byQuality)[0]?.properties.evseId ?? null;
   }, [corridorStops]);
 
   // Empfehlung einmalig als Vorauswahl übernehmen, wenn sie sich ändert (neue Route /

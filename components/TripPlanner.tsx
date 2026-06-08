@@ -482,6 +482,11 @@ export function TripPlanner({
                           <span className="tabular-nums">
                             {formatDetour(s.detourKm)} ab Route
                           </span>
+                          {s.side === "left" && (
+                            <span className="rounded bg-amber-100 px-1 text-[10px] text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                              ↔ Gegenfahrbahn
+                            </span>
+                          )}
                           {dc != null && (
                             <>
                               <span className="text-zinc-400">·</span>

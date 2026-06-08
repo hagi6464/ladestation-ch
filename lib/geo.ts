@@ -52,18 +52,20 @@ export function pointAtKm(line: LineCoords, km: number): [number, number] {
 
 /**
  * Kürzester Abstand [km] eines Punkts zur Route plus seine Position `alongKm`
- * entlang der Route (am nächstgelegenen Streckenpunkt). Für den Korridor-Filter
- * und die Reihenfolge der Ladestopps.
+ * entlang der Route (am nächstgelegenen Streckenpunkt) und die Seite relativ zur
+ * Fahrtrichtung (`side`). Für den Korridor-Filter, die Reihenfolge der Ladestopps
+ * und die Bevorzugung der anfahrbaren Fahrbahnseite.
  *
  * Lokale äquirektanguläre Näherung (Punkt-zu-Segment in km) — für den schmalen
- * Korridor (wenige km) genau genug.
+ * Korridor (wenige km) genau genug. `side` nimmt Rechtsverkehr an: „right" =
+ * rechts der Fahrtrichtung = ohne Kreuzen anfahrbar.
  */
 export function distanceToRouteKm(
   lat: number,
   lon: number,
   line: LineCoords,
-): { km: number; alongKm: number } {
-  let best = { km: Infinity, alongKm: 0 };
+): { km: number; alongKm: number; side: "left" | "right" } {
+  let best = { km: Infinity, alongKm: 0, side: "right" as "left" | "right" };
   let acc = 0;
   const kmPerDegLat = 110.574;
   const kmPerDegLon = 111.32 * Math.cos((lat * Math.PI) / 180);
@@ -81,7 +83,17 @@ export function distanceToRouteKm(
     t = Math.max(0, Math.min(1, t));
     const dist = Math.hypot(ax + dx * t, ay + dy * t);
     const segKm = haversineKm(lat1, lon1, lat2, lon2);
-    if (dist < best.km) best = { km: dist, alongKm: acc + t * segKm };
+    if (dist < best.km) {
+      // Seite relativ zur Fahrtrichtung (Segment A→B), Station = Ursprung:
+      // cross = dy*ax − dx*ay. cross < 0 → rechts der Fahrtrichtung (in CH/
+      // Rechtsverkehr ohne Kreuzen anfahrbar), sonst links (Gegenfahrbahn).
+      const cross = dy * ax - dx * ay;
+      best = {
+        km: dist,
+        alongKm: acc + t * segKm,
+        side: cross < 0 ? "right" : "left",
+      };
+    }
     acc += segKm;
   }
   return best;
