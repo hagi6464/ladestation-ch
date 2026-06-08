@@ -4,6 +4,20 @@ Notiert die nutzerseitig sichtbaren Änderungen der App — neueste zuoberst.
 Locker angelehnt an [Keep a Changelog](https://keepachangelog.com/de/); Versionierung
 per Datum, da die App kontinuierlich auf Vercel deployt wird.
 
+## 2026-06-08
+
+### Neu
+- **Neues App-Icon**: stilisierte Ladesäule mit Schweizerkreuz und Blitz (statt nur Blitz).
+
+### Verbessert (Reiseplaner)
+- **Start automatisch & frei wählbar**: Beim Öffnen von „Reise planen" wird der Standort
+  automatisch abgefragt. Zusätzlich lässt sich der **Start** — wie das Ziel — als Adresse
+  eingeben und überschreibt damit den GPS-Standort.
+- **Kompakteres Layout**: Fahrzeug-/Verbrauchshinweis auf einer Zeile; der
+  „Nur an der Autobahn"-Schalter sitzt nun platzsparend neben Anfang/Mitte/Ende.
+- **Klarere Distanzen je Ladestopp**: „Ab Start: … km" (Fahrstrecke bis zur Säule) und
+  „Nach Laden: … km" (von der Säule bis zum Ziel).
+
 ## 2026-06-07
 
 ### Neu (Reiseplaner)

@@ -19,6 +19,7 @@ import {
 import { useFavorites } from "@/lib/favorites";
 import { haversineKm, distanceToRouteKm, pointAtKm } from "@/lib/geo";
 import { MODEL_Y, estimateRangeKm, chargeWindowKm } from "@/lib/vehicle";
+import { requestUserLocation } from "@/lib/geolocate";
 import type {
   Filters,
   StationFeatureCollection,
@@ -120,6 +121,8 @@ export default function Page() {
   const [tripOpen, setTripOpen] = useState(false);
   const [tripDestination, setTripDestination] =
     useState<TripDestination | null>(null);
+  // Manueller Start (Eingabe wie Ziel); null = GPS-Standort verwenden.
+  const [tripStart, setTripStart] = useState<TripDestination | null>(null);
   const [soc, setSoc] = useState(80);
   const [consumption, setConsumption] = useState(MODEL_Y.consumptionKwh100);
   // Gewünschter Ladestand bei Ankunft (%) — ersetzt den früheren km-Puffer.
@@ -213,17 +216,21 @@ export default function Page() {
   // Reserve = Reichweite, die für den gewünschten Ankunfts-Ladestand nötig ist.
   const reserveKm = estimateRangeKm(arrivalSoc, consumption, MODEL_Y.usableKwh);
 
-  // Fahrroute (OpenRouteService via /api/route) — Start = GPS, Ziel = Geocode.
+  // Routen-Start: manuell eingegebener Start, sonst GPS-Standort.
+  const routeFrom: { lat: number; lon: number } | null =
+    tripStart ?? userLocation;
+
+  // Fahrroute (OpenRouteService via /api/route) — Start = routeFrom, Ziel = Geocode.
   const routeQuery = useQuery<TripRoute, Error>({
     queryKey: [
       "route",
-      userLocation?.lat,
-      userLocation?.lon,
+      routeFrom?.lat,
+      routeFrom?.lon,
       tripDestination?.lat,
       tripDestination?.lon,
     ],
-    queryFn: () => fetchRoute(userLocation!, tripDestination!),
-    enabled: !!userLocation && !!tripDestination,
+    queryFn: () => fetchRoute(routeFrom!, tripDestination!),
+    enabled: !!routeFrom && !!tripDestination,
     staleTime: 5 * 60_000,
   });
   const tripRoute = routeQuery.data ?? null;
@@ -344,7 +351,7 @@ export default function Page() {
 
   // Route inkl. gewählter Ladestopps an Google Maps übergeben (max. 3 mobil).
   const handleOpenInMaps = () => {
-    if (!userLocation || !tripDestination) return;
+    if (!routeFrom || !tripDestination) return;
     const chosen = corridorStops
       .filter((cs) => selectedStopIds.includes(cs.properties.evseId))
       .sort((a, b) => a.alongKm - b.alongKm)
@@ -353,9 +360,7 @@ export default function Page() {
         const [lon, lat] = cs.geometry.coordinates;
         return `${lat},${lon}`;
       });
-    const origin = encodeURIComponent(
-      `${userLocation.lat},${userLocation.lon}`,
-    );
+    const origin = encodeURIComponent(`${routeFrom.lat},${routeFrom.lon}`);
     const destination = encodeURIComponent(
       `${tripDestination.lat},${tripDestination.lon}`,
     );
@@ -369,14 +374,14 @@ export default function Page() {
   // Apple Karten kann per URL nur ein Ziel — daher der nächste gewählte
   // Ladestopp (oder das Ziel, falls keiner gewählt).
   const handleOpenInApple = () => {
-    if (!userLocation || !tripDestination) return;
+    if (!routeFrom || !tripDestination) return;
     const next = corridorStops
       .filter((cs) => selectedStopIds.includes(cs.properties.evseId))
       .sort((a, b) => a.alongKm - b.alongKm)[0];
     const target = next
       ? { lat: next.geometry.coordinates[1], lon: next.geometry.coordinates[0] }
       : { lat: tripDestination.lat, lon: tripDestination.lon };
-    const saddr = encodeURIComponent(`${userLocation.lat},${userLocation.lon}`);
+    const saddr = encodeURIComponent(`${routeFrom.lat},${routeFrom.lon}`);
     const daddr = encodeURIComponent(`${target.lat},${target.lon}`);
     window.open(
       `https://maps.apple.com/?saddr=${saddr}&daddr=${daddr}&dirflg=d`,
@@ -423,6 +428,12 @@ export default function Page() {
           onOpenTrip={() => {
             setSelectedEvseId(null);
             setTripOpen(true);
+            // Standort automatisch abfragen, falls noch keiner gesetzt ist.
+            if (!userLocation && !tripStart) {
+              requestUserLocation()
+                .then(setUserLocation)
+                .catch(() => {});
+            }
           }}
         />
         <div className="pointer-events-auto w-full sm:w-auto">
@@ -472,7 +483,9 @@ export default function Page() {
       <TripPlanner
         open={tripOpen}
         onClose={() => setTripOpen(false)}
-        hasLocation={!!userLocation}
+        canPlan={!!routeFrom}
+        onStartSelect={(s) => setTripStart(s)}
+        onStartClear={() => setTripStart(null)}
         vehicleName={MODEL_Y.name}
         soc={soc}
         onSocChange={setSoc}

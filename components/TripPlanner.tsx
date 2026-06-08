@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { CorridorStation, TripRoute } from "@/lib/types";
 import { findCpoTariff, type CpoTariff } from "@/lib/cpo-tariffs";
 import {
@@ -8,16 +8,19 @@ import {
   chargeWindowKm,
   type ChargePref,
 } from "@/lib/vehicle";
+import { GeocodeField, type GeocodeResult } from "@/components/GeocodeField";
 
 export type { ChargePref };
 export type TripDestination = { lat: number; lon: number; label: string };
-type GeocodeResult = { lat: number; lon: number; zoom: number; label: string };
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  /** Start = GPS-Standort; ohne ihn ist keine Planung möglich. */
-  hasLocation: boolean;
+  /** true, wenn ein Start (GPS oder manuell eingegeben) vorhanden ist. */
+  canPlan: boolean;
+  /** Manuellen Start setzen bzw. zurücksetzen (zurückgesetzt = GPS verwenden). */
+  onStartSelect: (s: TripDestination) => void;
+  onStartClear: () => void;
   vehicleName: string;
   soc: number;
   onSocChange: (n: number) => void;
@@ -76,7 +79,9 @@ function minDcPerKwh(cpo: CpoTariff): number | null {
 export function TripPlanner({
   open,
   onClose,
-  hasLocation,
+  canPlan,
+  onStartSelect,
+  onStartClear,
   vehicleName,
   soc,
   onSocChange,
@@ -103,46 +108,8 @@ export function TripPlanner({
   onOpenInApple,
 }: Props) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<GeocodeResult[]>([]);
-  const [listOpen, setListOpen] = useState(false);
-  const [geoBusy, setGeoBusy] = useState(false);
   const [destination, setDestination] = useState<TripDestination | null>(null);
-  const lastSelected = useRef<string>("");
-
-  // Ziel-Geocoding (gleicher Endpoint wie die Hauptsuche).
-  useEffect(() => {
-    const q = query.trim();
-    if (q === lastSelected.current) return;
-    const t = setTimeout(async () => {
-      if (q.length < 2) {
-        setResults([]);
-        setListOpen(false);
-        return;
-      }
-      setGeoBusy(true);
-      try {
-        const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}`);
-        if (!res.ok) throw new Error();
-        const data = (await res.json()) as { results?: GeocodeResult[] };
-        setResults(data.results ?? []);
-        setListOpen((data.results ?? []).length > 0);
-      } catch {
-        setResults([]);
-        setListOpen(false);
-      } finally {
-        setGeoBusy(false);
-      }
-    }, 300);
-    return () => clearTimeout(t);
-  }, [query]);
-
-  function selectResult(r: GeocodeResult) {
-    lastSelected.current = r.label;
-    setQuery(r.label);
-    setListOpen(false);
-    setResults([]);
-    setDestination({ lat: r.lat, lon: r.lon, label: r.label });
-  }
+  const [startQuery, setStartQuery] = useState("");
 
   if (!open) return null;
 
@@ -158,14 +125,9 @@ export function TripPlanner({
       aria-label="Reiseplaner"
     >
       <div className="mb-3 flex items-start justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-            Reise planen
-          </h2>
-          <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-            Standard: {vehicleName} — Verbrauch anpassbar
-          </p>
-        </div>
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+          Reise planen
+        </h2>
         <button
           type="button"
           onClick={onClose}
@@ -176,66 +138,57 @@ export function TripPlanner({
         </button>
       </div>
 
-      {!hasLocation && (
+      {!canPlan && (
         <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
-          Zuerst über das 📍-Symbol in der Suche den Standort setzen — er ist der
-          Startpunkt der Route.
+          Standort wird automatisch abgefragt — oder oben einen Start eingeben.
         </div>
       )}
 
       <div className="space-y-3">
-        {/* Start */}
-        <div className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-200">
-          <span className="inline-block h-3 w-3 shrink-0 rounded-full border-2 border-white bg-blue-600 shadow" />
-          <span className="font-medium">Start:</span>
-          <span className="text-zinc-600 dark:text-zinc-300">
-            Mein Standort
-          </span>
-        </div>
+        {/* Start (GPS-Standard oder manuell eingegeben) */}
+        <GeocodeField
+          label="Start"
+          placeholder="Mein Standort (GPS)"
+          value={startQuery}
+          onValueChange={(v) => {
+            setStartQuery(v);
+            onStartClear();
+          }}
+          onSelect={(r: GeocodeResult) =>
+            onStartSelect({ lat: r.lat, lon: r.lon, label: r.label })
+          }
+          ariaLabel="Startort"
+          trailing={
+            startQuery ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setStartQuery("");
+                  onStartClear();
+                }}
+                aria-label="Start zurücksetzen (mein Standort)"
+                className="shrink-0 rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+              >
+                ✕
+              </button>
+            ) : undefined
+          }
+        />
 
         {/* Ziel */}
-        <div className="relative">
-          <label className="mb-1 block text-xs uppercase text-zinc-500">
-            Ziel
-          </label>
-          <div className="flex items-center gap-1 rounded-xl border border-zinc-200 bg-white px-2 py-1.5 dark:border-zinc-700 dark:bg-zinc-800">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setDestination(null);
-              }}
-              onFocus={() => results.length > 0 && setListOpen(true)}
-              onBlur={() => setTimeout(() => setListOpen(false), 150)}
-              placeholder="Zielort oder Adresse…"
-              className="min-w-0 flex-1 bg-transparent px-1 py-0.5 text-base text-zinc-900 outline-none placeholder:text-zinc-400 dark:text-zinc-50"
-              aria-label="Zielort"
-              autoComplete="off"
-            />
-            {geoBusy && (
-              <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-zinc-300 border-t-blue-600" />
-            )}
-          </div>
-          {listOpen && results.length > 0 && (
-            <ul className="absolute z-30 mt-1 w-full overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
-              {results.map((r, idx) => (
-                <li key={`${r.label}-${idx}`}>
-                  <button
-                    type="button"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      selectResult(r);
-                    }}
-                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-zinc-700 hover:bg-blue-50 dark:text-zinc-200 dark:hover:bg-blue-950"
-                  >
-                    <span className="truncate">{r.label}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <GeocodeField
+          label="Ziel"
+          placeholder="Zielort oder Adresse…"
+          value={query}
+          onValueChange={(v) => {
+            setQuery(v);
+            setDestination(null);
+          }}
+          onSelect={(r: GeocodeResult) =>
+            setDestination({ lat: r.lat, lon: r.lon, label: r.label })
+          }
+          ariaLabel="Zielort"
+        />
 
         {/* Ladezustand */}
         <div>
@@ -267,6 +220,9 @@ export function TripPlanner({
         </div>
 
         {/* Verbrauch + Ankunft (Drehrad/Select — kein iOS-Auto-Zoom) */}
+        <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
+          Standard: {vehicleName} — anpassbar
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
             <span className="mb-1 block text-xs uppercase text-zinc-500">
@@ -308,62 +264,61 @@ export function TripPlanner({
           </label>
         </div>
 
-        {/* Autobahn-Filter */}
-        <button
-          type="button"
-          role="switch"
-          aria-checked={highwayOnly}
-          onClick={() => onHighwayOnlyChange(!highwayOnly)}
-          className={`flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2 text-left text-sm transition-colors ${
-            highwayOnly
-              ? "border-emerald-400 bg-emerald-50 text-emerald-800 dark:border-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-200"
-              : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
-          }`}
-        >
-          <span className="min-w-0">
-            <span className="block font-medium">🛣️ Nur an der Autobahn</span>
-            <span className="block text-[11px] text-zinc-500 dark:text-zinc-400">
-              Schnelllader &gt; 100 kW praktisch ohne Umweg
-            </span>
-          </span>
-          <span
-            aria-hidden="true"
-            className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
-              highwayOnly ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-600"
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${
-                highwayOnly ? "left-[18px]" : "left-0.5"
-              }`}
-            />
-          </span>
-        </button>
-
-        {/* Lade-Position */}
+        {/* Lade-Position + Autobahn-Filter (eine Zeile) */}
         <div>
           <span className="mb-1 block text-xs uppercase text-zinc-500">
             Laden bevorzugt
           </span>
-          <div className="grid grid-cols-3 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
-            {(["start", "middle", "end"] as const).map((p) => (
-              <button
-                key={p}
-                type="button"
-                aria-pressed={chargePref === p}
-                onClick={() => onChargePrefChange(p)}
-                className={`rounded-md px-2 py-1.5 text-sm font-medium transition-colors ${
-                  chargePref === p
-                    ? "bg-white text-emerald-700 shadow-sm dark:bg-zinc-900 dark:text-emerald-300"
-                    : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50"
+          <div className="flex items-stretch gap-2">
+            <div className="grid flex-1 grid-cols-3 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
+              {(["start", "middle", "end"] as const).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  aria-pressed={chargePref === p}
+                  onClick={() => onChargePrefChange(p)}
+                  className={`rounded-md px-2 py-1.5 text-sm font-medium transition-colors ${
+                    chargePref === p
+                      ? "bg-white text-emerald-700 shadow-sm dark:bg-zinc-900 dark:text-emerald-300"
+                      : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50"
+                  }`}
+                >
+                  {CHARGE_PREF_LABELS[p]}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={highwayOnly}
+              onClick={() => onHighwayOnlyChange(!highwayOnly)}
+              title="Nur Schnelllader über 100 kW praktisch ohne Umweg (an der Autobahn)"
+              aria-label="Nur Schnelllader über 100 kW an der Autobahn"
+              className={`flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 transition-colors ${
+                highwayOnly
+                  ? "border-emerald-400 bg-emerald-50 text-emerald-800 dark:border-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-200"
+                  : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+              }`}
+            >
+              <span aria-hidden="true" className="text-base">
+                🛣️
+              </span>
+              <span
+                aria-hidden="true"
+                className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
+                  highwayOnly ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-600"
                 }`}
               >
-                {CHARGE_PREF_LABELS[p]}
-              </button>
-            ))}
+                <span
+                  className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${
+                    highwayOnly ? "left-[18px]" : "left-0.5"
+                  }`}
+                />
+              </span>
+            </button>
           </div>
           <div className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
-            Zeigt Säulen ≈{" "}
+            {highwayOnly ? "Nur an der Autobahn · zeigt" : "Zeigt"} Säulen ≈{" "}
             <span className="tabular-nums">
               {Math.round(winLo)}–{Math.round(winHi)} km
             </span>{" "}
@@ -375,7 +330,7 @@ export function TripPlanner({
         <div className="flex items-center gap-2">
           <button
             type="button"
-            disabled={!hasLocation || !destination || loading}
+            disabled={!canPlan || !destination || loading}
             onClick={() => destination && onPlan(destination)}
             className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -500,9 +455,10 @@ export function TripPlanner({
                               </span>
                             )}
                           </span>
-                          <span className="shrink-0 text-[11px] tabular-nums text-zinc-500">
-                            nach {Math.round(s.alongKm)} km
-                          </span>
+                        </span>
+                        <span className="mt-0.5 block text-[11px] tabular-nums text-zinc-500 dark:text-zinc-400">
+                          Ab Start: {Math.round(s.alongKm)} km · Nach Laden:{" "}
+                          {Math.max(0, Math.round(route.distanceKm - s.alongKm))} km
                         </span>
                         <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-zinc-600 dark:text-zinc-300">
                           {s.properties.maxPowerKw != null && (

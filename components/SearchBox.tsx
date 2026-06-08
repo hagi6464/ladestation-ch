@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { isInServiceArea } from "@/lib/service-area";
+import { requestUserLocation } from "@/lib/geolocate";
 
 export type FlyTarget = { lat: number; lon: number; zoom: number };
 type GeocodeResult = FlyTarget & { label: string };
@@ -87,34 +87,21 @@ export function SearchBox({ onLocate, onUserLocation }: Props) {
 
   function handleLocate() {
     setError(null);
-    if (typeof navigator === "undefined" || !navigator.geolocation) {
-      setError("Standort wird von diesem Browser nicht unterstützt.");
-      return;
-    }
     setBusy(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
+    requestUserLocation()
+      .then((loc) => {
         setBusy(false);
-        const { latitude, longitude, accuracy } = pos.coords;
-        if (!isInServiceArea(latitude, longitude)) {
-          setError(
-            "Dein Standort liegt ausserhalb des abgedeckten Gebiets (Schweiz/Liechtenstein). Keine Ladesäulen-Daten verfügbar.",
-          );
-          return;
-        }
-        onUserLocation?.({ lat: latitude, lon: longitude, accuracy });
-        onLocate({ lat: latitude, lon: longitude, zoom: 14 });
-      },
-      (err) => {
+        onUserLocation?.(loc);
+        onLocate({ lat: loc.lat, lon: loc.lon, zoom: 14 });
+      })
+      .catch((e: unknown) => {
         setBusy(false);
-        if (err.code === err.PERMISSION_DENIED) {
-          setError("Standortfreigabe wurde verweigert.");
-        } else {
-          setError("Standort konnte nicht ermittelt werden.");
-        }
-      },
-      { enableHighAccuracy: true, timeout: 10000 },
-    );
+        setError(
+          e instanceof Error
+            ? e.message
+            : "Standort konnte nicht ermittelt werden.",
+        );
+      });
   }
 
   return (
