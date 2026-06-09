@@ -39,6 +39,7 @@ export function GeocodeField({
   const [listOpen, setListOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const lastSelected = useRef<string>("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const q = value.trim();
@@ -72,6 +73,8 @@ export function GeocodeField({
     setListOpen(false);
     setResults([]);
     onSelect(r);
+    // Auswahl getroffen → Fokus weg, damit sich die Tastatur (mobil) schliesst.
+    inputRef.current?.blur();
   }
 
   return (
@@ -81,6 +84,7 @@ export function GeocodeField({
       </label>
       <div className="flex items-center gap-1 rounded-xl border border-zinc-200 bg-white px-2 py-1.5 dark:border-zinc-700 dark:bg-zinc-800">
         <input
+          ref={inputRef}
           type="text"
           value={value}
           onChange={(e) => onValueChange(e.target.value)}

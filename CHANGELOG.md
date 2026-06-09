@@ -19,6 +19,8 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 - **Ladesäule auf der Karte wählen**: Im Reise-Modus eine Säule auf der Karte antippen
   öffnet ihre Infos und fragt nach kurzer Zeit, ob sie **zusätzlich** in den Reiseplan
   soll oder den **vorherigen** Ladestopp ersetzt.
+- **Feinschliff**: Die Tastatur schliesst sich nach Auswahl von Start/Ziel automatisch;
+  im Querformat ist der Planer schmaler (~40 %), damit mehr von der Karte sichtbar bleibt.
 
 ## 2026-06-08
 
