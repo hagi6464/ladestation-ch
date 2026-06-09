@@ -10,6 +10,9 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 - **Empfehlung nach Fahrtseite**: Die empfohlene Ladesäule liegt jetzt auf der Seite, die
   man in Fahrtrichtung ohne Kreuzen erreicht (rechts der Fahrtrichtung). Säulen auf der
   Gegenfahrbahn werden mit „↔ Gegenfahrbahn" markiert und nicht mehr empfohlen.
+- **Lade-Position ohne Lücken**: „Anfang / Mitte / Ende" decken die Reichweite jetzt
+  lückenlos in Dritteln ab (0–⅓ / ⅓–⅔ / ⅔–volle Reichweite) — so gehen keine interessanten
+  Ladesäulen mehr zwischen den Zonen verloren.
 
 ## 2026-06-08
 

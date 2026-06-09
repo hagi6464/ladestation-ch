@@ -37,19 +37,21 @@ export const MODEL_Y: Vehicle = {
 export type ChargePref = "start" | "middle" | "end";
 
 /**
- * Entfernungsfenster ab Start [km] für die gewählte Lade-Position, relativ zur
- * Reichweite `rangeKm` aus dem aktuellen Ladestand:
- * - start  = erstes Drittel der Reichweite (0–33 %)
- * - middle = Mitte der Reichweite (50 % ± 10 Prozentpunkte → 40–60 %)
- * - end    = später Abschnitt der Reichweite (70–90 %)
+ * Entfernungsfenster ab Start [km] für die gewählte Lade-Position — **lückenlose**
+ * Drittel der Reichweite aus dem aktuellen Ladestand, damit keine Säule zwischen
+ * den Zonen verloren geht:
+ * - start  = erstes Drittel (0 – ⅓ der Reichweite)
+ * - middle = mittleres Drittel (⅓ – ⅔)
+ * - end    = letztes Drittel (⅔ – volle Reichweite)
  */
 export function chargeWindowKm(
   pref: ChargePref,
   rangeKm: number,
 ): [number, number] {
-  if (pref === "start") return [0, rangeKm / 3];
-  if (pref === "end") return [rangeKm * 0.7, rangeKm * 0.9];
-  return [rangeKm * 0.4, rangeKm * 0.6];
+  const third = rangeKm / 3;
+  if (pref === "start") return [0, third];
+  if (pref === "end") return [2 * third, rangeKm];
+  return [third, 2 * third];
 }
 
 /** Reichweite [km] aus Ladezustand (%), Verbrauch und nutzbarer Batterie. */
