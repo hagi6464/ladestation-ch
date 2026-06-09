@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Map } from "@/components/Map";
-import { FilterBar } from "@/components/FilterBar";
+import { FilterSheet, activeFilterCount } from "@/components/FilterSheet";
 import { StationSheet } from "@/components/StationSheet";
 import { SearchBox, type FlyTarget } from "@/components/SearchBox";
 import { InstallModal } from "@/components/InstallModal";
@@ -111,6 +110,7 @@ export default function Page() {
   const [installOpen, setInstallOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [donateOpen, setDonateOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lon: number;
@@ -385,6 +385,15 @@ export default function Page() {
     setSelectedStopIds([]);
   };
 
+  // Reiseplaner öffnen (Primär-Button) + Standort automatisch abfragen.
+  const openTrip = () => {
+    setSelectedEvseId(null);
+    setTripOpen(true);
+    if (!userLocation && !tripStart) {
+      requestUserLocation().then(setUserLocation).catch(() => {});
+    }
+  };
+
   // Route inkl. gewählter Ladestopps an Google Maps übergeben (max. 3 mobil).
   const handleOpenInMaps = () => {
     if (!routeFrom || !tripDestination) return;
@@ -442,6 +451,8 @@ export default function Page() {
     setBbox(next);
   };
 
+  const filterCount = activeFilterCount(filters);
+
   return (
     <div className="relative h-full w-full">
       <Map
@@ -458,44 +469,78 @@ export default function Page() {
       />
 
       <div
-        className={`pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col items-start gap-2 p-3 sm:flex-row sm:flex-wrap sm:items-start sm:gap-3 ${
+        className={`pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col items-start gap-2 p-3 ${
           tripOpen ? "hidden" : ""
         }`}
       >
-        <LogoMenu
-          onOpenGuide={() => setGuideOpen(true)}
-          onOpenInstall={() => setInstallOpen(true)}
-          onOpenDonate={() => setDonateOpen(true)}
-          onOpenTrip={() => {
-            setSelectedEvseId(null);
-            setTripOpen(true);
-            // Standort automatisch abfragen, falls noch keiner gesetzt ist.
-            if (!userLocation && !tripStart) {
-              requestUserLocation()
-                .then(setUserLocation)
-                .catch(() => {});
-            }
-          }}
-        />
-        <div className="pointer-events-auto w-full sm:w-auto">
-          <SearchBox
-            onLocate={(t) => setFlyTarget({ ...t })}
-            onUserLocation={setUserLocation}
+        <div className="flex w-full items-start gap-2 sm:w-auto">
+          <LogoMenu
+            onOpenGuide={() => setGuideOpen(true)}
+            onOpenInstall={() => setInstallOpen(true)}
+            onOpenDonate={() => setDonateOpen(true)}
           />
+          <div className="pointer-events-auto min-w-0 flex-1 sm:w-80 sm:flex-none">
+            <SearchBox
+              onLocate={(t) => setFlyTarget({ ...t })}
+              onUserLocation={setUserLocation}
+            />
+          </div>
         </div>
-        <div className="pointer-events-auto">
-          <FilterBar
-            filters={filters}
-            onChange={setFilters}
-            hasLocation={!!userLocation}
-          />
-        </div>
+        <button
+          type="button"
+          onClick={() => setFilterOpen(true)}
+          className="pointer-events-auto inline-flex items-center gap-1.5 rounded-xl bg-white/95 px-3 py-1.5 text-sm font-medium text-zinc-700 shadow-md backdrop-blur transition-colors hover:bg-white dark:bg-zinc-900/90 dark:text-zinc-200 dark:hover:bg-zinc-900"
+        >
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+          </svg>
+          Filter
+          {filterCount > 0 && (
+            <span className="rounded-full bg-blue-600 px-1.5 text-[10px] font-semibold tabular-nums text-white">
+              {filterCount}
+            </span>
+          )}
+        </button>
         {data?.truncated && (
           <div className="pointer-events-auto rounded-xl bg-amber-100 px-3 py-2 text-xs text-amber-800 shadow-md">
             Mehr Stationen verfügbar — zoom oder filter, um mehr zu sehen
           </div>
         )}
       </div>
+
+      {/* Primär-Aktion: Reiseplaner öffnen (unten mittig) */}
+      {!tripOpen && !selectedEvseId && (
+        <button
+          type="button"
+          onClick={openTrip}
+          className="pointer-events-auto fixed bottom-4 left-1/2 z-20 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-emerald-500"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <polygon points="3 11 22 2 13 21 11 13 3 11" />
+          </svg>
+          Route planen
+        </button>
+      )}
 
       <StationSheet
         evseId={selectedEvseId}
@@ -522,6 +567,14 @@ export default function Page() {
       <DonationModal
         open={donateOpen}
         onClose={() => setDonateOpen(false)}
+      />
+
+      <FilterSheet
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        filters={filters}
+        onChange={setFilters}
+        hasLocation={!!userLocation}
       />
 
       <TripPlanner
@@ -556,14 +609,6 @@ export default function Page() {
         onOpenInApple={handleOpenInApple}
       />
 
-      <Link
-        href="/impressum"
-        className={`pointer-events-auto absolute bottom-1 left-1 z-20 rounded bg-white/70 px-1.5 py-0.5 text-[10px] text-zinc-600 backdrop-blur transition-colors hover:bg-white hover:text-zinc-900 dark:bg-zinc-900/70 dark:text-zinc-400 dark:hover:text-zinc-100 ${
-          tripOpen ? "hidden" : ""
-        }`}
-      >
-        Impressum
-      </Link>
     </div>
   );
 }
