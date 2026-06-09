@@ -13,6 +13,11 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 - **Lade-Position ohne Lücken**: „Anfang / Mitte / Ende" decken die Reichweite jetzt
   lückenlos in Dritteln ab (0–⅓ / ⅓–⅔ / ⅔–volle Reichweite) — so gehen keine interessanten
   Ladesäulen mehr zwischen den Zonen verloren.
+- **Vollbild im Hochformat**: Auf dem Handy im Hochformat füllt der Reiseplaner jetzt den
+  ganzen Bildschirm (andere Menüs ausgeblendet); im Querformat bzw. am Desktop liegt er als
+  seitliches Panel neben der sichtbaren Karte.
+- **Ladesäule auf der Karte wählen**: Im Reise-Modus eine Säule auf der Karte antippen
+  wählt sie direkt als Ladestopp an bzw. ab (Häkchen in der Liste + Marker aktualisieren sich).
 
 ## 2026-06-08
 

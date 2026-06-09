@@ -121,7 +121,7 @@ export function TripPlanner({
 
   return (
     <aside
-      className="pointer-events-auto fixed inset-x-0 bottom-0 z-30 max-h-[78vh] overflow-y-auto rounded-t-2xl border border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900 sm:inset-x-auto sm:bottom-4 sm:left-4 sm:top-auto sm:max-h-[82vh] sm:w-96 sm:rounded-2xl"
+      className="pointer-events-auto fixed inset-0 z-30 overflow-y-auto border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900 max-sm:landscape:inset-y-0 max-sm:landscape:right-auto max-sm:landscape:w-[62%] max-sm:landscape:max-w-md max-sm:landscape:rounded-r-2xl max-sm:landscape:border-r sm:inset-y-4 sm:left-4 sm:right-auto sm:bottom-4 sm:w-96 sm:rounded-2xl sm:border"
       aria-label="Reiseplaner"
     >
       <div className="mb-3 flex items-start justify-between gap-3">

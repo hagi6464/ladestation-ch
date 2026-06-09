@@ -357,6 +357,19 @@ export default function Page() {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
 
+  // Karten-Tipp: im Reise-Modus eine Korridor-Säule als Ladestopp an/abwählen,
+  // sonst das Detail-Sheet öffnen (normales Browsen).
+  const handleStationSelect = (evseId: string) => {
+    if (
+      tripActive &&
+      corridorStops.some((cs) => cs.properties.evseId === evseId)
+    ) {
+      toggleStop(evseId);
+    } else {
+      setSelectedEvseId(evseId);
+    }
+  };
+
   const handlePlan = (dest: TripDestination) => {
     setSelectedEvseId(null);
     setTripDestination(dest);
@@ -437,10 +450,14 @@ export default function Page() {
         selectedStops={tripActive ? selectedStopPoints : null}
         fitBounds={tripActive ? routeBbox : null}
         onBboxChange={handleBboxChange}
-        onSelect={setSelectedEvseId}
+        onSelect={handleStationSelect}
       />
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col items-start gap-2 p-3 sm:flex-row sm:flex-wrap sm:items-start sm:gap-3">
+      <div
+        className={`pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col items-start gap-2 p-3 sm:flex-row sm:flex-wrap sm:items-start sm:gap-3 ${
+          tripOpen ? "hidden" : ""
+        }`}
+      >
         <LogoMenu
           onOpenGuide={() => setGuideOpen(true)}
           onOpenInstall={() => setInstallOpen(true)}
@@ -534,7 +551,9 @@ export default function Page() {
 
       <Link
         href="/impressum"
-        className="pointer-events-auto absolute bottom-1 left-1 z-20 rounded bg-white/70 px-1.5 py-0.5 text-[10px] text-zinc-600 backdrop-blur transition-colors hover:bg-white hover:text-zinc-900 dark:bg-zinc-900/70 dark:text-zinc-400 dark:hover:text-zinc-100"
+        className={`pointer-events-auto absolute bottom-1 left-1 z-20 rounded bg-white/70 px-1.5 py-0.5 text-[10px] text-zinc-600 backdrop-blur transition-colors hover:bg-white hover:text-zinc-900 dark:bg-zinc-900/70 dark:text-zinc-400 dark:hover:text-zinc-100 ${
+          tripOpen ? "hidden" : ""
+        }`}
       >
         Impressum
       </Link>
