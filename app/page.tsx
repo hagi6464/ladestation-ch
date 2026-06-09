@@ -10,6 +10,7 @@ import { InstallModal } from "@/components/InstallModal";
 import { GuideModal } from "@/components/GuideModal";
 import { DonationModal } from "@/components/DonationModal";
 import { LogoMenu } from "@/components/LogoMenu";
+import { InfoCallout } from "@/components/ui/InfoCallout";
 import {
   TripPlanner,
   type TripDestination,
@@ -490,9 +491,9 @@ export default function Page() {
           </div>
         </div>
         {data?.truncated && (
-          <div className="pointer-events-auto rounded-xl bg-amber-100 px-3 py-2 text-xs text-amber-800 shadow-md">
+          <InfoCallout tone="warn" className="pointer-events-auto shadow-popover">
             Mehr Stationen verfügbar — zoom oder filter, um mehr zu sehen
-          </div>
+          </InfoCallout>
         )}
       </div>
 

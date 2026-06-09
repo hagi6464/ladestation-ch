@@ -2,6 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { Badge } from "@/components/ui/Badge";
+import {
+  IconBookOpen,
+  IconCheck,
+  IconChevronDown,
+  IconDownload,
+  IconFilter,
+  IconHeart,
+  IconInfo,
+  IconRoute,
+  IconShare,
+} from "@/components/ui/Icon";
 
 type Props = {
   /** Filter-Fenster öffnen (Teil der Ladestation-Suche). */
@@ -16,11 +28,12 @@ type Props = {
 };
 
 const SECTION =
-  "px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-zinc-400";
+  "px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-tertiary";
 const ITEM =
-  "flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800";
+  "flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm text-primary hover:bg-surface-muted";
 const ITEM_PRIMARY =
-  "flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-medium text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-950";
+  "flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm font-medium text-brand hover:bg-brand-soft";
+const DIVIDER = "my-1 border-t border-border";
 
 export function LogoMenu({
   onOpenFilter,
@@ -93,7 +106,7 @@ export function LogoMenu({
         aria-expanded={open}
         aria-label="Menü"
         title="Menü"
-        className="relative inline-flex items-center gap-1 rounded-xl bg-white/95 p-1.5 pr-2 shadow-md backdrop-blur transition-colors hover:bg-white dark:bg-zinc-900/90 dark:hover:bg-zinc-900"
+        className="relative inline-flex items-center gap-1 rounded-control bg-surface/95 p-1.5 pr-2 shadow-popover backdrop-blur transition-colors hover:bg-surface"
       >
         {/* App-Logo: Ladesäule + Schweizerkreuz */}
         <svg
@@ -114,16 +127,14 @@ export function LogoMenu({
             fill="#10b981"
           />
         </svg>
-        <span
-          aria-hidden="true"
-          className={`text-xs text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
-        >
-          ▾
-        </span>
+        <IconChevronDown
+          size={14}
+          className={`text-tertiary transition-transform ${open ? "rotate-180" : ""}`}
+        />
         {filterCount > 0 && (
           <span
             aria-hidden="true"
-            className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-semibold tabular-nums text-white"
+            className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold tabular-nums text-on-accent"
           >
             {filterCount}
           </span>
@@ -134,7 +145,7 @@ export function LogoMenu({
         <div
           role="menu"
           aria-label="Menü"
-          className="absolute left-0 top-full z-30 mt-1 min-w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
+          className="absolute left-0 top-full z-30 mt-1 min-w-56 overflow-hidden rounded-popover border border-border bg-surface py-1 shadow-popover"
         >
           {/* 1) Ladestation suchen */}
           <div className={SECTION}>Ladestation suchen</div>
@@ -144,16 +155,17 @@ export function LogoMenu({
             onClick={() => choose(onOpenFilter)}
             className={ITEM}
           >
-            ⚙️ Filter
+            <IconFilter size={18} />
+            Filter
             {filterCount > 0 && (
-              <span className="ml-auto rounded-full bg-blue-600 px-1.5 text-[10px] font-semibold tabular-nums text-white">
+              <Badge tone="accent" variant="solid" className="ml-auto">
                 {filterCount}
-              </span>
+              </Badge>
             )}
           </button>
 
           {/* 2) Reiseplaner */}
-          <div className="my-1 border-t border-zinc-200 dark:border-zinc-700" />
+          <div className={DIVIDER} />
           <div className={SECTION}>Reiseplaner</div>
           <button
             type="button"
@@ -161,18 +173,20 @@ export function LogoMenu({
             onClick={() => choose(onOpenTrip)}
             className={ITEM_PRIMARY}
           >
-            🗺️ Route planen
+            <IconRoute size={18} />
+            Route planen
           </button>
 
           {/* 3) Weitere Funktionen */}
-          <div className="my-1 border-t border-zinc-200 dark:border-zinc-700" />
+          <div className={DIVIDER} />
           <button
             type="button"
             role="menuitem"
             onClick={() => choose(onOpenGuide)}
             className={ITEM}
           >
-            📖 Kurzanleitung
+            <IconBookOpen size={18} />
+            Kurzanleitung
           </button>
           <button
             type="button"
@@ -180,7 +194,8 @@ export function LogoMenu({
             onClick={() => choose(onOpenInstall)}
             className={ITEM}
           >
-            📲 Als App speichern
+            <IconDownload size={18} />
+            Als App speichern
           </button>
           <button
             type="button"
@@ -188,7 +203,8 @@ export function LogoMenu({
             onClick={handleShare}
             className={ITEM}
           >
-            {copied ? "✓ Link kopiert" : "📤 Weiterempfehlen"}
+            {copied ? <IconCheck size={18} /> : <IconShare size={18} />}
+            {copied ? "Link kopiert" : "Weiterempfehlen"}
           </button>
           <button
             type="button"
@@ -196,7 +212,8 @@ export function LogoMenu({
             onClick={() => choose(onOpenDonate)}
             className={ITEM}
           >
-            ❤️ Trinkgeld senden
+            <IconHeart size={18} />
+            Trinkgeld senden
           </button>
           <Link
             href="/impressum"
@@ -204,7 +221,8 @@ export function LogoMenu({
             onClick={() => setOpen(false)}
             className={ITEM}
           >
-            ℹ️ Impressum
+            <IconInfo size={18} />
+            Impressum
           </Link>
         </div>
       )}

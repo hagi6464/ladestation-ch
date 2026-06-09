@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { IconArrowLeft } from "@/components/ui/Icon";
 
 export const metadata: Metadata = {
   title: "Impressum — Ladestation Schweiz",
@@ -9,21 +10,18 @@ export const metadata: Metadata = {
 
 export default function ImpressumPage() {
   return (
-    <main className="mx-auto max-w-2xl px-5 py-10 text-zinc-800 dark:text-zinc-200">
+    <main className="mx-auto max-w-2xl px-5 py-10 text-secondary">
       <Link
         href="/"
-        className="text-sm text-emerald-700 hover:underline dark:text-emerald-400"
+        className="inline-flex items-center gap-1 text-sm text-brand hover:underline"
       >
-        ← Zur Karte
+        <IconArrowLeft size={15} />
+        Zur Karte
       </Link>
 
-      <h1 className="mt-4 text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
-        Impressum
-      </h1>
+      <h1 className="mt-4 t-large-title text-primary">Impressum</h1>
 
-      <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-        Betreiber
-      </h2>
+      <h2 className="mt-8 t-title text-primary">Betreiber</h2>
       <div className="mt-2 space-y-1 text-sm">
         <p>Marek Hagmann</p>
         <p>2540 Grenchen, Schweiz</p>
@@ -31,16 +29,14 @@ export default function ImpressumPage() {
           E-Mail:{" "}
           <a
             href="mailto:ladestation-ch.relock425@passmail.com"
-            className="text-emerald-700 hover:underline dark:text-emerald-400"
+            className="text-brand hover:underline"
           >
             ladestation-ch.relock425@passmail.com
           </a>
         </p>
       </div>
 
-      <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-        Über die App
-      </h2>
+      <h2 className="mt-8 t-title text-primary">Über die App</h2>
       <p className="mt-2 text-sm leading-relaxed">
         „Ladestation Schweiz“ ist eine kostenlose und werbefreie Web-App zur
         Anzeige öffentlicher Elektroauto-Ladestationen in der Schweiz. Die App
@@ -52,9 +48,7 @@ export default function ImpressumPage() {
         werden keine Produkte oder Dienstleistungen verkauft.
       </p>
 
-      <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-        Freiwillige Unterstützung
-      </h2>
+      <h2 className="mt-8 t-title text-primary">Freiwillige Unterstützung</h2>
       <p className="mt-2 text-sm leading-relaxed">
         Wer das Projekt unterstützen möchte, kann freiwillig ein Trinkgeld über
         den Button „Trinkgeld senden“ überweisen. Die Zahlung kann per TWINT oder
@@ -70,9 +64,7 @@ export default function ImpressumPage() {
         und Nutzungsbedingungen des jeweiligen Zahlungsdienstleisters.
       </p>
 
-      <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-        Datenquellen
-      </h2>
+      <h2 className="mt-8 t-title text-primary">Datenquellen</h2>
       <p className="mt-2 text-sm leading-relaxed">
         Die Ladestationsdaten stammen aus den öffentlich zugänglichen Daten von
         ich-tanke-strom.ch des Bundesamts für Energie (BFE).
@@ -82,9 +74,7 @@ export default function ImpressumPage() {
         zugehörigen Kartendiensten.
       </p>
 
-      <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-        Haftungsausschluss
-      </h2>
+      <h2 className="mt-8 t-title text-primary">Haftungsausschluss</h2>
       <p className="mt-2 text-sm leading-relaxed">
         Die Inhalte dieser App werden mit grösstmöglicher Sorgfalt erstellt und
         aktualisiert. Dennoch kann keine Gewähr für die Richtigkeit,
@@ -106,9 +96,7 @@ export default function ImpressumPage() {
         zulässigen Umfang ausgeschlossen.
       </p>
 
-      <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-        Datenschutz
-      </h2>
+      <h2 className="mt-8 t-title text-primary">Datenschutz</h2>
       <p className="mt-2 text-sm leading-relaxed">
         Diese App nutzt Vercel Web Analytics, um anonyme Nutzungsstatistiken (z. B.
         Seitenaufrufe, ungefähre Herkunft, Gerätetyp) zu erfassen. Dieser Dienst

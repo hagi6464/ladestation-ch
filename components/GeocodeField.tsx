@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { SectionLabel } from "@/components/ui/SectionLabel";
+import { IconMapPin } from "@/components/ui/Icon";
 
 export type GeocodeResult = {
   lat: number;
@@ -40,6 +42,8 @@ export function GeocodeField({
   const [busy, setBusy] = useState(false);
   const lastSelected = useRef<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const fieldId = useId();
+  const listId = `${fieldId}-list`;
 
   useEffect(() => {
     const q = value.trim();
@@ -77,41 +81,55 @@ export function GeocodeField({
     inputRef.current?.blur();
   }
 
+  const listVisible = listOpen && results.length > 0;
+
   return (
     <div className="relative">
-      <label className="mb-1 block text-xs uppercase text-zinc-500">
+      <SectionLabel as="label" htmlFor={fieldId}>
         {label}
-      </label>
-      <div className="flex items-center gap-1 rounded-xl border border-zinc-200 bg-white px-2 py-1.5 dark:border-zinc-700 dark:bg-zinc-800">
+      </SectionLabel>
+      <div className="flex items-center gap-1 rounded-control border border-border bg-surface px-2 py-1.5">
         <input
           ref={inputRef}
+          id={fieldId}
           type="text"
           value={value}
           onChange={(e) => onValueChange(e.target.value)}
           onFocus={() => results.length > 0 && setListOpen(true)}
           onBlur={() => setTimeout(() => setListOpen(false), 150)}
           placeholder={placeholder}
-          className="min-w-0 flex-1 bg-transparent px-1 py-0.5 text-base text-zinc-900 outline-none placeholder:text-zinc-400 dark:text-zinc-50"
+          className="min-w-0 flex-1 bg-transparent px-1 py-0.5 text-base text-primary outline-none placeholder:text-tertiary"
           aria-label={ariaLabel ?? label}
           autoComplete="off"
+          role="combobox"
+          aria-expanded={listVisible}
+          aria-controls={listId}
+          aria-autocomplete="list"
         />
         {busy && (
-          <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-zinc-300 border-t-blue-600" />
+          <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-border border-t-accent" />
         )}
         {trailing}
       </div>
-      {listOpen && results.length > 0 && (
-        <ul className="absolute z-30 mt-1 w-full overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
+      {listVisible && (
+        <ul
+          id={listId}
+          role="listbox"
+          className="absolute z-30 mt-1 w-full overflow-hidden rounded-popover border border-border bg-surface shadow-popover"
+        >
           {results.map((r, idx) => (
             <li key={`${r.label}-${idx}`}>
               <button
                 type="button"
+                role="option"
+                aria-selected={false}
                 onMouseDown={(e) => {
                   e.preventDefault();
                   pick(r);
                 }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-zinc-700 hover:bg-blue-50 dark:text-zinc-200 dark:hover:bg-blue-950"
+                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-secondary hover:bg-accent-soft hover:text-primary"
               >
+                <IconMapPin size={14} className="shrink-0 text-tertiary" />
                 <span className="truncate">{r.label}</span>
               </button>
             </li>

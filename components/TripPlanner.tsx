@@ -9,6 +9,19 @@ import {
   type ChargePref,
 } from "@/lib/vehicle";
 import { GeocodeField, type GeocodeResult } from "@/components/GeocodeField";
+import { Button } from "@/components/ui/Button";
+import { IconButton } from "@/components/ui/IconButton";
+import { Badge } from "@/components/ui/Badge";
+import { InfoCallout } from "@/components/ui/InfoCallout";
+import { SectionLabel } from "@/components/ui/SectionLabel";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import {
+  IconCheck,
+  IconClose,
+  IconNavigation,
+  IconRoute,
+  IconRotate,
+} from "@/components/ui/Icon";
 
 export type { ChargePref };
 export type TripDestination = { lat: number; lon: number; label: string };
@@ -51,6 +64,12 @@ type Props = {
   onOpenInMaps: () => void;
   onOpenInApple: () => void;
 };
+
+const CHARGE_PREF_OPTIONS: { value: ChargePref; label: string }[] = [
+  { value: "start", label: "Anfang" },
+  { value: "middle", label: "Mitte" },
+  { value: "end", label: "Ende" },
+];
 
 const CHARGE_PREF_LABELS: Record<ChargePref, string> = {
   start: "Anfang",
@@ -121,36 +140,30 @@ export function TripPlanner({
 
   return (
     <aside
-      className="pointer-events-auto fixed inset-0 z-30 overflow-y-auto border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900 landscape:inset-y-0 landscape:right-auto landscape:w-2/5 landscape:min-w-[300px] landscape:max-w-[460px] landscape:rounded-r-2xl landscape:border-r"
+      className="pointer-events-auto fixed inset-0 z-30 overflow-y-auto bg-surface p-5 shadow-sheet landscape:inset-y-0 landscape:right-auto landscape:w-2/5 landscape:min-w-[300px] landscape:max-w-[460px] landscape:rounded-r-sheet landscape:border-r landscape:border-border"
       aria-label="Reiseplaner"
     >
       <div className="mb-3 flex items-start justify-between gap-3">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-          Reise planen
-        </h2>
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-full p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
-          aria-label="Schliessen"
-        >
-          ✕
-        </button>
+        <h2 className="t-title text-primary">Reise planen</h2>
+        <IconButton label="Schliessen" onClick={onClose} className="-mr-1 -mt-1">
+          <IconClose size={20} />
+        </IconButton>
       </div>
 
       {/* Nur auf dem Handy im Hochformat: Hinweis aufs Querformat. */}
-      <div className="mb-3 flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-[11px] text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200 sm:hidden landscape:hidden">
-        <span aria-hidden="true" className="text-sm">
-          📱↻
-        </span>
+      <InfoCallout
+        tone="info"
+        icon={<IconRotate size={16} />}
+        className="mb-3 items-center sm:hidden landscape:hidden"
+      >
         Tipp: Gerät um 90° drehen (Querformat), damit Karte und Planer
         nebeneinander sichtbar sind.
-      </div>
+      </InfoCallout>
 
       {!canPlan && (
-        <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
+        <InfoCallout tone="warn" className="mb-3">
           Standort wird automatisch abgefragt — oder oben einen Start eingeben.
-        </div>
+        </InfoCallout>
       )}
 
       <div className="space-y-3">
@@ -169,17 +182,15 @@ export function TripPlanner({
           ariaLabel="Startort"
           trailing={
             startQuery ? (
-              <button
-                type="button"
+              <IconButton
+                label="Start zurücksetzen (mein Standort)"
                 onClick={() => {
                   setStartQuery("");
                   onStartClear();
                 }}
-                aria-label="Start zurücksetzen (mein Standort)"
-                className="shrink-0 rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
               >
-                ✕
-              </button>
+                <IconClose size={16} />
+              </IconButton>
             ) : undefined
           }
         />
@@ -202,10 +213,10 @@ export function TripPlanner({
         {/* Ladezustand */}
         <div>
           <div className="mb-1 flex items-baseline justify-between">
-            <label className="text-xs uppercase text-zinc-500">
+            <SectionLabel as="label" className="mb-0">
               Ladezustand
-            </label>
-            <span className="text-sm font-semibold tabular-nums text-zinc-900 dark:text-zinc-50">
+            </SectionLabel>
+            <span className="text-sm font-semibold tabular-nums text-primary">
               {soc}%
             </span>
           </div>
@@ -216,10 +227,10 @@ export function TripPlanner({
             step={5}
             value={soc}
             onChange={(e) => onSocChange(Number(e.target.value))}
-            className="w-full accent-emerald-600"
+            className="w-full accent-brand"
             aria-label="Ladezustand in Prozent"
           />
-          <div className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">
+          <div className="mt-0.5 t-caption text-tertiary">
             Reichweite ≈{" "}
             <span className="font-semibold tabular-nums">
               {Math.round(rangeKm)} km
@@ -229,18 +240,16 @@ export function TripPlanner({
         </div>
 
         {/* Verbrauch + Ankunft (Drehrad/Select — kein iOS-Auto-Zoom) */}
-        <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
+        <div className="t-caption text-tertiary">
           Standard: {vehicleName} — anpassbar
         </div>
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
-            <span className="mb-1 block text-xs uppercase text-zinc-500">
-              Verbrauch
-            </span>
+            <SectionLabel>Verbrauch</SectionLabel>
             <select
               value={consumption}
               onChange={(e) => onConsumptionChange(Number(e.target.value))}
-              className="w-full rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-base text-zinc-900 outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+              className="w-full rounded-control border border-border bg-surface px-2 py-1.5 text-base text-primary outline-none"
               aria-label="Verbrauch in kWh pro 100 km"
             >
               {CONSUMPTION_OPTIONS.map((v) => (
@@ -249,18 +258,16 @@ export function TripPlanner({
                 </option>
               ))}
             </select>
-            <span className="mt-0.5 block text-[11px] text-zinc-500">
+            <span className="mt-0.5 block t-caption text-tertiary">
               kWh/100&nbsp;km
             </span>
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs uppercase text-zinc-500">
-              Ankunft mit
-            </span>
+            <SectionLabel>Ankunft mit</SectionLabel>
             <select
               value={arrivalSoc}
               onChange={(e) => onArrivalSocChange(Number(e.target.value))}
-              className="w-full rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-base text-zinc-900 outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+              className="w-full rounded-control border border-border bg-surface px-2 py-1.5 text-base text-primary outline-none"
               aria-label="Gewünschter Ladestand bei Ankunft in Prozent"
             >
               {ARRIVAL_OPTIONS.map((p) => (
@@ -269,33 +276,21 @@ export function TripPlanner({
                 </option>
               ))}
             </select>
-            <span className="mt-0.5 block text-[11px] text-zinc-500">am Ziel</span>
+            <span className="mt-0.5 block t-caption text-tertiary">am Ziel</span>
           </label>
         </div>
 
         {/* Lade-Position + Autobahn-Filter (eine Zeile) */}
         <div>
-          <span className="mb-1 block text-xs uppercase text-zinc-500">
-            Laden bevorzugt
-          </span>
+          <SectionLabel>Laden bevorzugt</SectionLabel>
           <div className="flex items-stretch gap-2">
-            <div className="grid flex-1 grid-cols-3 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
-              {(["start", "middle", "end"] as const).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  aria-pressed={chargePref === p}
-                  onClick={() => onChargePrefChange(p)}
-                  className={`rounded-md px-2 py-1.5 text-sm font-medium transition-colors ${
-                    chargePref === p
-                      ? "bg-white text-emerald-700 shadow-sm dark:bg-zinc-900 dark:text-emerald-300"
-                      : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50"
-                  }`}
-                >
-                  {CHARGE_PREF_LABELS[p]}
-                </button>
-              ))}
-            </div>
+            <SegmentedControl
+              className="flex-1"
+              ariaLabel="Laden bevorzugt"
+              options={CHARGE_PREF_OPTIONS}
+              value={chargePref}
+              onChange={onChargePrefChange}
+            />
             <button
               type="button"
               role="switch"
@@ -303,19 +298,17 @@ export function TripPlanner({
               onClick={() => onHighwayOnlyChange(!highwayOnly)}
               title="Nur Schnelllader über 100 kW praktisch ohne Umweg (an der Autobahn)"
               aria-label="Nur Schnelllader über 100 kW an der Autobahn"
-              className={`flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 transition-colors ${
+              className={`flex shrink-0 items-center gap-1.5 rounded-control border px-2.5 transition-colors ${
                 highwayOnly
-                  ? "border-emerald-400 bg-emerald-50 text-emerald-800 dark:border-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-200"
-                  : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                  ? "border-brand bg-brand-soft text-brand-strong"
+                  : "border-border bg-surface text-secondary hover:border-border-strong"
               }`}
             >
-              <span aria-hidden="true" className="text-base">
-                🛣️
-              </span>
+              <IconRoute size={16} />
               <span
                 aria-hidden="true"
                 className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
-                  highwayOnly ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-600"
+                  highwayOnly ? "bg-brand" : "bg-border-strong"
                 }`}
               >
                 <span
@@ -326,7 +319,7 @@ export function TripPlanner({
               </span>
             </button>
           </div>
-          <div className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+          <div className="mt-1 t-caption text-tertiary">
             {highwayOnly ? "Nur an der Autobahn · zeigt" : "Zeigt"} Säulen ≈{" "}
             <span className="tabular-nums">
               {Math.round(winLo)}–{Math.round(winHi)} km
@@ -337,69 +330,46 @@ export function TripPlanner({
 
         {/* CTA */}
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            disabled={!canPlan || !destination || loading}
+          <Button
+            variant="primary"
+            className="flex-1"
+            disabled={!canPlan || !destination}
+            loading={loading}
             onClick={() => destination && onPlan(destination)}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {loading ? (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-            ) : (
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <polygon points="3 11 22 2 13 21 11 13 3 11" />
-              </svg>
-            )}
+            {!loading && <IconNavigation size={16} />}
             Route planen
-          </button>
+          </Button>
           {route && (
-            <button
-              type="button"
-              onClick={onClear}
-              className="rounded-xl border border-zinc-200 px-3 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            >
+            <Button variant="secondary" onClick={onClear}>
               Zurücksetzen
-            </button>
+            </Button>
           )}
         </div>
 
-        {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
-            {error}
-          </div>
-        )}
+        {error && <InfoCallout tone="danger">{error}</InfoCallout>}
       </div>
 
       {/* Ergebnis */}
       {route && (
-        <div className="mt-4 space-y-3 border-t border-zinc-200 pt-4 dark:border-zinc-700">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-700 dark:text-zinc-200">
-            <span className="font-semibold tabular-nums">
+        <div className="mt-4 space-y-3 border-t border-border pt-4">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-secondary">
+            <span className="font-semibold tabular-nums text-primary">
               {Math.round(route.distanceKm)} km
             </span>
-            <span className="text-zinc-400">·</span>
+            <span className="text-tertiary">·</span>
             <span className="tabular-nums">
               ≈ {formatDuration(route.durationMin)}
             </span>
           </div>
 
           {reachWithoutCharge ? (
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">
-              ✓ Ziel ohne Nachladen erreichbar — mit ca. {arrivalSoc}% Restladung am
+            <InfoCallout tone="success" icon={<IconCheck size={16} />}>
+              Ziel ohne Nachladen erreichbar — mit ca. {arrivalSoc}% Restladung am
               Ziel.
-            </div>
+            </InfoCallout>
           ) : (
-            <div className="text-xs text-zinc-500 dark:text-zinc-400">
+            <div className="t-caption text-tertiary">
               Nachladen nötig — Schnelllader im Abschnitt{" "}
               <span className="font-medium">
                 {CHARGE_PREF_LABELS[chargePref]}
@@ -415,89 +385,77 @@ export function TripPlanner({
                 const suggested = s.properties.evseId === suggestedStopId;
                 const cpo = findCpoTariff(s.properties.operatorName);
                 const dc = cpo ? minDcPerKwh(cpo) : null;
-                const chargeMin = Math.round(
-                  estimateChargeMinutes(s.properties.maxPowerKw) / 5,
-                ) * 5;
+                const chargeMin =
+                  Math.round(
+                    estimateChargeMinutes(s.properties.maxPowerKw) / 5,
+                  ) * 5;
                 return (
                   <li key={s.properties.evseId}>
                     <button
                       type="button"
                       onClick={() => onToggleStop(s.properties.evseId)}
-                      className={`flex w-full items-start gap-2 rounded-lg border px-2.5 py-2 text-left transition-colors ${
+                      className={`flex w-full items-start gap-2 rounded-card border px-2.5 py-2 text-left transition-colors ${
                         selected
-                          ? "border-emerald-400 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-950/50"
-                          : "border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800"
+                          ? "border-brand bg-brand-soft"
+                          : "border-border bg-surface hover:border-border-strong"
                       } ${s.reachable ? "" : "opacity-60"}`}
                     >
                       <span
                         className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
                           selected
-                            ? "border-emerald-500 bg-emerald-500 text-white"
-                            : "border-zinc-300 dark:border-zinc-600"
+                            ? "border-brand bg-brand text-on-brand"
+                            : "border-border-strong"
                         }`}
                         aria-hidden="true"
                       >
-                        {selected && (
-                          <svg
-                            width="11"
-                            height="11"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                        )}
+                        {selected && <IconCheck size={12} strokeWidth={3} />}
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="flex items-baseline justify-between gap-2">
                           <span className="flex min-w-0 items-center gap-1.5">
-                            <span className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                            <span className="truncate text-sm font-medium text-primary">
                               {s.properties.name ?? "Ladestation"}
                             </span>
                             {suggested && (
-                              <span className="shrink-0 rounded bg-emerald-600 px-1 text-[10px] font-semibold text-white">
+                              <Badge tone="brand" variant="solid">
                                 Empfohlen
-                              </span>
+                              </Badge>
                             )}
                           </span>
                         </span>
-                        <span className="mt-0.5 block text-[11px] tabular-nums text-zinc-500 dark:text-zinc-400">
+                        <span className="mt-0.5 block t-caption tabular-nums text-tertiary">
                           Ab Start {Math.round(s.alongKm)} km · ab Laden{" "}
-                          {Math.max(0, Math.round(route.distanceKm - s.alongKm))} km
+                          {Math.max(
+                            0,
+                            Math.round(route.distanceKm - s.alongKm),
+                          )}{" "}
+                          km
                         </span>
-                        <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-zinc-600 dark:text-zinc-300">
+                        <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 t-caption text-secondary">
                           {s.properties.maxPowerKw != null && (
                             <span className="font-semibold tabular-nums">
                               {s.properties.maxPowerKw} kW
                             </span>
                           )}
-                          <span className="text-zinc-400">·</span>
+                          <span className="text-tertiary">·</span>
                           <span>≈ {chargeMin} min</span>
-                          <span className="text-zinc-400">·</span>
+                          <span className="text-tertiary">·</span>
                           <span className="tabular-nums">
                             {formatDetour(s.detourKm)} ab Route
                           </span>
                           {s.side === "left" && (
-                            <span className="rounded bg-amber-100 px-1 text-[10px] text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
-                              ↔ Gegenfahrbahn
-                            </span>
+                            <Badge tone="warning">↔ Gegenfahrbahn</Badge>
                           )}
                           {dc != null && (
                             <>
-                              <span className="text-zinc-400">·</span>
+                              <span className="text-tertiary">·</span>
                               <span className="tabular-nums">
                                 ab {dc.toFixed(2)} CHF/kWh
                               </span>
                             </>
                           )}
                           {!s.reachable && (
-                            <span className="rounded bg-zinc-200 px-1 text-[10px] text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300">
-                              ausser Reichweite
-                            </span>
+                            <Badge tone="neutral">ausser Reichweite</Badge>
                           )}
                         </span>
                       </span>
@@ -509,47 +467,36 @@ export function TripPlanner({
           )}
 
           {stops.length === 0 && !reachWithoutCharge && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
+            <InfoCallout tone="warn">
               {highwayOnly
                 ? `Keine Schnelllader (> 100 kW) im Abschnitt „${CHARGE_PREF_LABELS[chargePref]}" gefunden — Autobahn-Filter ausschalten oder andere Lade-Position wählen.`
                 : `Keine Ladesäule im Abschnitt „${CHARGE_PREF_LABELS[chargePref]}" gefunden — andere Lade-Position wählen.`}
-            </div>
+            </InfoCallout>
           )}
 
-          <button
-            type="button"
+          <Button
+            variant="accent"
+            className="w-full"
             onClick={onOpenInMaps}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <polygon points="3 11 22 2 13 21 11 13 3 11" />
-            </svg>
+            <IconNavigation size={16} />
             In Google Maps öffnen
-          </button>
+          </Button>
 
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            className="w-full"
             onClick={onOpenInApple}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
           >
             In Apple Karten (nächster Stopp)
-          </button>
+          </Button>
 
-          <p className="text-[11px] leading-relaxed text-zinc-400">
+          <p className="t-caption leading-relaxed text-tertiary">
             Grobe Orientierung ohne Gewähr — Verbrauch/Reichweite je nach Tempo,
-            Wetter und Höhe verschieden. Distanzen entlang der Route = Fahrstrecke,
-            der seitliche Umweg ab Route = Luftlinie. Google Maps übernimmt auf dem
-            Handy max. 3 Zwischenstopps; Apple Karten nur den nächsten Stopp.
+            Wetter und Höhe verschieden. Distanzen entlang der Route =
+            Fahrstrecke, der seitliche Umweg ab Route = Luftlinie. Google Maps
+            übernimmt auf dem Handy max. 3 Zwischenstopps; Apple Karten nur den
+            nächsten Stopp.
           </p>
         </div>
       )}

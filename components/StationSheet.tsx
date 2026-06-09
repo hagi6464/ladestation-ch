@@ -6,6 +6,22 @@ import type { StationDetail, StationPoint } from "@/lib/types";
 import { PlugIcon, classifyPlug } from "@/components/PlugIcon";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { labelAuthModes, labelAccessibility } from "@/lib/oicp-labels";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { IconButton } from "@/components/ui/IconButton";
+import { InfoCallout } from "@/components/ui/InfoCallout";
+import { SectionLabel } from "@/components/ui/SectionLabel";
+import {
+  IconCheck,
+  IconClose,
+  IconInfo,
+  IconLeaf,
+  IconLightbulb,
+  IconNavigation,
+  IconPhone,
+  IconShare,
+  IconSmartphone,
+} from "@/components/ui/Icon";
 
 type CpoTariffEntry = {
   name: string;
@@ -122,10 +138,7 @@ async function fetchStation(evseId: string): Promise<StationDetail> {
 function CpoStandardTariffSection({ cpo }: { cpo: CpoTariff }) {
   let host = "";
   try {
-    host = new URL(cpo.pricingUrl ?? cpo.websiteUrl).host.replace(
-      /^www\./,
-      "",
-    );
+    host = new URL(cpo.pricingUrl ?? cpo.websiteUrl).host.replace(/^www\./, "");
   } catch {
     host = cpo.websiteUrl;
   }
@@ -133,10 +146,10 @@ function CpoStandardTariffSection({ cpo }: { cpo: CpoTariff }) {
   return (
     <div className="space-y-2">
       <div className="flex items-baseline justify-between">
-        <div className="text-xs uppercase text-zinc-500">
+        <SectionLabel className="mb-0">
           {isPlatform ? "Tarif-Info" : "Eigentarif des Betreibers"}
-        </div>
-        <div className="text-[10px] text-zinc-400">{cpo.displayName}</div>
+        </SectionLabel>
+        <div className="t-caption text-tertiary">{cpo.displayName}</div>
       </div>
       {cpo.platformNote ? (
         (() => {
@@ -154,67 +167,40 @@ function CpoStandardTariffSection({ cpo }: { cpo: CpoTariff }) {
           const tip = obj?.tip ? String(obj.tip) : "";
           return (
             <div className="space-y-2">
-              <div className="rounded-lg border-2 border-blue-300 bg-blue-50 p-3 text-blue-900 dark:border-blue-600 dark:bg-blue-950 dark:text-blue-100">
-                <div className="flex items-start gap-2">
-                  <svg
-                    className="mt-0.5 h-5 w-5 shrink-0"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="16" x2="12" y2="12" />
-                    <line x1="12" y1="8" x2="12.01" y2="8" />
-                  </svg>
-                  <div className="space-y-1">
-                    {headline && (
-                      <div className="text-sm font-semibold leading-snug">
-                        {headline}
-                      </div>
-                    )}
-                    {body && (
-                      <div className="text-xs leading-relaxed">{body}</div>
-                    )}
+              <InfoCallout tone="info" icon={<IconInfo size={18} />}>
+                {headline && (
+                  <div className="text-sm font-semibold leading-snug">
+                    {headline}
                   </div>
-                </div>
-              </div>
+                )}
+                {body && <div className="mt-1">{body}</div>}
+              </InfoCallout>
               {tip && (
-                <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-[11px] text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
-                  <span aria-hidden="true">💡</span>
-                  <span className="leading-relaxed">{tip}</span>
-                </div>
+                <InfoCallout tone="warn" icon={<IconLightbulb size={16} />}>
+                  {tip}
+                </InfoCallout>
               )}
             </div>
           );
         })()
       ) : (
-        <div className="rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[11px] text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200">
-          Pay-per-Use-Tarif laut Anbieter-Website. Mit Anbieter-eigenem Abo
-          oft günstiger, mit Roaming-Karten anderer Provider meist teurer.
-          Preise sind kuratiert und können veraltet sein.
-        </div>
+        <InfoCallout tone="info">
+          Pay-per-Use-Tarif laut Anbieter-Website. Mit Anbieter-eigenem Abo oft
+          günstiger, mit Roaming-Karten anderer Provider meist teurer. Preise
+          sind kuratiert und können veraltet sein.
+        </InfoCallout>
       )}
       <ul className="space-y-1.5">
         {cpo.tariffs.map((t, idx) => (
           <li
             key={`${cpo.cpoId}-${idx}`}
-            className="rounded-lg border border-zinc-200 bg-white p-2 dark:border-zinc-700 dark:bg-zinc-900"
+            className="rounded-card border border-border bg-surface p-2"
           >
             <div className="flex items-baseline justify-between gap-2">
-              <div className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-                {t.name}
-              </div>
-              {t.requiresMembership && (
-                <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
-                  Abo nötig
-                </span>
-              )}
+              <div className="text-sm font-medium text-primary">{t.name}</div>
+              {t.requiresMembership && <Badge tone="warning">Abo nötig</Badge>}
             </div>
-            <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-700 dark:text-zinc-200">
+            <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-secondary">
               {t.acPerKwh != null && (
                 <span>
                   AC{" "}
@@ -251,19 +237,17 @@ function CpoStandardTariffSection({ cpo }: { cpo: CpoTariff }) {
               )}
             </div>
             {t.notes && (
-              <div className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
-                {t.notes}
-              </div>
+              <div className="mt-1 t-caption text-tertiary">{t.notes}</div>
             )}
           </li>
         ))}
       </ul>
-      <div className="flex items-baseline justify-between text-[10px] text-zinc-400">
+      <div className="flex items-baseline justify-between t-caption text-tertiary">
         <a
           href={cpo.pricingUrl ?? cpo.websiteUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-600 hover:underline"
+          className="text-accent hover:underline"
         >
           Aktueller Tarif auf {host} ↗
         </a>
@@ -280,22 +264,22 @@ function TariffSection({
 }) {
   if (state.isPending) {
     return (
-      <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+      <div className="rounded-card bg-surface-muted px-3 py-2 text-xs text-secondary">
         Lade Tarifinfo…
       </div>
     );
   }
   if (state.error) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+      <InfoCallout tone="danger">
         Tarifinfo konnte nicht geladen werden: {state.error.message}
-      </div>
+      </InfoCallout>
     );
   }
   const data = state.data;
   if (!data || data.ok === false) {
     return (
-      <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+      <div className="rounded-card bg-surface-muted px-3 py-2 text-xs text-secondary">
         Für diesen Betreiber liegt kein hinterlegter Tarif vor.
       </div>
     );
@@ -303,29 +287,28 @@ function TariffSection({
   return <CpoStandardTariffSection cpo={data.cpoStandardTariff} />;
 }
 
-function availabilityBadge(data: StationDetail) {
+function availabilityBadge(data: StationDetail): {
+  label: string;
+  tone: "neutral" | "brand" | "danger";
+} {
   if (!data.hasStatus)
     return {
       label: `${data.total} Ladepunkt${data.total === 1 ? "" : "e"}`,
-      className: "bg-zinc-100 text-zinc-600",
+      tone: "neutral",
     };
-  const cls =
-    data.available >= 1
-      ? "bg-emerald-100 text-emerald-700"
-      : "bg-red-100 text-red-700";
   return {
     label: `${data.available} von ${data.total} frei`,
-    className: cls,
+    tone: data.available >= 1 ? "brand" : "danger",
   };
 }
 
 function pointStatus(status: string | null) {
-  if (status === "Available") return { label: "Frei", dot: "bg-emerald-500" };
-  if (status === "Occupied") return { label: "Besetzt", dot: "bg-red-500" };
-  if (status === "Reserved") return { label: "Reserviert", dot: "bg-amber-500" };
+  if (status === "Available") return { label: "Frei", dot: "bg-brand" };
+  if (status === "Occupied") return { label: "Besetzt", dot: "bg-danger" };
+  if (status === "Reserved") return { label: "Reserviert", dot: "bg-warning" };
   if (status === "OutOfService")
-    return { label: "Ausser Betrieb", dot: "bg-zinc-400" };
-  return { label: "Unbekannt", dot: "bg-zinc-300" };
+    return { label: "Ausser Betrieb", dot: "bg-tertiary" };
+  return { label: "Unbekannt", dot: "bg-border-strong" };
 }
 
 function PointsList({ points }: { points: StationPoint[] }) {
@@ -380,16 +363,16 @@ function PointsList({ points }: { points: StationPoint[] }) {
   return (
     <div>
       <div className="flex items-center justify-between gap-2">
-        <div className="text-xs uppercase text-zinc-500">
+        <SectionLabel className="mb-0">
           Ladepunkte ({points.length})
-        </div>
+        </SectionLabel>
         {plugTypes.length > 0 && (
           <div className="flex flex-wrap items-center justify-end gap-1.5">
             {plugTypes.map(({ type, label }) => (
               <span
                 key={type}
                 title={label}
-                className="inline-flex items-center gap-1 rounded-md bg-zinc-100 px-1.5 py-0.5 text-[11px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                className="inline-flex items-center gap-1 rounded-md bg-surface-muted px-1.5 py-0.5 text-[11px] text-secondary"
               >
                 <PlugIcon
                   type={type}
@@ -408,7 +391,7 @@ function PointsList({ points }: { points: StationPoint[] }) {
           return (
             <li
               key={g.key}
-              className="flex items-center gap-2 rounded-md bg-zinc-50 px-2 py-1 text-xs dark:bg-zinc-800/60"
+              className="flex items-center gap-2 rounded-md bg-surface-muted px-2 py-1 text-xs"
             >
               <span
                 className={`h-2.5 w-2.5 shrink-0 rounded-full ${st.dot}`}
@@ -416,24 +399,22 @@ function PointsList({ points }: { points: StationPoint[] }) {
                 aria-label={st.label}
               />
               {g.count > 1 && (
-                <span className="shrink-0 font-medium tabular-nums text-zinc-500">
+                <span className="shrink-0 font-medium tabular-nums text-tertiary">
                   {g.count}×
                 </span>
               )}
-              <span className="font-medium tabular-nums">
+              <span className="font-medium tabular-nums text-primary">
                 {g.maxPowerKw ? `${g.maxPowerKw} kW` : "–"}
               </span>
               {showPlugPerRow && (
                 <>
-                  <span className="text-zinc-400">·</span>
-                  <span className="truncate text-zinc-600 dark:text-zinc-300">
+                  <span className="text-tertiary">·</span>
+                  <span className="truncate text-secondary">
                     {g.plugLabels.join(", ") || "—"}
                   </span>
                 </>
               )}
-              <span className="ml-auto shrink-0 text-zinc-500">
-                {st.label}
-              </span>
+              <span className="ml-auto shrink-0 text-tertiary">{st.label}</span>
             </li>
           );
         })}
@@ -519,194 +500,118 @@ export function StationSheet({
     }
   }
 
+  const avail = data ? availabilityBadge(data) : null;
+  const maxKw = data
+    ? Math.max(0, ...data.points.map((p) => p.maxPowerKw ?? 0))
+    : 0;
+
   return (
     <aside
-      className="pointer-events-auto fixed inset-x-0 bottom-0 z-30 max-h-[70vh] overflow-y-auto rounded-t-2xl border border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:top-20 sm:max-h-none sm:w-96 sm:rounded-2xl"
+      className="pointer-events-auto fixed inset-x-0 bottom-0 z-30 max-h-[70vh] overflow-y-auto rounded-t-sheet border border-border bg-surface p-5 shadow-sheet sm:inset-x-auto sm:bottom-4 sm:right-4 sm:top-20 sm:max-h-none sm:w-96 sm:rounded-sheet"
       aria-label="Stationsdetails"
     >
       <div className="mb-3 flex items-start justify-between gap-3">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-          {data?.name ?? "Ladestation"}
-        </h2>
+        <h2 className="t-title text-primary">{data?.name ?? "Ladestation"}</h2>
         <div className="flex shrink-0 items-center gap-1">
           {data && (
-            <button
-              type="button"
+            <IconButton
+              label={shared ? "Link kopiert" : "Säule teilen"}
               onClick={handleShare}
-              aria-label="Säule teilen"
-              title={shared ? "Link kopiert" : "Diese Säule teilen"}
-              className="rounded-full p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
             >
-              {shared ? (
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              ) : (
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <circle cx="18" cy="5" r="3" />
-                  <circle cx="6" cy="12" r="3" />
-                  <circle cx="18" cy="19" r="3" />
-                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-                </svg>
-              )}
-            </button>
+              {shared ? <IconCheck size={20} /> : <IconShare size={20} />}
+            </IconButton>
           )}
           <FavoriteButton evseId={evseId} />
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
-            aria-label="Schliessen"
-          >
-            ✕
-          </button>
+          <IconButton label="Schliessen" onClick={onClose}>
+            <IconClose size={20} />
+          </IconButton>
         </div>
       </div>
 
       {tripPrompt && showTripPrompt && (
-        <div className="mb-4 rounded-lg border border-emerald-300 bg-emerald-50 p-3 dark:border-emerald-700 dark:bg-emerald-950/50">
-          <p className="text-sm font-medium text-emerald-900 dark:text-emerald-100">
-            Diese Säule zum Reiseplan?
-          </p>
+        <InfoCallout tone="success" className="mb-4 flex-col">
+          <p className="text-sm font-medium">Diese Säule zum Reiseplan?</p>
           <div className="mt-2 flex gap-2">
-            <button
-              type="button"
+            <Button
+              variant="primary"
+              size="sm"
+              className="flex-1"
               onClick={() => {
                 onTripAdd?.();
                 onClose();
               }}
-              className="flex-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-500"
             >
               Zusätzlich
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="flex-1"
               onClick={() => {
                 onTripReplace?.();
                 onClose();
               }}
-              className="flex-1 rounded-lg border border-emerald-400 px-3 py-1.5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-100 dark:border-emerald-600 dark:text-emerald-200 dark:hover:bg-emerald-900/50"
             >
               Vorherige ersetzen
-            </button>
+            </Button>
           </div>
-        </div>
+        </InfoCallout>
       )}
 
-      {isPending && <p className="text-sm text-zinc-500">Lade Details…</p>}
+      {isPending && <p className="t-body text-tertiary">Lade Details…</p>}
       {error && (
-        <p className="text-sm text-red-600">
-          Fehler: {(error as Error).message}
-        </p>
+        <p className="t-body text-danger">Fehler: {(error as Error).message}</p>
       )}
 
       {data && (
-        <div className="space-y-4 text-sm text-zinc-700 dark:text-zinc-200">
+        <div className="space-y-4 text-sm text-secondary">
           <div className="flex flex-wrap items-center gap-2">
-            <span
-              className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                availabilityBadge(data).className
-              }`}
-            >
-              {availabilityBadge(data).label}
-            </span>
-            {data.points.some((p) => p.isDc) && (
-              <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
-                DC
-              </span>
-            )}
-            {data.points.some((p) => p.isAc) && (
-              <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-700">
-                AC
-              </span>
-            )}
-            {(() => {
-              const maxKw = Math.max(
-                0,
-                ...data.points.map((p) => p.maxPowerKw ?? 0),
-              );
-              return maxKw > 0 ? (
-                <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-                  bis {maxKw} kW
-                </span>
-              ) : null;
-            })()}
+            {avail && <Badge tone={avail.tone}>{avail.label}</Badge>}
+            {data.points.some((p) => p.isDc) && <Badge tone="accent">DC</Badge>}
+            {data.points.some((p) => p.isAc) && <Badge tone="accent">AC</Badge>}
+            {maxKw > 0 && <Badge tone="neutral">bis {maxKw} kW</Badge>}
             {data.renewableEnergy && (
-              <span
+              <Badge
+                tone="brand"
+                variant="solid"
                 title="100% erneuerbare Energie"
-                className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white shadow-sm"
               >
-                🌱 100% erneuerbar
-              </span>
+                <IconLeaf size={12} />
+                100% erneuerbar
+              </Badge>
             )}
-            <span
+            <Badge
+              tone={data.isOpen24h ? "neutral" : "warning"}
               title={
                 data.isOpen24h
                   ? "Rund um die Uhr zugänglich"
                   : "Nicht durchgehend zugänglich"
               }
-              className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                data.isOpen24h
-                  ? "bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100"
-                  : "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
-              }`}
             >
               {data.isOpen24h ? "24 h Zugang" : "Kein 24 h Zugang"}
-            </span>
+            </Badge>
           </div>
 
           {(data.operatorName || data.hotline) && (
             <div>
-              <div className="text-xs uppercase text-zinc-500">Betreiber</div>
+              <SectionLabel>Betreiber</SectionLabel>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   {data.operatorName && <div>{data.operatorName}</div>}
                   {data.hotline && (
                     <a
                       href={`tel:${data.hotline.replace(/\s/g, "")}`}
-                      className="mt-0.5 inline-flex items-center gap-1.5 text-blue-600 hover:underline"
+                      className="mt-0.5 inline-flex items-center gap-1.5 text-accent hover:underline"
                     >
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
-                      >
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z" />
-                      </svg>
+                      <IconPhone size={14} />
                       {data.hotline}
                     </a>
                   )}
                 </div>
                 {appCpo && stationApp && (
-                  <button
-                    type="button"
+                  <Button
+                    variant="primary"
+                    size="sm"
                     onClick={() =>
                       window.open(
                         pickStoreUrl(stationApp, appCpo.websiteUrl),
@@ -715,24 +620,11 @@ export function StationSheet({
                       )
                     }
                     title="Öffnet die App im Store – startet sie, falls installiert."
-                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-emerald-500"
+                    className="shrink-0 text-xs"
                   >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-                      <line x1="12" y1="18" x2="12.01" y2="18" />
-                    </svg>
+                    <IconSmartphone size={14} />
                     App öffnen
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -741,7 +633,7 @@ export function StationSheet({
           <PointsList points={data.points} />
 
           <div>
-            <div className="text-xs uppercase text-zinc-500">Adresse</div>
+            <SectionLabel>Adresse</SectionLabel>
             <div className="flex items-start justify-between gap-3">
               <div>
                 {data.street ?? "—"}
@@ -749,38 +641,25 @@ export function StationSheet({
                 {data.postalCode ?? ""} {data.city ?? ""}
               </div>
               {!showNav && (
-                <button
-                  type="button"
+                <Button
+                  variant="accent"
+                  size="sm"
                   onClick={() => setShowNav(true)}
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
+                  className="shrink-0 text-xs"
                 >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <polygon points="3 11 22 2 13 21 11 13 3 11" />
-                  </svg>
+                  <IconNavigation size={14} />
                   Navigation
-                </button>
+                </Button>
               )}
             </div>
             {showNav && (
               <div className="mt-2 space-y-2">
                 <div className="flex items-center justify-between">
-                  <div className="text-xs uppercase text-zinc-500">
-                    Mit welcher App?
-                  </div>
+                  <SectionLabel className="mb-0">Mit welcher App?</SectionLabel>
                   <button
                     type="button"
                     onClick={() => setShowNav(false)}
-                    className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                    className="text-xs text-tertiary hover:text-secondary"
                   >
                     Abbrechen
                   </button>
@@ -793,7 +672,7 @@ export function StationSheet({
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setShowNav(false)}
-                      className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-center text-sm font-medium text-zinc-700 transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:border-blue-700 dark:hover:bg-blue-950 dark:hover:text-blue-300"
+                      className="rounded-control border border-border bg-surface px-3 py-2 text-center text-sm font-medium text-secondary transition-colors hover:border-accent-border hover:bg-accent-soft hover:text-accent"
                     >
                       {app.label}
                     </a>
@@ -806,9 +685,7 @@ export function StationSheet({
           {(data.authModes.length > 0 ||
             labelAccessibility(data.accessibility)) && (
             <div>
-              <div className="text-xs uppercase text-zinc-500">
-                Zahlung &amp; Zugang
-              </div>
+              <SectionLabel>Zahlung &amp; Zugang</SectionLabel>
               {labelAccessibility(data.accessibility) && (
                 <div className="mb-1">
                   {labelAccessibility(data.accessibility)}
@@ -819,7 +696,7 @@ export function StationSheet({
                   {labelAuthModes(data.authModes).map((m) => (
                     <span
                       key={m}
-                      className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs dark:bg-zinc-800"
+                      className="rounded-md bg-surface-muted px-2 py-0.5 text-xs text-secondary"
                     >
                       {m}
                     </span>
@@ -831,7 +708,7 @@ export function StationSheet({
 
           <TariffSection state={tariff} />
 
-          <div className="text-xs text-zinc-500">EVSE-ID: {data.evseId}</div>
+          <div className="t-caption text-tertiary">EVSE-ID: {data.evseId}</div>
         </div>
       )}
     </aside>

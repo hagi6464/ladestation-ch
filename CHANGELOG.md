@@ -4,6 +4,20 @@ Notiert die nutzerseitig sichtbaren Änderungen der App — neueste zuoberst.
 Locker angelehnt an [Keep a Changelog](https://keepachangelog.com/de/); Versionierung
 per Datum, da die App kontinuierlich auf Vercel deployt wird.
 
+## 2026-06-10
+
+### Verbessert (Design)
+- **Durchgängig überarbeitetes Erscheinungsbild** nach Apple-Designprinzipien: klare
+  Schrift-Hierarchie, mehr Ruhe und Weissraum, dezente Tiefe (weiche Schatten, sanfte
+  Rundungen) und eine einheitliche Farbsprache (Emerald = Aktion, Blau = Navigation).
+- **Vollständiger Hell- und Dunkelmodus**: folgt automatisch der Systemeinstellung; alle
+  Fenster, Karten-Bedienelemente und das Impressum passen sich an.
+- **Einheitliche Symbole statt Emoji** in Menü und Schaltflächen — ruhiger und auf jedem
+  Gerät gleich dargestellt.
+- **Bessere Bedienbarkeit & Barrierefreiheit**: gut sichtbare Fokus-Rahmen bei
+  Tastaturbedienung, kräftigere Kontraste, und die Fenster sperren jetzt den Hintergrund
+  und führen den Fokus sauber (schliessen mit Esc).
+
 ## 2026-06-09
 
 ### Verbessert (Bedienung)
