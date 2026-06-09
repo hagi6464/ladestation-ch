@@ -466,9 +466,8 @@ export function TripPlanner({
                           </span>
                         </span>
                         <span className="mt-0.5 block text-[11px] tabular-nums text-zinc-500 dark:text-zinc-400">
-                          Ab Start: {Math.round(s.alongKm)} km · Nach Laden noch{" "}
+                          Ab Start {Math.round(s.alongKm)} km · ab Laden{" "}
                           {Math.max(0, Math.round(route.distanceKm - s.alongKm))} km
-                          zum Ziel
                         </span>
                         <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-zinc-600 dark:text-zinc-300">
                           {s.properties.maxPowerKw != null && (
