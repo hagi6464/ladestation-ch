@@ -7,12 +7,12 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 ## 2026-06-09
 
 ### Verbessert (Bedienung)
-- **Aufgeräumte Oberfläche**: Die Karte ist deutlich freier. Oben nur noch Menü + Suche;
-  alle Filter (Strom, Leistung, Stecker, Reichweite, Favoriten) sind in **einem
-  Filter-Fenster** gebündelt (Knopf zeigt die Anzahl aktiver Filter). „Route planen" ist
-  jetzt ein **prominenter Button unten**. Anleitung, Als-App-speichern, Weiterempfehlen,
-  Trinkgeld und Impressum stecken kompakt im **Menü (Logo links oben)**. Keine Funktion
-  entfällt — nur klarer sortiert.
+- **Aufgeräumtes, klar gegliedertes Menü**: Die Karte ist deutlich freier — oben nur noch
+  Menü (Logo) + Suche. Das **Menü** trennt die Hauptfunktionen klar: **Ladestation suchen**
+  (→ Filter), **Reiseplaner** (→ Route planen) und darunter Kurzanleitung / Als App
+  speichern / Weiterempfehlen / Trinkgeld / Impressum. Aktive Filter werden direkt am Menü
+  als Zahl angezeigt; alle Filter (Strom, Leistung, Stecker, Reichweite, Favoriten) sind in
+  einem Filter-Fenster gebündelt. Keine Funktion entfällt — nur klarer sortiert.
 
 ### Verbessert (Reiseplaner)
 - **Empfehlung nach Fahrtseite**: Die empfohlene Ladesäule liegt jetzt auf der Seite, die

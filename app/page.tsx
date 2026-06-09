@@ -475,6 +475,9 @@ export default function Page() {
       >
         <div className="flex w-full items-start gap-2 sm:w-auto">
           <LogoMenu
+            onOpenFilter={() => setFilterOpen(true)}
+            filterCount={filterCount}
+            onOpenTrip={openTrip}
             onOpenGuide={() => setGuideOpen(true)}
             onOpenInstall={() => setInstallOpen(true)}
             onOpenDonate={() => setDonateOpen(true)}
@@ -486,61 +489,12 @@ export default function Page() {
             />
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => setFilterOpen(true)}
-          className="pointer-events-auto inline-flex items-center gap-1.5 rounded-xl bg-white/95 px-3 py-1.5 text-sm font-medium text-zinc-700 shadow-md backdrop-blur transition-colors hover:bg-white dark:bg-zinc-900/90 dark:text-zinc-200 dark:hover:bg-zinc-900"
-        >
-          <svg
-            width="15"
-            height="15"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-          </svg>
-          Filter
-          {filterCount > 0 && (
-            <span className="rounded-full bg-blue-600 px-1.5 text-[10px] font-semibold tabular-nums text-white">
-              {filterCount}
-            </span>
-          )}
-        </button>
         {data?.truncated && (
           <div className="pointer-events-auto rounded-xl bg-amber-100 px-3 py-2 text-xs text-amber-800 shadow-md">
             Mehr Stationen verfügbar — zoom oder filter, um mehr zu sehen
           </div>
         )}
       </div>
-
-      {/* Primär-Aktion: Reiseplaner öffnen (unten mittig) */}
-      {!tripOpen && !selectedEvseId && (
-        <button
-          type="button"
-          onClick={openTrip}
-          className="pointer-events-auto fixed bottom-4 left-1/2 z-20 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-emerald-500"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <polygon points="3 11 22 2 13 21 11 13 3 11" />
-          </svg>
-          Route planen
-        </button>
-      )}
 
       <StationSheet
         evseId={selectedEvseId}
