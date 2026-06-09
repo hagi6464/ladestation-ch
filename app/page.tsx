@@ -357,18 +357,22 @@ export default function Page() {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
 
-  // Karten-Tipp: im Reise-Modus eine Korridor-Säule als Ladestopp an/abwählen,
-  // sonst das Detail-Sheet öffnen (normales Browsen).
-  const handleStationSelect = (evseId: string) => {
-    if (
-      tripActive &&
-      corridorStops.some((cs) => cs.properties.evseId === evseId)
-    ) {
-      toggleStop(evseId);
-    } else {
-      setSelectedEvseId(evseId);
-    }
-  };
+  // Reise-Modus: getippte Säule zusätzlich in den Plan aufnehmen …
+  const handleTripAdd = (id: string) =>
+    setSelectedStopIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  // … oder den zuletzt gewählten Ladestopp durch diese ersetzen.
+  const handleTripReplace = (id: string) =>
+    setSelectedStopIds((prev) => {
+      const without = prev.filter((x) => x !== id);
+      return without.length > 0 ? [...without.slice(0, -1), id] : [id];
+    });
+
+  // Im Reise-Modus auf eine Korridor-Säule getippt? → Detail-Sheet zeigt die
+  // „zum Reiseplan?"-Nachfrage (zusätzlich / ersetzen).
+  const tripPromptStop =
+    tripActive &&
+    selectedEvseId != null &&
+    corridorStops.some((cs) => cs.properties.evseId === selectedEvseId);
 
   const handlePlan = (dest: TripDestination) => {
     setSelectedEvseId(null);
@@ -450,7 +454,7 @@ export default function Page() {
         selectedStops={tripActive ? selectedStopPoints : null}
         fitBounds={tripActive ? routeBbox : null}
         onBboxChange={handleBboxChange}
-        onSelect={handleStationSelect}
+        onSelect={setSelectedEvseId}
       />
 
       <div
@@ -496,6 +500,9 @@ export default function Page() {
       <StationSheet
         evseId={selectedEvseId}
         onClose={() => setSelectedEvseId(null)}
+        tripPrompt={tripPromptStop}
+        onTripAdd={() => selectedEvseId && handleTripAdd(selectedEvseId)}
+        onTripReplace={() => selectedEvseId && handleTripReplace(selectedEvseId)}
       />
 
       <InstallModal

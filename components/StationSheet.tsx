@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { StationDetail, StationPoint } from "@/lib/types";
 import { PlugIcon, classifyPlug } from "@/components/PlugIcon";
@@ -105,6 +105,12 @@ function pickStoreUrl(
 type Props = {
   evseId: string | null;
   onClose: () => void;
+  /** Reise-Modus: nach kurzer Zeit fragen, ob die Säule in den Reiseplan soll. */
+  tripPrompt?: boolean;
+  /** Säule zusätzlich in den Reiseplan aufnehmen. */
+  onTripAdd?: () => void;
+  /** Zuletzt gewählten Ladestopp durch diese Säule ersetzen. */
+  onTripReplace?: () => void;
 };
 
 async function fetchStation(evseId: string): Promise<StationDetail> {
@@ -436,7 +442,13 @@ function PointsList({ points }: { points: StationPoint[] }) {
   );
 }
 
-export function StationSheet({ evseId, onClose }: Props) {
+export function StationSheet({
+  evseId,
+  onClose,
+  tripPrompt,
+  onTripAdd,
+  onTripReplace,
+}: Props) {
   const [showNav, setShowNav] = useState(false);
   const [shared, setShared] = useState(false);
   const { data, isPending, error } = useQuery({
@@ -450,6 +462,19 @@ export function StationSheet({ evseId, onClose }: Props) {
     enabled: !!evseId,
     staleTime: 5 * 60_000,
   });
+
+  // Reise-Modus-Nachfrage „zum Reiseplan?" erst nach kurzer Zeit zeigen, damit
+  // man zuerst die Stations-Infos sieht.
+  const [showTripPrompt, setShowTripPrompt] = useState(false);
+  useEffect(() => {
+    if (!tripPrompt || !evseId) return;
+    const t = setTimeout(() => setShowTripPrompt(true), 1200);
+    // Cleanup (Säulenwechsel/Schliessen) setzt die Nachfrage wieder zurück.
+    return () => {
+      clearTimeout(t);
+      setShowTripPrompt(false);
+    };
+  }, [tripPrompt, evseId]);
 
   // Navigations-Auswahl schliessen, wenn eine andere Säule geöffnet wird
   // (State-Reset beim Säulenwechsel ohne Effekt — empfohlenes React-Muster).
@@ -558,6 +583,36 @@ export function StationSheet({ evseId, onClose }: Props) {
           </button>
         </div>
       </div>
+
+      {tripPrompt && showTripPrompt && (
+        <div className="mb-4 rounded-lg border border-emerald-300 bg-emerald-50 p-3 dark:border-emerald-700 dark:bg-emerald-950/50">
+          <p className="text-sm font-medium text-emerald-900 dark:text-emerald-100">
+            Diese Säule zum Reiseplan?
+          </p>
+          <div className="mt-2 flex gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                onTripAdd?.();
+                onClose();
+              }}
+              className="flex-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-500"
+            >
+              Zusätzlich
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onTripReplace?.();
+                onClose();
+              }}
+              className="flex-1 rounded-lg border border-emerald-400 px-3 py-1.5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-100 dark:border-emerald-600 dark:text-emerald-200 dark:hover:bg-emerald-900/50"
+            >
+              Vorherige ersetzen
+            </button>
+          </div>
+        </div>
+      )}
 
       {isPending && <p className="text-sm text-zinc-500">Lade Details…</p>}
       {error && (

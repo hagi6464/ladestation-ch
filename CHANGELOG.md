@@ -17,7 +17,8 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
   ganzen Bildschirm (andere Menüs ausgeblendet); im Querformat bzw. am Desktop liegt er als
   seitliches Panel neben der sichtbaren Karte.
 - **Ladesäule auf der Karte wählen**: Im Reise-Modus eine Säule auf der Karte antippen
-  wählt sie direkt als Ladestopp an bzw. ab (Häkchen in der Liste + Marker aktualisieren sich).
+  öffnet ihre Infos und fragt nach kurzer Zeit, ob sie **zusätzlich** in den Reiseplan
+  soll oder den **vorherigen** Ladestopp ersetzt.
 
 ## 2026-06-08
 
