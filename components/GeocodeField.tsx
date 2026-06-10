@@ -88,7 +88,7 @@ export function GeocodeField({
       <SectionLabel as="label" htmlFor={fieldId}>
         {label}
       </SectionLabel>
-      <div className="flex items-center gap-1 rounded-control border border-border bg-surface px-2 py-1.5">
+      <div className="flex items-center gap-1 rounded-control border border-border-strong bg-field px-2 py-1.5">
         <input
           ref={inputRef}
           id={fieldId}
@@ -107,7 +107,7 @@ export function GeocodeField({
           aria-autocomplete="list"
         />
         {busy && (
-          <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-border border-t-accent" />
+          <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-border-strong border-t-accent" />
         )}
         {trailing}
       </div>

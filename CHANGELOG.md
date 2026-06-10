@@ -6,6 +6,17 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
 
 ## 2026-06-10
 
+### Verbessert (Reiseplaner)
+- **Deutlich besser lesbar im Dunkelmodus**: Beschriftungen (Start, Ziel, Ladezustand, …)
+  und Erklärtexte sind klar heller; Eingabefelder heben sich dafür mit eigener Fläche und
+  kräftigerem Rand sichtbar von den Texten ab — Werte bleiben am hellsten.
+- **„Mein Standort"-Knopf im Startfeld**: fragt den GPS-Standort gezielt (erneut) ab,
+  zeigt Blau wenn der Standort aktiv als Start dient, und meldet verständlich, wenn die
+  Standortfreigabe fehlt. Eine getippte Start-Adresse lässt sich damit wieder auf
+  „Mein Standort" zurücksetzen.
+- **„Nur Schnelllader (an der Autobahn)" ist jetzt standardmässig aktiv** — auf Reisen
+  fast immer gewollt; weiterhin jederzeit abschaltbar.
+
 ### Verbessert (Design)
 - **Durchgängig überarbeitetes Erscheinungsbild** nach Apple-Designprinzipien: klare
   Schrift-Hierarchie, mehr Ruhe und Weissraum, dezente Tiefe (weiche Schatten, sanfte

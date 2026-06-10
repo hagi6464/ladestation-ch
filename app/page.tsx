@@ -128,10 +128,14 @@ export default function Page() {
   const [consumption, setConsumption] = useState(MODEL_Y.consumptionKwh100);
   // Gewünschter Ladestand bei Ankunft (%) — ersetzt den früheren km-Puffer.
   const [arrivalSoc, setArrivalSoc] = useState(25);
-  const [highwayOnly, setHighwayOnly] = useState(false);
+  // Standard an: auf Reisen sind Schnelllader ohne Umweg fast immer gewollt.
+  const [highwayOnly, setHighwayOnly] = useState(true);
   const [chargePref, setChargePref] = useState<ChargePref>("middle");
   const [selectedStopIds, setSelectedStopIds] = useState<string[]>([]);
   const appliedSuggestionRef = useRef<string | null>(null);
+  // Standortabfrage für den Reiseplaner (Spinner + Fehlermeldung am Startfeld).
+  const [tripLocating, setTripLocating] = useState(false);
+  const [tripLocateError, setTripLocateError] = useState<string | null>(null);
 
   // Anleitung beim allerersten Besuch einmalig automatisch zeigen.
   useEffect(() => {
@@ -386,13 +390,36 @@ export default function Page() {
     setSelectedStopIds([]);
   };
 
+  // GPS abfragen; Fehler nur bei explizitem Klick zeigen (Auto-Abfrage bleibt still).
+  const locateForTrip = (showError: boolean) => {
+    setTripLocateError(null);
+    setTripLocating(true);
+    requestUserLocation()
+      .then(setUserLocation)
+      .catch((e: unknown) => {
+        if (showError) {
+          setTripLocateError(
+            e instanceof Error
+              ? e.message
+              : "Standort konnte nicht ermittelt werden.",
+          );
+        }
+      })
+      .finally(() => setTripLocating(false));
+  };
+
+  // „Mein Standort"-Knopf im Startfeld: manuellen Start verwerfen + GPS holen.
+  const handleTripLocate = () => {
+    setTripStart(null);
+    locateForTrip(true);
+  };
+
   // Reiseplaner öffnen (Primär-Button) + Standort automatisch abfragen.
   const openTrip = () => {
     setSelectedEvseId(null);
     setTripOpen(true);
-    if (!userLocation && !tripStart) {
-      requestUserLocation().then(setUserLocation).catch(() => {});
-    }
+    setTripLocateError(null);
+    if (!userLocation && !tripStart) locateForTrip(false);
   };
 
   // Route inkl. gewählter Ladestopps an Google Maps übergeben (max. 3 mobil).
@@ -538,6 +565,9 @@ export default function Page() {
         canPlan={!!routeFrom}
         onStartSelect={(s) => setTripStart(s)}
         onStartClear={() => setTripStart(null)}
+        onLocateStart={handleTripLocate}
+        locating={tripLocating}
+        locateError={tripLocateError}
         vehicleName={MODEL_Y.name}
         soc={soc}
         onSocChange={setSoc}

@@ -11,6 +11,7 @@
   --app-bg: #f5f5f4; /* canvas behind chrome / plain pages */
   --surface: #ffffff; /* raised: sheets, popovers, cards */
   --surface-muted: #f4f4f5; /* inset rows / segmented track (zinc-100) */
+  --field: #ffffff; /* editable controls (inputs, selects) — hebt sich im Dark Mode vom Sheet ab */
   --scrim: rgb(0 0 0 / 0.4); /* modal backdrop */
 
   /* Borders / hairlines */
@@ -64,14 +65,15 @@
     --app-bg: #0a0a0a;
     --surface: #18181b; /* zinc-900 */
     --surface-muted: #27272a; /* zinc-800 */
+    --field: #27272a; /* zinc-800 — eine Stufe heller als das Sheet */
     --scrim: rgb(0 0 0 / 0.55);
 
     --border: #27272a; /* zinc-800 */
-    --border-strong: #3f3f46; /* zinc-700 */
+    --border-strong: #52525b; /* zinc-600 (controls — sichtbar auf --field) */
 
     --text-primary: #fafafa; /* zinc-50 */
-    --text-secondary: #a1a1aa; /* zinc-400 */
-    --text-tertiary: #71717a; /* zinc-500 */
+    --text-secondary: #d4d4d8; /* zinc-300 — Labels/Body klar lesbar (~10:1) */
+    --text-tertiary: #a1a1aa; /* zinc-400 — Captions lesbar (~7:1), bleibt gedämpfter */
 
     --brand: #10b981;
     --brand-hover: #34d399;
@@ -120,6 +122,7 @@
   --color-app: var(--app-bg);
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
+  --color-field: var(--field);
   --color-scrim: var(--scrim);
 
   --color-border: var(--border);

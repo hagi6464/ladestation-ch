@@ -18,6 +18,7 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import {
   IconCheck,
   IconClose,
+  IconLocate,
   IconNavigation,
   IconRoute,
   IconRotate,
@@ -34,6 +35,10 @@ type Props = {
   /** Manuellen Start setzen bzw. zurücksetzen (zurückgesetzt = GPS verwenden). */
   onStartSelect: (s: TripDestination) => void;
   onStartClear: () => void;
+  /** GPS-Standort (erneut) anfordern — „Mein Standort"-Knopf im Startfeld. */
+  onLocateStart: () => void;
+  locating: boolean;
+  locateError: string | null;
   vehicleName: string;
   soc: number;
   onSocChange: (n: number) => void;
@@ -101,6 +106,9 @@ export function TripPlanner({
   canPlan,
   onStartSelect,
   onStartClear,
+  onLocateStart,
+  locating,
+  locateError,
   vehicleName,
   soc,
   onSocChange,
@@ -162,7 +170,9 @@ export function TripPlanner({
 
       {!canPlan && (
         <InfoCallout tone="warn" className="mb-3">
-          Standort wird automatisch abgefragt — oder oben einen Start eingeben.
+          {locating
+            ? "Standort wird abgefragt …"
+            : "Kein Standort — den Standort-Knopf im Startfeld antippen oder einen Start eingeben."}
         </InfoCallout>
       )}
 
@@ -181,19 +191,44 @@ export function TripPlanner({
           }
           ariaLabel="Startort"
           trailing={
-            startQuery ? (
+            <>
+              {startQuery && (
+                <IconButton
+                  label="Eingabe löschen (mein Standort verwenden)"
+                  onClick={() => {
+                    setStartQuery("");
+                    onStartClear();
+                  }}
+                >
+                  <IconClose size={16} />
+                </IconButton>
+              )}
               <IconButton
-                label="Start zurücksetzen (mein Standort)"
+                label="Mein Standort"
+                disabled={locating}
                 onClick={() => {
                   setStartQuery("");
-                  onStartClear();
+                  onLocateStart();
                 }}
               >
-                <IconClose size={16} />
+                {locating ? (
+                  <span
+                    className="h-4 w-4 animate-spin rounded-full border-2 border-border-strong border-t-accent"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <IconLocate
+                    size={18}
+                    // blau = GPS ist aktiv die Start-Quelle
+                    className={!startQuery && canPlan ? "text-accent" : undefined}
+                  />
+                )}
               </IconButton>
-            ) : undefined
+            </>
           }
         />
+
+        {locateError && <InfoCallout tone="danger">{locateError}</InfoCallout>}
 
         {/* Ziel */}
         <GeocodeField
@@ -249,7 +284,7 @@ export function TripPlanner({
             <select
               value={consumption}
               onChange={(e) => onConsumptionChange(Number(e.target.value))}
-              className="w-full rounded-control border border-border bg-surface px-2 py-1.5 text-base text-primary outline-none"
+              className="w-full rounded-control border border-border-strong bg-field px-2 py-1.5 text-base text-primary outline-none"
               aria-label="Verbrauch in kWh pro 100 km"
             >
               {CONSUMPTION_OPTIONS.map((v) => (
@@ -267,7 +302,7 @@ export function TripPlanner({
             <select
               value={arrivalSoc}
               onChange={(e) => onArrivalSocChange(Number(e.target.value))}
-              className="w-full rounded-control border border-border bg-surface px-2 py-1.5 text-base text-primary outline-none"
+              className="w-full rounded-control border border-border-strong bg-field px-2 py-1.5 text-base text-primary outline-none"
               aria-label="Gewünschter Ladestand bei Ankunft in Prozent"
             >
               {ARRIVAL_OPTIONS.map((p) => (
@@ -301,7 +336,7 @@ export function TripPlanner({
               className={`flex shrink-0 items-center gap-1.5 rounded-control border px-2.5 transition-colors ${
                 highwayOnly
                   ? "border-brand bg-brand-soft text-brand-strong"
-                  : "border-border bg-surface text-secondary hover:border-border-strong"
+                  : "border-border-strong bg-field text-secondary hover:text-primary"
               }`}
             >
               <IconRoute size={16} />
