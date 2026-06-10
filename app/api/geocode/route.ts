@@ -52,6 +52,9 @@ const PHOTON_HEADERS = {
   "User-Agent": "ladestation-app/0.1 (Schweizer EV-Karte)",
 };
 
+// Hängende Photon-Requests abbrechen — Fehler landet im bestehenden catch→502-Pfad.
+const PHOTON_TIMEOUT_MS = 8000;
+
 export async function GET(req: NextRequest) {
   const parsed = querySchema.safeParse(
     Object.fromEntries(req.nextUrl.searchParams),
@@ -72,6 +75,7 @@ export async function GET(req: NextRequest) {
       const res = await fetch(url.toString(), {
         headers: PHOTON_HEADERS,
         cache: "no-store",
+        signal: AbortSignal.timeout(PHOTON_TIMEOUT_MS),
       });
       if (!res.ok) {
         return NextResponse.json(
@@ -106,6 +110,7 @@ export async function GET(req: NextRequest) {
     const res = await fetch(url.toString(), {
       headers: PHOTON_HEADERS,
       cache: "no-store",
+      signal: AbortSignal.timeout(PHOTON_TIMEOUT_MS),
     });
     if (!res.ok) {
       return NextResponse.json(

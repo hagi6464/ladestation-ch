@@ -166,6 +166,9 @@ async function fetchWithRetry(url: string, attempts = 3): Promise<unknown> {
       const res = await fetch(url, {
         headers: BFE_HEADERS,
         cache: "no-store",
+        // Hängende BFE-Antworten abbrechen — der Retry übernimmt.
+        // Grosszügig bemessen: das Static-JSON ist mehrere MB gross.
+        signal: AbortSignal.timeout(60_000),
       });
       if (!res.ok) {
         throw new Error(`HTTP ${res.status} ${res.statusText}`);

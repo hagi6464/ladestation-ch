@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { StationDetail, StationPoint } from "@/lib/types";
+import type { CpoTariff } from "@/lib/cpo-tariffs";
 import { PlugIcon, classifyPlug } from "@/components/PlugIcon";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { labelAuthModes, labelAccessibility } from "@/lib/oicp-labels";
@@ -23,28 +24,6 @@ import {
   IconSmartphone,
 } from "@/components/ui/Icon";
 
-type CpoTariffEntry = {
-  name: string;
-  requiresMembership: boolean;
-  monthlyFeeChf?: number;
-  acPerKwh?: number;
-  dcPerKwh?: number;
-  blockingFeeChfPerMin?: number;
-  blockingStartsAfterMinutes?: number;
-  notes?: string;
-};
-
-type CpoTariff = {
-  cpoId: string;
-  displayName: string;
-  websiteUrl: string;
-  pricingUrl?: string;
-  app?: { name?: string; ios?: string; android?: string };
-  platformNote?: { headline: string; body: string; tip?: string };
-  tariffs: CpoTariffEntry[];
-  lastUpdated: string;
-};
-
 type TariffResponse =
   | {
       ok: true;
@@ -56,8 +35,13 @@ type TariffResponse =
       reason: string;
     };
 
-async function fetchTariff(evseId: string): Promise<TariffResponse> {
-  const res = await fetch(`/api/prices/${encodeURIComponent(evseId)}`);
+async function fetchTariff(
+  evseId: string,
+  signal: AbortSignal,
+): Promise<TariffResponse> {
+  const res = await fetch(`/api/prices/${encodeURIComponent(evseId)}`, {
+    signal,
+  });
   const body = (await res.json()) as TariffResponse;
   if (!res.ok && (body as { ok?: boolean }).ok !== false) {
     throw new Error(`tariff HTTP ${res.status}`);
@@ -129,8 +113,13 @@ type Props = {
   onTripReplace?: () => void;
 };
 
-async function fetchStation(evseId: string): Promise<StationDetail> {
-  const res = await fetch(`/api/stations/${encodeURIComponent(evseId)}`);
+async function fetchStation(
+  evseId: string,
+  signal: AbortSignal,
+): Promise<StationDetail> {
+  const res = await fetch(`/api/stations/${encodeURIComponent(evseId)}`, {
+    signal,
+  });
   if (!res.ok) throw new Error(`Station ${evseId} failed: ${res.status}`);
   return res.json();
 }
@@ -434,12 +423,12 @@ export function StationSheet({
   const [shared, setShared] = useState(false);
   const { data, isPending, error } = useQuery({
     queryKey: ["station", evseId],
-    queryFn: () => fetchStation(evseId!),
+    queryFn: ({ signal }) => fetchStation(evseId!, signal),
     enabled: !!evseId,
   });
   const tariff = useQuery({
     queryKey: ["tariff", evseId],
-    queryFn: () => fetchTariff(evseId!),
+    queryFn: ({ signal }) => fetchTariff(evseId!, signal),
     enabled: !!evseId,
     staleTime: 5 * 60_000,
   });

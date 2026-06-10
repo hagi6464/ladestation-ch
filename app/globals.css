@@ -21,7 +21,7 @@
   /* Text */
   --text-primary: #18181b; /* zinc-900 */
   --text-secondary: #52525b; /* zinc-600 */
-  --text-tertiary: #a1a1aa; /* zinc-400 (captions, separators) */
+  --text-tertiary: #71717a; /* zinc-500 — Captions lesbar (~4.6:1); zinc-400 fiel unter WCAG AA */
 
   /* Brand (emerald = CTA, == PWA theme-color) */
   --brand: #10b981;

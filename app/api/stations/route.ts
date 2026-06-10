@@ -16,7 +16,7 @@ const querySchema = z.object({
     .transform(
       (s) => s.split(",").map(Number) as [number, number, number, number],
     ),
-  minPower: z.coerce.number().min(0).optional(),
+  minPower: z.coerce.number().min(0).max(1000).optional(),
   current: z.enum(["ac", "dc", "any"]).default("any"),
   plugType: z.enum(["any", "type2", "ccs", "chademo"]).default("any"),
 });

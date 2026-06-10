@@ -38,9 +38,12 @@ const CORRIDOR_KM = 4;
 const HIGHWAY_DETOUR_KM = 0.6;
 const HIGHWAY_MIN_POWER_KW = 100;
 
+// Alle queryFns reichen das TanStack-`signal` an fetch durch — veraltete
+// Requests (bbox-Wechsel, neues Ziel, geschlossenes Sheet) werden abgebrochen.
 async function fetchStations(
   bbox: Bbox,
   filters: Filters,
+  signal: AbortSignal,
 ): Promise<StationFeatureCollection> {
   const params = new URLSearchParams({
     bbox: bbox.map((n) => n.toFixed(5)).join(","),
@@ -48,7 +51,7 @@ async function fetchStations(
   });
   if (filters.minPower > 0) params.set("minPower", String(filters.minPower));
   if (filters.plugType !== "any") params.set("plugType", filters.plugType);
-  const res = await fetch(`/api/stations?${params}`);
+  const res = await fetch(`/api/stations?${params}`, { signal });
   if (!res.ok) throw new Error(`stations failed: ${res.status}`);
   return res.json();
 }
@@ -56,9 +59,11 @@ async function fetchStations(
 async function fetchRoute(
   from: { lat: number; lon: number },
   to: { lat: number; lon: number },
+  signal: AbortSignal,
 ): Promise<TripRoute> {
   const res = await fetch(
     `/api/route?from=${from.lat},${from.lon}&to=${to.lat},${to.lon}`,
+    { signal },
   );
   if (!res.ok) {
     let message = "Route konnte nicht berechnet werden.";
@@ -75,6 +80,7 @@ async function fetchRoute(
 
 async function fetchCorridorStations(
   bbox: Bbox,
+  signal: AbortSignal,
 ): Promise<StationFeatureCollection> {
   // CCS-DC-Schnelllader (Model-Y-Stecker) — hält das Set klein, kein Tiling nötig.
   const params = new URLSearchParams({
@@ -82,7 +88,7 @@ async function fetchCorridorStations(
     current: "dc",
     plugType: "ccs",
   });
-  const res = await fetch(`/api/stations?${params}`);
+  const res = await fetch(`/api/stations?${params}`, { signal });
   if (!res.ok) throw new Error(`corridor failed: ${res.status}`);
   return res.json();
 }
@@ -185,9 +191,9 @@ export default function Page() {
     [debouncedBbox, minPower, current, plugType],
   );
 
-  const { data: rawData } = useQuery({
+  const { data: rawData, isError: stationsError } = useQuery({
     queryKey,
-    queryFn: () => fetchStations(debouncedBbox!, filters),
+    queryFn: ({ signal }) => fetchStations(debouncedBbox!, filters, signal),
     enabled: !!debouncedBbox,
     placeholderData: (prev) => prev,
   });
@@ -236,7 +242,7 @@ export default function Page() {
       tripDestination?.lat,
       tripDestination?.lon,
     ],
-    queryFn: () => fetchRoute(routeFrom!, tripDestination!),
+    queryFn: ({ signal }) => fetchRoute(routeFrom!, tripDestination!, signal),
     enabled: !!routeFrom && !!tripDestination,
     staleTime: 5 * 60_000,
   });
@@ -263,7 +269,7 @@ export default function Page() {
   // CCS-DC-Säulen im Routen-bbox (eigener Fetch, unabhängig vom Karten-bbox).
   const corridorQuery = useQuery<StationFeatureCollection, Error>({
     queryKey: ["corridor", routeBbox],
-    queryFn: () => fetchCorridorStations(routeBbox!),
+    queryFn: ({ signal }) => fetchCorridorStations(routeBbox!, signal),
     enabled: !!routeBbox,
     staleTime: 60_000,
   });
@@ -403,7 +409,9 @@ export default function Page() {
         setUserLocation(loc);
         // Ortschaft fürs Startfeld auflösen — best effort, Routing braucht sie nicht.
         try {
-          const res = await fetch(`/api/geocode?lat=${loc.lat}&lon=${loc.lon}`);
+          const res = await fetch(`/api/geocode?lat=${loc.lat}&lon=${loc.lon}`, {
+            signal: AbortSignal.timeout(8000),
+          });
           if (res.ok) {
             const data = (await res.json()) as { place?: string | null };
             if (data.place) setTripLocatedLabel(data.place);
@@ -533,6 +541,14 @@ export default function Page() {
             />
           </div>
         </div>
+        {stationsError && (
+          <InfoCallout
+            tone="danger"
+            className="pointer-events-auto shadow-popover"
+          >
+            Stationen konnten nicht geladen werden — Verbindung prüfen.
+          </InfoCallout>
+        )}
         {data?.truncated && (
           <InfoCallout tone="warn" className="pointer-events-auto shadow-popover">
             Mehr Stationen verfügbar — zoom oder filter, um mehr zu sehen

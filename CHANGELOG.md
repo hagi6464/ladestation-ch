@@ -4,6 +4,31 @@ Notiert die nutzerseitig sichtbaren Änderungen der App — neueste zuoberst.
 Locker angelehnt an [Keep a Changelog](https://keepachangelog.com/de/); Versionierung
 per Datum, da die App kontinuierlich auf Vercel deployt wird.
 
+## 2026-06-11
+
+### Verbessert (Zuverlässigkeit, nach Code-Review)
+- **Fehler werden angezeigt statt verschluckt**: Können die Ladesäulen nicht geladen
+  werden (z. B. ohne Empfang), erscheint ein Hinweis-Banner statt einer stumm
+  eingefrorenen Karte. Auch die Ort-Suchfelder im Reiseplaner melden, wenn die
+  Suche fehlschlägt.
+- **Keine hängenden Anfragen mehr**: Veraltete Suchanfragen (schnelles Verschieben
+  der Karte, schnelles Tippen) werden abgebrochen; hängende externe Dienste
+  (Ortssuche, Routenberechnung) laufen in ein Zeitlimit, statt endlos zu warten.
+
+### Verbessert (Bedienung & Barrierefreiheit)
+- **Besser lesbar im Hellmodus**: Hinweis- und Beschreibungstexte sind dunkler
+  (Kontrast nun gemäss WCAG AA — das Pendant zum Dunkelmodus-Fix vom 2026-06-10).
+- **Grössere Tippflächen**: Runde Symbol-Knöpfe und Filter-Pillen sind jetzt
+  mindestens 36 px gross — präziseres Tippen unterwegs.
+- **Tastatur-Bedienung im Reiseplaner**: Die Start-/Ziel-Suchfelder lassen sich
+  jetzt wie die Hauptsuche per Pfeiltasten/Enter/Esc bedienen, inkl.
+  Screenreader-Ansagen des markierten Treffers.
+
+### Intern
+- Erste automatische Tests (24, Vitest) für Reichweiten-/Routen-Geometrie und
+  Fahrzeug-Logik; Sync-Endpoints gehärtet (keine internen Fehlertexte nach aussen,
+  konstante Token-Prüfung).
+
 ## 2026-06-10
 
 ### Verbessert (Reiseplaner)

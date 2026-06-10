@@ -28,6 +28,9 @@ export function SearchBox({ onLocate, onUserLocation }: Props) {
     const q = query.trim();
     if (q === lastSelected.current) return;
 
+    // Veraltete Requests abbrechen (neuer Tastendruck/Unmount) — Abbruch ist
+    // kein Fehler und darf keine Fehlermeldung auslösen.
+    const ac = new AbortController();
     const t = setTimeout(async () => {
       if (q.length < 2) {
         setResults([]);
@@ -37,7 +40,9 @@ export function SearchBox({ onLocate, onUserLocation }: Props) {
       setBusy(true);
       setError(null);
       try {
-        const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}`);
+        const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}`, {
+          signal: ac.signal,
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = (await res.json()) as {
           results: GeocodeResult[];
@@ -55,13 +60,17 @@ export function SearchBox({ onLocate, onUserLocation }: Props) {
           setOpen(true);
         }
       } catch {
+        if (ac.signal.aborted) return;
         setError("Suche fehlgeschlagen. Bitte erneut versuchen.");
         setResults([]);
       } finally {
-        setBusy(false);
+        if (!ac.signal.aborted) setBusy(false);
       }
     }, 300);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      ac.abort();
+    };
   }, [query]);
 
   function select(r: GeocodeResult) {

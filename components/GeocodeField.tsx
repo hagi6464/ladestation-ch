@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { SectionLabel } from "@/components/ui/SectionLabel";
+import { InfoCallout } from "@/components/ui/InfoCallout";
 import { IconMapPin } from "@/components/ui/Icon";
 
 export type GeocodeResult = {
@@ -44,6 +45,8 @@ export function GeocodeField({
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [listOpen, setListOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const [lastSelected, setLastSelected] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const fieldId = useId();
@@ -66,27 +69,40 @@ export function GeocodeField({
   useEffect(() => {
     const q = value.trim();
     if (q === lastSelected) return;
+    // Veraltete Requests abbrechen (neuer Tastendruck/Unmount) — Abbruch ist
+    // kein Fehler und darf keine Fehlermeldung auslösen.
+    const ac = new AbortController();
     const t = setTimeout(async () => {
       if (q.length < 2) {
         setResults([]);
         setListOpen(false);
+        setError(null);
         return;
       }
       setBusy(true);
       try {
-        const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}`);
+        const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}`, {
+          signal: ac.signal,
+        });
         if (!res.ok) throw new Error();
         const data = (await res.json()) as { results?: GeocodeResult[] };
         setResults(data.results ?? []);
         setListOpen((data.results ?? []).length > 0);
+        setActiveIndex(-1);
+        setError(null);
       } catch {
+        if (ac.signal.aborted) return;
         setResults([]);
         setListOpen(false);
+        setError("Suche fehlgeschlagen — bitte erneut versuchen.");
       } finally {
-        setBusy(false);
+        if (!ac.signal.aborted) setBusy(false);
       }
     }, 300);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      ac.abort();
+    };
   }, [value, lastSelected]);
 
   function pick(r: GeocodeResult) {
@@ -94,9 +110,27 @@ export function GeocodeField({
     onValueChange(r.label);
     setListOpen(false);
     setResults([]);
+    setError(null);
     onSelect(r);
     // Auswahl getroffen → Fokus weg, damit sich die Tastatur (mobil) schliesst.
     inputRef.current?.blur();
+  }
+
+  // Tastatur-Navigation in der Trefferliste — gleiches Muster wie SearchBox.
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (!listOpen || results.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((i) => (i + 1) % results.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((i) => (i - 1 + results.length) % results.length);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      pick(results[activeIndex >= 0 ? activeIndex : 0]);
+    } else if (e.key === "Escape") {
+      setListOpen(false);
+    }
   }
 
   const listVisible = listOpen && results.length > 0;
@@ -113,6 +147,7 @@ export function GeocodeField({
           type="text"
           value={value}
           onChange={(e) => onValueChange(e.target.value)}
+          onKeyDown={handleKeyDown}
           onFocus={() => results.length > 0 && setListOpen(true)}
           onBlur={() => setTimeout(() => setListOpen(false), 150)}
           placeholder={placeholder}
@@ -123,6 +158,11 @@ export function GeocodeField({
           aria-expanded={listVisible}
           aria-controls={listId}
           aria-autocomplete="list"
+          aria-activedescendant={
+            listVisible && activeIndex >= 0
+              ? `${listId}-opt-${activeIndex}`
+              : undefined
+          }
         />
         {busy && (
           <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-border-strong border-t-accent" />
@@ -139,13 +179,19 @@ export function GeocodeField({
             <li key={`${r.label}-${idx}`}>
               <button
                 type="button"
+                id={`${listId}-opt-${idx}`}
                 role="option"
-                aria-selected={false}
+                aria-selected={idx === activeIndex}
                 onMouseDown={(e) => {
                   e.preventDefault();
                   pick(r);
                 }}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-secondary hover:bg-accent-soft hover:text-primary"
+                onMouseEnter={() => setActiveIndex(idx)}
+                className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${
+                  idx === activeIndex
+                    ? "bg-accent-soft text-primary"
+                    : "text-secondary"
+                }`}
               >
                 <IconMapPin size={14} className="shrink-0 text-tertiary" />
                 <span className="truncate">{r.label}</span>
@@ -153,6 +199,11 @@ export function GeocodeField({
             </li>
           ))}
         </ul>
+      )}
+      {error && (
+        <InfoCallout tone="danger" className="mt-1">
+          {error}
+        </InfoCallout>
       )}
     </div>
   );

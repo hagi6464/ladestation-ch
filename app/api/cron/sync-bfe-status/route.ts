@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { stationStatus } from "@/lib/db/schema";
 import { extractStatus, fetchStatusData } from "@/lib/bfe";
+import { cronAuthorized } from "@/lib/cron-auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,19 +11,13 @@ export const maxDuration = 120;
 
 const CHUNK = 1000;
 
-function authorized(req: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
-  return req.headers.get("authorization") === `Bearer ${secret}`;
-}
-
 const UPSERT_SET = {
   status: sql`excluded.status`,
   fetchedAt: sql`now()`,
 };
 
 export async function GET(req: NextRequest) {
-  if (!authorized(req)) {
+  if (!cronAuthorized(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
@@ -50,13 +45,13 @@ export async function GET(req: NextRequest) {
       upserted: inserted,
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
+    // Details nur ins Server-Log — Fehlertexte (z. B. DB-Meldungen) nicht nach aussen geben.
     console.error("[sync-bfe-status] fatal:", err);
     return NextResponse.json(
       {
         ok: false,
         durationMs: Date.now() - started,
-        error: message,
+        error: "sync failed",
       },
       { status: 500 },
     );

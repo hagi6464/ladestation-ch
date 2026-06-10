@@ -59,6 +59,8 @@ export async function GET(req: NextRequest) {
       "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
       {
         method: "POST",
+        // Hängenden ORS-Request abbrechen, statt den Client ewig warten zu lassen.
+        signal: AbortSignal.timeout(8000),
         headers: {
           Authorization: apiKey,
           "Content-Type": "application/json",
