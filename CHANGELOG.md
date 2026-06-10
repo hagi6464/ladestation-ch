@@ -14,6 +14,10 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
   zeigt Blau wenn der Standort aktiv als Start dient, und meldet verständlich, wenn die
   Standortfreigabe fehlt. Eine getippte Start-Adresse lässt sich damit wieder auf
   „Mein Standort" zurücksetzen.
+- **Erkannte Ortschaft im Startfeld**: Nach der Standort-Erkennung erscheint die
+  Ortschaft (z. B. „8001 Zürich") direkt im Startfeld — man sieht, wovon die Route
+  ausgeht. Die Route selbst rechnet weiterhin mit der exakten GPS-Position; eine
+  selbst getippte Start-Adresse wird nie überschrieben.
 - **„Nur Schnelllader (an der Autobahn)" ist jetzt standardmässig aktiv** — auf Reisen
   fast immer gewollt; weiterhin jederzeit abschaltbar.
 

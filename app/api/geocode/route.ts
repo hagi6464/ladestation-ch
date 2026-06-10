@@ -5,7 +5,14 @@ import { isInServiceArea } from "@/lib/service-area";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const querySchema = z.object({ q: z.string().min(1).max(200) });
+// Vorwärts (q = Suchtext) oder rückwärts (lat/lon → Ortschaft, fürs Reiseplaner-Startfeld).
+const querySchema = z.union([
+  z.object({ q: z.string().min(1).max(200) }),
+  z.object({
+    lat: z.coerce.number().min(-90).max(90),
+    lon: z.coerce.number().min(-180).max(180),
+  }),
+]);
 
 type PhotonFeature = {
   geometry: { coordinates: [number, number] };
@@ -16,6 +23,7 @@ type PhotonFeature = {
     housenumber?: string;
     postcode?: string;
     city?: string;
+    district?: string;
     state?: string;
     osm_id?: number;
   };
@@ -33,6 +41,17 @@ function buildLabel(p: PhotonFeature["properties"]): string {
   return parts.filter(Boolean).join(", ");
 }
 
+/** Kompakte Ortschaft („PLZ Ort") für das Startfeld — kein voller Adress-String. */
+function buildPlaceLabel(p: PhotonFeature["properties"]): string {
+  const place = p.city ?? p.district ?? p.name ?? "";
+  return [p.postcode, place].filter(Boolean).join(" ") || buildLabel(p);
+}
+
+const PHOTON_HEADERS = {
+  Accept: "application/json",
+  "User-Agent": "ladestation-app/0.1 (Schweizer EV-Karte)",
+};
+
 export async function GET(req: NextRequest) {
   const parsed = querySchema.safeParse(
     Object.fromEntries(req.nextUrl.searchParams),
@@ -40,6 +59,40 @@ export async function GET(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: "invalid query" }, { status: 400 });
   }
+
+  // Rückwärts: Koordinaten → Ortschaft (z. B. „2540 Grenchen").
+  if ("lat" in parsed.data) {
+    const { lat, lon } = parsed.data;
+    const url = new URL("https://photon.komoot.io/reverse");
+    url.searchParams.set("lat", String(lat));
+    url.searchParams.set("lon", String(lon));
+    url.searchParams.set("lang", "de");
+    url.searchParams.set("limit", "1");
+    try {
+      const res = await fetch(url.toString(), {
+        headers: PHOTON_HEADERS,
+        cache: "no-store",
+      });
+      if (!res.ok) {
+        return NextResponse.json(
+          { error: `geocoder HTTP ${res.status}` },
+          { status: 502 },
+        );
+      }
+      const data = (await res.json()) as { features: PhotonFeature[] };
+      const place = data.features[0]
+        ? buildPlaceLabel(data.features[0].properties)
+        : null;
+      return NextResponse.json(
+        { place },
+        { headers: { "Cache-Control": "public, max-age=3600" } },
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return NextResponse.json({ error: msg }, { status: 502 });
+    }
+  }
+
   const { q } = parsed.data;
 
   const url = new URL("https://photon.komoot.io/api/");
@@ -51,10 +104,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const res = await fetch(url.toString(), {
-      headers: {
-        Accept: "application/json",
-        "User-Agent": "ladestation-app/0.1 (Schweizer EV-Karte)",
-      },
+      headers: PHOTON_HEADERS,
       cache: "no-store",
     });
     if (!res.ok) {

@@ -39,6 +39,8 @@ type Props = {
   onLocateStart: () => void;
   locating: boolean;
   locateError: string | null;
+  /** Per GPS erkannte Ortschaft — wird ins Startfeld geschrieben (nur Anzeige). */
+  locatedLabel: string | null;
   vehicleName: string;
   soc: number;
   onSocChange: (n: number) => void;
@@ -109,6 +111,7 @@ export function TripPlanner({
   onLocateStart,
   locating,
   locateError,
+  locatedLabel,
   vehicleName,
   soc,
   onSocChange,
@@ -137,8 +140,26 @@ export function TripPlanner({
   const [query, setQuery] = useState("");
   const [destination, setDestination] = useState<TripDestination | null>(null);
   const [startQuery, setStartQuery] = useState("");
+  // Zuletzt per GPS gesetzter Feldtext — unterscheidet „zeigt Mein Standort"
+  // von einer manuellen Eingabe (die nie überschrieben wird).
+  const [gpsLabel, setGpsLabel] = useState<string | null>(null);
+
+  // Neue GPS-Ortschaft ins Startfeld übernehmen (guarded Render-Anpassung).
+  const [prevLocatedLabel, setPrevLocatedLabel] = useState<string | null>(null);
+  if (locatedLabel !== prevLocatedLabel) {
+    setPrevLocatedLabel(locatedLabel);
+    if (locatedLabel) {
+      if (startQuery === "" || startQuery === gpsLabel) {
+        setStartQuery(locatedLabel);
+      }
+      setGpsLabel(locatedLabel);
+    }
+  }
 
   if (!open) return null;
+
+  // GPS ist die Start-Quelle: Feld leer (Platzhalter) oder zeigt die GPS-Ortschaft.
+  const gpsIsStart = canPlan && (startQuery === "" || startQuery === gpsLabel);
 
   const reachWithoutCharge =
     route != null && route.distanceKm <= rangeKm - reserveKm;
@@ -190,6 +211,7 @@ export function TripPlanner({
             onStartSelect({ lat: r.lat, lon: r.lon, label: r.label })
           }
           ariaLabel="Startort"
+          committedValue={locatedLabel}
           trailing={
             <>
               {startQuery && (
@@ -220,7 +242,7 @@ export function TripPlanner({
                   <IconLocate
                     size={18}
                     // blau = GPS ist aktiv die Start-Quelle
-                    className={!startQuery && canPlan ? "text-accent" : undefined}
+                    className={gpsIsStart ? "text-accent" : undefined}
                   />
                 )}
               </IconButton>

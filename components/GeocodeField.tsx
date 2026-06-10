@@ -22,6 +22,9 @@ type Props = {
   /** Optionales Element rechts im Feld (z. B. ein Zurücksetzen-Knopf). */
   trailing?: ReactNode;
   ariaLabel?: string;
+  /** Programmatisch gesetzter Wert (z. B. per GPS aufgelöste Ortschaft) —
+   *  zählt wie eine getroffene Auswahl und löst KEINE Suche aus. */
+  committedValue?: string | null;
 };
 
 /**
@@ -36,18 +39,33 @@ export function GeocodeField({
   onSelect,
   trailing,
   ariaLabel,
+  committedValue,
 }: Props) {
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [listOpen, setListOpen] = useState(false);
   const [busy, setBusy] = useState(false);
-  const lastSelected = useRef<string>("");
+  const [lastSelected, setLastSelected] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const fieldId = useId();
   const listId = `${fieldId}-list`;
 
+  // Programmatischen Wert als „gewählt" übernehmen (guarded Render-Anpassung),
+  // damit der Such-Effekt dafür keine Trefferliste öffnet.
+  const [prevCommitted, setPrevCommitted] = useState<string | null | undefined>(
+    undefined,
+  );
+  if (committedValue !== prevCommitted) {
+    setPrevCommitted(committedValue);
+    if (committedValue) {
+      setLastSelected(committedValue);
+      setResults([]);
+      setListOpen(false);
+    }
+  }
+
   useEffect(() => {
     const q = value.trim();
-    if (q === lastSelected.current) return;
+    if (q === lastSelected) return;
     const t = setTimeout(async () => {
       if (q.length < 2) {
         setResults([]);
@@ -69,10 +87,10 @@ export function GeocodeField({
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [value]);
+  }, [value, lastSelected]);
 
   function pick(r: GeocodeResult) {
-    lastSelected.current = r.label;
+    setLastSelected(r.label);
     onValueChange(r.label);
     setListOpen(false);
     setResults([]);

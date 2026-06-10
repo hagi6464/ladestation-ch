@@ -136,6 +136,8 @@ export default function Page() {
   // Standortabfrage für den Reiseplaner (Spinner + Fehlermeldung am Startfeld).
   const [tripLocating, setTripLocating] = useState(false);
   const [tripLocateError, setTripLocateError] = useState<string | null>(null);
+  // Per GPS erkannte Ortschaft — wird im Startfeld angezeigt (Routing nutzt die Koordinaten).
+  const [tripLocatedLabel, setTripLocatedLabel] = useState<string | null>(null);
 
   // Anleitung beim allerersten Besuch einmalig automatisch zeigen.
   useEffect(() => {
@@ -394,8 +396,22 @@ export default function Page() {
   const locateForTrip = (showError: boolean) => {
     setTripLocateError(null);
     setTripLocating(true);
+    // Erst zurücksetzen, damit auch ein erneuter Klick am selben Ort das Feld neu füllt.
+    setTripLocatedLabel(null);
     requestUserLocation()
-      .then(setUserLocation)
+      .then(async (loc) => {
+        setUserLocation(loc);
+        // Ortschaft fürs Startfeld auflösen — best effort, Routing braucht sie nicht.
+        try {
+          const res = await fetch(`/api/geocode?lat=${loc.lat}&lon=${loc.lon}`);
+          if (res.ok) {
+            const data = (await res.json()) as { place?: string | null };
+            if (data.place) setTripLocatedLabel(data.place);
+          }
+        } catch {
+          // Feld zeigt dann weiter den Platzhalter „Mein Standort (GPS)"
+        }
+      })
       .catch((e: unknown) => {
         if (showError) {
           setTripLocateError(
@@ -568,6 +584,7 @@ export default function Page() {
         onLocateStart={handleTripLocate}
         locating={tripLocating}
         locateError={tripLocateError}
+        locatedLabel={tripLocatedLabel}
         vehicleName={MODEL_Y.name}
         soc={soc}
         onSocChange={setSoc}
