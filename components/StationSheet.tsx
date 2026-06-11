@@ -581,6 +581,14 @@ export function StationSheet({
             </Badge>
           </div>
 
+          {!data.hasStatus && (
+            <InfoCallout tone="info" icon={<IconInfo size={18} />}>
+              <span className="font-semibold">Keine Echtzeit-Belegung:</span>{" "}
+              Dieser Betreiber liefert keine Live-Verfügbarkeit (z. B. Tesla).
+              Freie Plätze ggf. in der Anbieter-App prüfen.
+            </InfoCallout>
+          )}
+
           {(data.operatorName || data.hotline) && (
             <div>
               <SectionLabel>Betreiber</SectionLabel>

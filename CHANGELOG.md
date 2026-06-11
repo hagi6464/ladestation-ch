@@ -4,6 +4,24 @@ Notiert die nutzerseitig sichtbaren Änderungen der App — neueste zuoberst.
 Locker angelehnt an [Keep a Changelog](https://keepachangelog.com/de/); Versionierung
 per Datum, da die App kontinuierlich auf Vercel deployt wird.
 
+## 2026-06-12
+
+### Neu
+- **Automatische Standort-Erkennung beim Start**: Beim Öffnen der App wird der
+  Standort abgefragt, die erkannte Ortschaft erscheint im Suchfeld und die Karte
+  zoomt auf die Umgebung (~12 km Umkreis — Ladesäulen in der Nähe sofort sichtbar).
+  Geteilte Säulen-Links behalten Vorrang; ohne Standortfreigabe bleibt alles wie
+  bisher. Der erkannte Standort wird beim Öffnen von „Reise planen" automatisch
+  als Start übernommen.
+
+### Korrigiert
+- **Betreiber ohne Live-Status (z. B. Tesla) wirkten komplett besetzt**: Tesla
+  meldet für alle Supercharger nur „Unknown" — die App zeigte daraus fälschlich
+  „0 von 14 frei" und rote Karten-Marker. Neu gilt „Unknown" als „keine
+  Live-Daten": neutrales Badge („14 Ladepunkte"), graue statt rote Marker und ein
+  klarer Hinweis im Detail-Fenster („Keine Echtzeit-Belegung — Freie Plätze ggf.
+  in der Anbieter-App prüfen").
+
 ## 2026-06-11
 
 ### Verbessert (Zuverlässigkeit, nach Code-Review)

@@ -89,7 +89,9 @@ export async function GET(req: NextRequest) {
       bool_or(s.is_dc) AS is_dc,
       count(*)::int AS total,
       count(*) FILTER (WHERE st.status = 'Available')::int AS available,
-      count(st.status)::int AS with_status
+      -- 'Unknown' = Betreiber liefert keine Live-Daten (z. B. Tesla) → zählt
+      -- nicht als Status, sonst wirkt der Standort fälschlich komplett besetzt.
+      count(st.status) FILTER (WHERE st.status <> 'Unknown')::int AS with_status
     FROM stations s
     LEFT JOIN station_status st ON st.evse_id = s.evse_id
     WHERE ${whereClause}

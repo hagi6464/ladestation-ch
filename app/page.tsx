@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Map } from "@/components/Map";
 import { FilterSheet, activeFilterCount } from "@/components/FilterSheet";
@@ -37,6 +37,12 @@ const CORRIDOR_KM = 4;
 // Autobahn. Reiner Proxy aus den vorhandenen Daten (kein „Raststätte"-Feld im Datensatz).
 const HIGHWAY_DETOUR_KM = 0.6;
 const HIGHWAY_MIN_POWER_KW = 100;
+
+// Karten-Zoom der Auto-Ortung beim Seitenstart: ~12 km Umkreis sichtbar.
+// MapLibre-GL-Zoom (512er-Tiles): Zoom 10 ≈ ±10 km kurze / ±22 km lange
+// Handy-Achse bei 47° N. Der Knopf bleibt näher dran.
+const AUTO_LOCATE_ZOOM = 10;
+const LOCATE_BUTTON_ZOOM = 14;
 
 // Alle queryFns reichen das TanStack-`signal` an fetch durch — veraltete
 // Requests (bbox-Wechsel, neues Ziel, geschlossenes Sheet) werden abgebrochen.
@@ -139,11 +145,54 @@ export default function Page() {
   const [chargePref, setChargePref] = useState<ChargePref>("middle");
   const [selectedStopIds, setSelectedStopIds] = useState<string[]>([]);
   const appliedSuggestionRef = useRef<string | null>(null);
-  // Standortabfrage für den Reiseplaner (Spinner + Fehlermeldung am Startfeld).
-  const [tripLocating, setTripLocating] = useState(false);
-  const [tripLocateError, setTripLocateError] = useState<string | null>(null);
-  // Per GPS erkannte Ortschaft — wird im Startfeld angezeigt (Routing nutzt die Koordinaten).
-  const [tripLocatedLabel, setTripLocatedLabel] = useState<string | null>(null);
+  // Standortabfrage — geteilt vom Suchfeld (Hauptschirm) und Reiseplaner-Startfeld.
+  const [locating, setLocating] = useState(false);
+  const [locateError, setLocateError] = useState<string | null>(null);
+  // Per GPS erkannte Ortschaft — erscheint im Suchfeld und im Reiseplaner-Start
+  // (nur Anzeige; Karte/Routing nutzen die exakten Koordinaten).
+  const [locatedLabel, setLocatedLabel] = useState<string | null>(null);
+
+  // GPS abfragen + Ortschaft auflösen — zentral für Seitenstart, Suchfeld-Knopf
+  // und Reiseplaner-Startfeld. Fehler nur bei explizitem Klick zeigen.
+  const locateUser = useCallback(
+    (opts: { flyZoom?: number; showError: boolean }) => {
+      setLocateError(null);
+      setLocating(true);
+      // Erst zurücksetzen, damit auch ein erneuter Klick am selben Ort die Felder neu füllt.
+      setLocatedLabel(null);
+      requestUserLocation()
+        .then(async (loc) => {
+          setUserLocation(loc);
+          if (opts.flyZoom != null) {
+            setFlyTarget({ lat: loc.lat, lon: loc.lon, zoom: opts.flyZoom });
+          }
+          // Ortschaft auflösen — best effort, Karte/Routing brauchen sie nicht.
+          try {
+            const res = await fetch(
+              `/api/geocode?lat=${loc.lat}&lon=${loc.lon}`,
+              { signal: AbortSignal.timeout(8000) },
+            );
+            if (res.ok) {
+              const data = (await res.json()) as { place?: string | null };
+              if (data.place) setLocatedLabel(data.place);
+            }
+          } catch {
+            // Felder zeigen dann weiter ihren Platzhalter.
+          }
+        })
+        .catch((e: unknown) => {
+          if (opts.showError) {
+            setLocateError(
+              e instanceof Error
+                ? e.message
+                : "Standort konnte nicht ermittelt werden.",
+            );
+          }
+        })
+        .finally(() => setLocating(false));
+    },
+    [],
+  );
 
   // Anleitung beim allerersten Besuch einmalig automatisch zeigen.
   useEffect(() => {
@@ -160,12 +209,20 @@ export default function Page() {
   }, []);
 
   // Deep-Link verarbeiten: ?fly=lat,lon&open=evseId → hinfliegen + Säule öffnen.
+  // Ohne Deep-Link: Standort automatisch bestimmen (Suchfeld + ~12-km-Umkreis).
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     const fly = params.get("fly");
     const open = params.get("open");
-    if (!fly && !open) return;
+    if (!fly && !open) {
+      // Still: Verweigerung beim Seitenstart zeigt keinen Fehler (Knopf bleibt).
+      const t = setTimeout(
+        () => locateUser({ flyZoom: AUTO_LOCATE_ZOOM, showError: false }),
+        0,
+      );
+      return () => clearTimeout(t);
+    }
     // URL säubern, damit Reload den Deep-Link nicht erneut auslöst.
     window.history.replaceState(null, "", window.location.pathname);
     // Nach dem Mount anwenden, damit die Karte bereit ist.
@@ -181,7 +238,7 @@ export default function Page() {
       if (open) setSelectedEvseId(decodeURIComponent(open));
     }, 0);
     return () => clearTimeout(t);
-  }, []);
+  }, [locateUser]);
 
   const debouncedBbox = useDebounced(bbox, 350);
 
@@ -398,52 +455,24 @@ export default function Page() {
     setSelectedStopIds([]);
   };
 
-  // GPS abfragen; Fehler nur bei explizitem Klick zeigen (Auto-Abfrage bleibt still).
-  const locateForTrip = (showError: boolean) => {
-    setTripLocateError(null);
-    setTripLocating(true);
-    // Erst zurücksetzen, damit auch ein erneuter Klick am selben Ort das Feld neu füllt.
-    setTripLocatedLabel(null);
-    requestUserLocation()
-      .then(async (loc) => {
-        setUserLocation(loc);
-        // Ortschaft fürs Startfeld auflösen — best effort, Routing braucht sie nicht.
-        try {
-          const res = await fetch(`/api/geocode?lat=${loc.lat}&lon=${loc.lon}`, {
-            signal: AbortSignal.timeout(8000),
-          });
-          if (res.ok) {
-            const data = (await res.json()) as { place?: string | null };
-            if (data.place) setTripLocatedLabel(data.place);
-          }
-        } catch {
-          // Feld zeigt dann weiter den Platzhalter „Mein Standort (GPS)"
-        }
-      })
-      .catch((e: unknown) => {
-        if (showError) {
-          setTripLocateError(
-            e instanceof Error
-              ? e.message
-              : "Standort konnte nicht ermittelt werden.",
-          );
-        }
-      })
-      .finally(() => setTripLocating(false));
-  };
-
-  // „Mein Standort"-Knopf im Startfeld: manuellen Start verwerfen + GPS holen.
+  // „Mein Standort"-Knopf im Reiseplaner-Startfeld: manuellen Start verwerfen + GPS holen.
   const handleTripLocate = () => {
     setTripStart(null);
-    locateForTrip(true);
+    locateUser({ showError: true });
   };
 
-  // Reiseplaner öffnen (Primär-Button) + Standort automatisch abfragen.
+  // „Mein Standort"-Knopf im Suchfeld: hinfliegen (Nahansicht) + Felder füllen.
+  const handleSearchLocate = () => {
+    locateUser({ flyZoom: LOCATE_BUTTON_ZOOM, showError: true });
+  };
+
+  // Reiseplaner öffnen (Primär-Button) + Standort automatisch abfragen,
+  // falls die Auto-Ortung beim Seitenstart nichts geliefert hat (z. B. verweigert).
   const openTrip = () => {
     setSelectedEvseId(null);
     setTripOpen(true);
-    setTripLocateError(null);
-    if (!userLocation && !tripStart) locateForTrip(false);
+    setLocateError(null);
+    if (!userLocation && !tripStart) locateUser({ showError: false });
   };
 
   // Route inkl. gewählter Ladestopps an Google Maps übergeben (max. 3 mobil).
@@ -537,7 +566,11 @@ export default function Page() {
           <div className="pointer-events-auto min-w-0 flex-1 sm:w-80 sm:flex-none">
             <SearchBox
               onLocate={(t) => setFlyTarget({ ...t })}
-              onUserLocation={setUserLocation}
+              locatedLabel={locatedLabel}
+              onLocateRequest={handleSearchLocate}
+              locating={locating}
+              locateError={locateError}
+              hasFix={!!userLocation}
             />
           </div>
         </div>
@@ -598,9 +631,9 @@ export default function Page() {
         onStartSelect={(s) => setTripStart(s)}
         onStartClear={() => setTripStart(null)}
         onLocateStart={handleTripLocate}
-        locating={tripLocating}
-        locateError={tripLocateError}
-        locatedLabel={tripLocatedLabel}
+        locating={locating}
+        locateError={locateError}
+        locatedLabel={locatedLabel}
         vehicleName={MODEL_Y.name}
         soc={soc}
         onSocChange={setSoc}

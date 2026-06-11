@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { requestUserLocation } from "@/lib/geolocate";
+import { useEffect, useId, useState } from "react";
 import { IconButton } from "@/components/ui/IconButton";
 import { InfoCallout } from "@/components/ui/InfoCallout";
 import { IconLocate, IconMapPin, IconSearch } from "@/components/ui/Icon";
@@ -11,22 +10,56 @@ type GeocodeResult = FlyTarget & { label: string };
 
 type Props = {
   onLocate: (target: FlyTarget) => void;
-  onUserLocation?: (loc: { lat: number; lon: number; accuracy: number }) => void;
+  /** Per GPS erkannte Ortschaft — wird ins Feld übernommen (nur Anzeige). */
+  locatedLabel: string | null;
+  /** GPS-Standort (erneut) anfordern — „Mein Standort"-Knopf. */
+  onLocateRequest: () => void;
+  locating: boolean;
+  locateError: string | null;
+  /** true = GPS-Fix vorhanden (färbt den Knopf blau, solange das Feld ihn zeigt). */
+  hasFix: boolean;
 };
 
-export function SearchBox({ onLocate, onUserLocation }: Props) {
+export function SearchBox({
+  onLocate,
+  locatedLabel,
+  onLocateRequest,
+  locating,
+  locateError,
+  hasFix,
+}: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GeocodeResult[]>([]);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const lastSelected = useRef<string>("");
+  const [lastSelected, setLastSelected] = useState("");
   const listId = useId();
+
+  // Zuletzt per GPS gesetzter Feldtext — unterscheidet „zeigt Mein Standort"
+  // von einer manuellen Eingabe (die nie überschrieben wird).
+  const [gpsLabel, setGpsLabel] = useState<string | null>(null);
+
+  // Neue GPS-Ortschaft ins Feld übernehmen (guarded Render-Anpassung) — zählt
+  // wie eine getroffene Auswahl, damit kein Autocomplete-Dropdown aufgeht.
+  const [prevLocatedLabel, setPrevLocatedLabel] = useState<string | null>(null);
+  if (locatedLabel !== prevLocatedLabel) {
+    setPrevLocatedLabel(locatedLabel);
+    if (locatedLabel) {
+      if (query === "" || query === gpsLabel) {
+        setQuery(locatedLabel);
+        setLastSelected(locatedLabel);
+        setResults([]);
+        setOpen(false);
+      }
+      setGpsLabel(locatedLabel);
+    }
+  }
 
   useEffect(() => {
     const q = query.trim();
-    if (q === lastSelected.current) return;
+    if (q === lastSelected) return;
 
     // Veraltete Requests abbrechen (neuer Tastendruck/Unmount) — Abbruch ist
     // kein Fehler und darf keine Fehlermeldung auslösen.
@@ -71,10 +104,10 @@ export function SearchBox({ onLocate, onUserLocation }: Props) {
       clearTimeout(t);
       ac.abort();
     };
-  }, [query]);
+  }, [query, lastSelected]);
 
   function select(r: GeocodeResult) {
-    lastSelected.current = r.label;
+    setLastSelected(r.label);
     setQuery(r.label);
     setOpen(false);
     setResults([]);
@@ -98,26 +131,9 @@ export function SearchBox({ onLocate, onUserLocation }: Props) {
     }
   }
 
-  function handleLocate() {
-    setError(null);
-    setBusy(true);
-    requestUserLocation()
-      .then((loc) => {
-        setBusy(false);
-        onUserLocation?.(loc);
-        onLocate({ lat: loc.lat, lon: loc.lon, zoom: 14 });
-      })
-      .catch((e: unknown) => {
-        setBusy(false);
-        setError(
-          e instanceof Error
-            ? e.message
-            : "Standort konnte nicht ermittelt werden.",
-        );
-      });
-  }
-
   const listVisible = open && results.length > 0;
+  // GPS ist die angezeigte Quelle: Feld leer (Platzhalter) oder zeigt die GPS-Ortschaft.
+  const gpsShown = hasFix && (query === "" || query === gpsLabel);
 
   return (
     <div className="relative w-full sm:w-80">
@@ -148,8 +164,23 @@ export function SearchBox({ onLocate, onUserLocation }: Props) {
             aria-hidden="true"
           />
         )}
-        <IconButton label="Mein Standort" onClick={handleLocate} disabled={busy}>
-          <IconLocate size={18} />
+        <IconButton
+          label="Mein Standort"
+          onClick={onLocateRequest}
+          disabled={locating}
+        >
+          {locating ? (
+            <span
+              className="h-4 w-4 animate-spin rounded-full border-2 border-border-strong border-t-accent"
+              aria-hidden="true"
+            />
+          ) : (
+            <IconLocate
+              size={18}
+              // blau = GPS ist aktuell die angezeigte Quelle
+              className={gpsShown ? "text-accent" : undefined}
+            />
+          )}
         </IconButton>
       </div>
 
@@ -185,9 +216,9 @@ export function SearchBox({ onLocate, onUserLocation }: Props) {
         </ul>
       )}
 
-      {error && (
+      {(locateError ?? error) && (
         <InfoCallout tone="danger" className="mt-1">
-          {error}
+          {locateError ?? error}
         </InfoCallout>
       )}
     </div>

@@ -72,7 +72,11 @@ export async function GET(
 
   const total = points.length;
   const available = points.filter((p) => p.status === "Available").length;
-  const hasStatus = points.some((p) => p.status != null);
+  // 'Unknown' = Betreiber liefert keine Live-Daten (z. B. Tesla) → kein Status,
+  // sonst zeigt das Sheet fälschlich „0 von N frei".
+  const hasStatus = points.some(
+    (p) => p.status != null && p.status !== "Unknown",
+  );
 
   const detail: StationDetail = {
     evseId: head.evseId,
