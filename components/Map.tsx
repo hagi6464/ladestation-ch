@@ -28,6 +28,16 @@ const SELECTED_STOP_MARKER_HTML = `
     </svg>
   </div>`;
 
+// Tesla-Standorte: weisses „T" im Marker (eigene Zeichnung, gleiche Optik wie
+// das Tesla-Plug-Chip im Detail-Sheet). Tesla liefert keinen Live-Status — der
+// Kreis bleibt grau und wäre sonst nicht von anderen „Status unbekannt"-Säulen
+// unterscheidbar. 56 px + pixelRatio 4 → 14 px logisch, scharf auf Retina.
+const TESLA_ICON_ID = "tesla-t";
+const TESLA_ICON_SVG = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24">
+    <path d="M 7 8 L 17 8 M 12 8.3 L 12 17" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+  </svg>`;
+
 type UserLocation = { lat: number; lon: number; accuracy: number };
 
 /**
@@ -335,6 +345,45 @@ export function Map({
           ],
         },
       });
+
+      // Tesla-„T" über den (grauen) Tesla-Markern. Bild lädt asynchron —
+      // Layer erst im onload anlegen, sonst meldet MapLibre ein fehlendes Bild.
+      const teslaImg = new Image(56, 56);
+      teslaImg.onload = () => {
+        if (!mapRef.current || map.hasImage(TESLA_ICON_ID)) return;
+        map.addImage(TESLA_ICON_ID, teslaImg, { pixelRatio: 4 });
+        map.addLayer({
+          id: "unclustered-tesla",
+          type: "symbol",
+          source: SOURCE_ID,
+          filter: [
+            "all",
+            ["!", ["has", "point_count"]],
+            [
+              "in",
+              "tesla",
+              ["downcase", ["coalesce", ["get", "operatorName"], ""]],
+            ],
+          ],
+          layout: {
+            "icon-image": TESLA_ICON_ID,
+            "icon-allow-overlap": true,
+            "icon-ignore-placement": true,
+          },
+          paint: {
+            // Reichweiten-Filter: wie der Kreis darunter leicht ausgrauen.
+            "icon-opacity": [
+              "case",
+              ["==", ["get", "inRange"], false],
+              0.7,
+              1,
+            ],
+          },
+        });
+      };
+      teslaImg.src =
+        "data:image/svg+xml;charset=utf-8," +
+        encodeURIComponent(TESLA_ICON_SVG);
 
       map.on("click", "clusters", (e) => {
         const features = map.queryRenderedFeatures(e.point, {

@@ -21,6 +21,10 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
   Live-Daten": neutrales Badge („14 Ladepunkte"), graue statt rote Marker und ein
   klarer Hinweis im Detail-Fenster („Keine Echtzeit-Belegung — Freie Plätze ggf.
   in der Anbieter-App prüfen").
+- **Tesla-Standorte auf der Karte erkennbar**: Tesla-Supercharger tragen jetzt
+  ein weisses „T" im Karten-Marker (gleiche Optik wie das Tesla-Symbol im
+  Detail-Fenster) — so ist auf einen Blick klar, warum dort keine
+  Live-Verfügbarkeit angezeigt wird.
 
 ## 2026-06-11
 
