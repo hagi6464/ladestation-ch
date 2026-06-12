@@ -15,7 +15,11 @@ export const PLUG_FILTER_NEEDLES: Record<
   readonly string[]
 > = {
   type2: ["type 2", "type2", "mennekes"],
-  ccs: ["ccs"],
+  // "tesla": Schweizer Supercharger (V3/V4) haben physisch CCS-2-Stecker und
+  // sind mehrheitlich für Fremdmarken offen — BFE meldet sie aber nur als
+  // "Tesla Connector". Ohne die Needle fehlen sie im CCS-Filter und im
+  // Reiseplaner-Korridor (der CCS-Schnelllader sucht).
+  ccs: ["ccs", "tesla"],
   chademo: ["chademo"],
 };
 

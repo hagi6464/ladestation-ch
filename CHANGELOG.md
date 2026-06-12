@@ -25,6 +25,13 @@ per Datum, da die App kontinuierlich auf Vercel deployt wird.
   ein weisses „T" im Karten-Marker (gleiche Optik wie das Tesla-Symbol im
   Detail-Fenster) — so ist auf einen Blick klar, warum dort keine
   Live-Verfügbarkeit angezeigt wird.
+- **Tesla-Supercharger fehlten im Reiseplaner**: BFE meldet Supercharger ohne
+  Stromart (AC/DC) und nur mit Stecker „Tesla Connector" — sie fielen dadurch
+  aus dem DC- und CCS-Filter des Reiseplaner-Korridors. Neu gelten Säulen ab
+  50 kW ohne Stromart-Angabe als DC-Schnelllader, und Tesla zählt zum
+  CCS-Filter (Schweizer Supercharger haben CCS-Stecker und sind mehrheitlich
+  für alle Marken offen). Supercharger erscheinen damit als Ladestopps im
+  Reiseplaner und im Stecker-Filter „CCS".
 
 ## 2026-06-11
 

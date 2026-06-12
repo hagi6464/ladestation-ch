@@ -121,7 +121,14 @@ export function mapRecordToStation(
   const coords = parseGeo(rec.GeoCoordinates?.Google);
   if (!coords) return null;
   const [lat, lon] = coords;
-  const { isAc, isDc } = classifyAcDc(rec.ChargingFacilities);
+  const power = maxPower(rec.ChargingFacilities);
+  const acDc = classifyAcDc(rec.ChargingFacilities);
+  const isAc = acDc.isAc;
+  // Manche Betreiber (z. B. Tesla) liefern kein powertype. Ab 50 kW ist die
+  // Säule physikalisch sicher DC (AC endet bei 43 kW) — sonst fallen
+  // Schnelllader aus dem DC-Filter und dem Reiseplaner-Korridor.
+  const isDc =
+    acDc.isDc || (!isAc && !acDc.isDc && power != null && power >= 50);
 
   return {
     evseId: rec.EvseID,
@@ -140,7 +147,7 @@ export function mapRecordToStation(
     nameEn: pickName(rec.ChargingStationNames, "en"),
     plugs: toArray(rec.Plugs),
     authModes: toArray(rec.AuthenticationModes),
-    maxPowerKw: maxPower(rec.ChargingFacilities),
+    maxPowerKw: power,
     isAc,
     isDc,
     isOpen24h: toBool(rec.IsOpen24Hours),
