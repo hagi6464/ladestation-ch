@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import maplibregl, { Map as MapInstance } from "maplibre-gl";
+import maplibregl, {
+  Map as MapInstance,
+  type ExpressionSpecification,
+} from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { StationFeatureCollection } from "@/lib/types";
 import type { LineCoords } from "@/lib/geo";
@@ -37,6 +40,17 @@ const TESLA_ICON_SVG = `
   <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24">
     <path d="M 7 8 L 17 8 M 12 8.3 L 12 17" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" fill="none"/>
   </svg>`;
+
+// Tesla-Erkennung über den Betreiber — geteilt von Kreis-Farbe und T-Symbol.
+const IS_TESLA: ExpressionSpecification = [
+  "in",
+  "tesla",
+  ["downcase", ["coalesce", ["get", "operatorName"], ""]],
+];
+
+// Tesla-Markerfarbe (orange-500) — bewusst eigenständig: kein Live-Status,
+// aber als Supercharger-Standort auf einen Blick erkennbar.
+const TESLA_COLOR = "#f97316";
 
 type UserLocation = { lat: number; lon: number; accuracy: number };
 
@@ -303,6 +317,9 @@ export function Map({
             "#10b981",
             ["get", "hasStatus"],
             "#ef4444",
+            // Tesla (kein Live-Status): orange statt grau, T-Symbol liegt darüber.
+            IS_TESLA,
+            TESLA_COLOR,
             "#64748b",
           ],
           "circle-radius": [
@@ -356,15 +373,7 @@ export function Map({
           id: "unclustered-tesla",
           type: "symbol",
           source: SOURCE_ID,
-          filter: [
-            "all",
-            ["!", ["has", "point_count"]],
-            [
-              "in",
-              "tesla",
-              ["downcase", ["coalesce", ["get", "operatorName"], ""]],
-            ],
-          ],
+          filter: ["all", ["!", ["has", "point_count"]], IS_TESLA],
           layout: {
             "icon-image": TESLA_ICON_ID,
             "icon-allow-overlap": true,
