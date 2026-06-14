@@ -337,7 +337,11 @@ export default function Page() {
   const corridorStops = useMemo<CorridorStation[]>(() => {
     if (!tripRoute || !corridorQuery.data) return [];
     const line = tripRoute.geometry.coordinates;
-    const [winLo, winHi] = chargeWindowKm(chargePref, tripRangeKm);
+    // Lade-Abschnitt entlang der TATSÄCHLICHEN Fahrstrecke wählen, gedeckelt auf
+    // die Reichweite: Bei kurzen Reisen (Strecke < Reichweite) liegen Anfang/Mitte/
+    // Ende über der Route, sonst fielen Mitte/Ende hinter das Ziel = keine Säulen.
+    const planLengthKm = Math.min(tripRangeKm, tripRoute.distanceKm);
+    const [winLo, winHi] = chargeWindowKm(chargePref, planLengthKm);
     const out: CorridorStation[] = [];
     for (const f of corridorQuery.data.features) {
       const [lon, lat] = f.geometry.coordinates;

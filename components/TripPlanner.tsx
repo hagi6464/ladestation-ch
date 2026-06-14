@@ -164,8 +164,10 @@ export function TripPlanner({
   const reachWithoutCharge =
     route != null && route.distanceKm <= rangeKm - reserveKm;
 
-  // Entfernungsfenster ab Start für die gewählte Lade-Position (relativ zur Reichweite).
-  const [winLo, winHi] = chargeWindowKm(chargePref, rangeKm);
+  // Entfernungsfenster ab Start für die gewählte Lade-Position — relativ zur
+  // tatsächlichen Fahrstrecke, gedeckelt auf die Reichweite (vor dem Planen: Reichweite).
+  const planLengthKm = route ? Math.min(rangeKm, route.distanceKm) : rangeKm;
+  const [winLo, winHi] = chargeWindowKm(chargePref, planLengthKm);
 
   return (
     <aside
@@ -381,7 +383,7 @@ export function TripPlanner({
             <span className="tabular-nums">
               {Math.round(winLo)}–{Math.round(winHi)} km
             </span>{" "}
-            ab Start (Reichweiten-Abschnitt).
+            ab Start (Reise-Abschnitt).
           </div>
         </div>
 

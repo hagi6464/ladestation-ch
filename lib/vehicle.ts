@@ -38,19 +38,20 @@ export type ChargePref = "start" | "middle" | "end";
 
 /**
  * Entfernungsfenster ab Start [km] für die gewählte Lade-Position — **lückenlose**
- * Drittel der Reichweite aus dem aktuellen Ladestand, damit keine Säule zwischen
- * den Zonen verloren geht:
- * - start  = erstes Drittel (0 – ⅓ der Reichweite)
+ * Drittel der übergebenen Länge `lengthKm`, damit keine Säule zwischen den Zonen
+ * verloren geht. Aufrufer übergibt min(Reichweite, Fahrstrecke), damit Mitte/Ende
+ * bei kurzen Reisen nicht hinter dem Ziel liegen:
+ * - start  = erstes Drittel (0 – ⅓)
  * - middle = mittleres Drittel (⅓ – ⅔)
- * - end    = letztes Drittel (⅔ – volle Reichweite)
+ * - end    = letztes Drittel (⅔ – volle Länge)
  */
 export function chargeWindowKm(
   pref: ChargePref,
-  rangeKm: number,
+  lengthKm: number,
 ): [number, number] {
-  const third = rangeKm / 3;
+  const third = lengthKm / 3;
   if (pref === "start") return [0, third];
-  if (pref === "end") return [2 * third, rangeKm];
+  if (pref === "end") return [2 * third, lengthKm];
   return [third, 2 * third];
 }
 
