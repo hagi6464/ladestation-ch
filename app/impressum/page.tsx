@@ -73,6 +73,11 @@ export default function ImpressumPage() {
         Das Kartenmaterial basiert auf Daten von OpenStreetMap sowie den
         zugehörigen Kartendiensten.
       </p>
+      <p className="mt-3 text-sm leading-relaxed">
+        Die Fahrzeugdaten (Batterie, Verbrauch, Ladekurven) im Reiseplaner
+        stammen aus dem Projekt open-ev-data von OpenChargingCloud, veröffentlicht
+        unter der MIT-Lizenz.
+      </p>
 
       <h2 className="mt-8 t-title text-primary">Haftungsausschluss</h2>
       <p className="mt-2 text-sm leading-relaxed">

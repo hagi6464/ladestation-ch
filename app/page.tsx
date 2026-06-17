@@ -17,8 +17,14 @@ import {
   type ChargePref,
 } from "@/components/TripPlanner";
 import { useFavorites } from "@/lib/favorites";
+import { useSelectedVehicleId } from "@/lib/selected-vehicle";
 import { haversineKm, distanceToRouteKm, pointAtKm } from "@/lib/geo";
-import { MODEL_Y, estimateRangeKm, chargeWindowKm } from "@/lib/vehicle";
+import {
+  MODEL_Y,
+  estimateRangeKm,
+  chargeWindowKm,
+  type Vehicle,
+} from "@/lib/vehicle";
 import { requestUserLocation } from "@/lib/geolocate";
 import type {
   Filters,
@@ -86,13 +92,14 @@ async function fetchRoute(
 
 async function fetchCorridorStations(
   bbox: Bbox,
+  plugType: string,
   signal: AbortSignal,
 ): Promise<StationFeatureCollection> {
-  // CCS-DC-Schnelllader (Model-Y-Stecker) — hält das Set klein, kein Tiling nötig.
+  // DC-Schnelllader des gewählten Steckertyps — hält das Set klein, kein Tiling nötig.
   const params = new URLSearchParams({
     bbox: bbox.map((n) => n.toFixed(5)).join(","),
     current: "dc",
-    plugType: "ccs",
+    plugType,
   });
   const res = await fetch(`/api/stations?${params}`, { signal });
   if (!res.ok) throw new Error(`corridor failed: ${res.status}`);
@@ -143,6 +150,7 @@ export default function Page() {
   // Standard an: auf Reisen sind Schnelllader ohne Umweg fast immer gewollt.
   const [highwayOnly, setHighwayOnly] = useState(true);
   const [chargePref, setChargePref] = useState<ChargePref>("middle");
+  const { vehicleId: selectedVehicleId, setVehicleId } = useSelectedVehicleId();
   const [selectedStopIds, setSelectedStopIds] = useState<string[]>([]);
   const appliedSuggestionRef = useRef<string | null>(null);
   // Standortabfrage — geteilt vom Suchfeld (Hauptschirm) und Reiseplaner-Startfeld.
@@ -281,10 +289,42 @@ export default function Page() {
   ]);
 
   // ---- Reiseplaner ------------------------------------------------------
-  // Fahrzeug-Reichweite aus Ladezustand/Verbrauch (Model-Y-Referenz).
-  const tripRangeKm = estimateRangeKm(soc, consumption, MODEL_Y.usableKwh);
+  // Kuratierte Fahrzeugliste (open-ev-data, gebündelt) + Default Model Y voranstellen.
+  const vehiclesQuery = useQuery<Vehicle[], Error>({
+    queryKey: ["vehicles"],
+    queryFn: async ({ signal }) => {
+      const res = await fetch("/api/vehicles", { signal });
+      if (!res.ok) throw new Error("vehicles failed");
+      return res.json();
+    },
+    staleTime: Infinity,
+  });
+  const vehicles = useMemo<Vehicle[]>(
+    () => [MODEL_Y, ...(vehiclesQuery.data ?? [])],
+    [vehiclesQuery.data],
+  );
+  const selectedVehicle = useMemo<Vehicle>(
+    () => vehicles.find((v) => v.id === selectedVehicleId) ?? MODEL_Y,
+    [vehicles, selectedVehicleId],
+  );
+
+  // Beim Fahrzeugwechsel den Verbrauch auf den Fahrzeug-Default setzen; innerhalb
+  // desselben Fahrzeugs bleibt eine manuelle Anpassung erhalten (guarded Render-
+  // Anpassung statt Effekt — wie die GPS-Ortschaft im Reiseplaner).
+  const [prevVehicleId, setPrevVehicleId] = useState(selectedVehicle.id);
+  if (selectedVehicle.id !== prevVehicleId) {
+    setPrevVehicleId(selectedVehicle.id);
+    setConsumption(selectedVehicle.consumptionKwh100);
+  }
+
+  // Fahrzeug-Reichweite aus Ladezustand/Verbrauch und Batterie des gewählten Autos.
+  const tripRangeKm = estimateRangeKm(soc, consumption, selectedVehicle.usableKwh);
   // Reserve = Reichweite, die für den gewünschten Ankunfts-Ladestand nötig ist.
-  const reserveKm = estimateRangeKm(arrivalSoc, consumption, MODEL_Y.usableKwh);
+  const reserveKm = estimateRangeKm(
+    arrivalSoc,
+    consumption,
+    selectedVehicle.usableKwh,
+  );
 
   // Routen-Start: manuell eingegebener Start, sonst GPS-Standort.
   const routeFrom: { lat: number; lon: number } | null =
@@ -323,10 +363,11 @@ export default function Page() {
     return [w - padLon, s - padLat, e + padLon, n + padLat];
   }, [tripRoute]);
 
-  // CCS-DC-Säulen im Routen-bbox (eigener Fetch, unabhängig vom Karten-bbox).
+  // DC-Säulen (Stecker des gewählten Autos) im Routen-bbox (eigener Fetch).
   const corridorQuery = useQuery<StationFeatureCollection, Error>({
-    queryKey: ["corridor", routeBbox],
-    queryFn: ({ signal }) => fetchCorridorStations(routeBbox!, signal),
+    queryKey: ["corridor", routeBbox, selectedVehicle.plug],
+    queryFn: ({ signal }) =>
+      fetchCorridorStations(routeBbox!, selectedVehicle.plug, signal),
     enabled: !!routeBbox,
     staleTime: 60_000,
   });
@@ -638,7 +679,9 @@ export default function Page() {
         locating={locating}
         locateError={locateError}
         locatedLabel={locatedLabel}
-        vehicleName={MODEL_Y.name}
+        vehicles={vehicles}
+        selectedVehicle={selectedVehicle}
+        onVehicleChange={setVehicleId}
         soc={soc}
         onSocChange={setSoc}
         consumption={consumption}

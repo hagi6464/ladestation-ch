@@ -42,21 +42,22 @@ describe("chargeWindowKm", () => {
 });
 
 describe("estimateChargeMinutes", () => {
-  // Gemittelte 10→80-Leistung des Model Y: 0.7·75 kWh / 0.5 h = 105 kW.
-  const sustainedKw = (0.7 * MODEL_Y.usableKwh) / (MODEL_Y.charge1080Min / 60);
-
-  it("Lader ≥ gemittelte Leistung → bekannte 10→80-Zeit", () => {
-    expect(estimateChargeMinutes(sustainedKw)).toBe(MODEL_Y.charge1080Min);
-    expect(estimateChargeMinutes(300)).toBe(MODEL_Y.charge1080Min);
+  it("langsamer Lader unter der Kurve ist der Begrenzer (50 kW → 63 min)", () => {
+    // Model-Y-Kurve liegt 10→80 % durchgehend über 50 kW, also begrenzt die Säule:
+    // 0.7·75 kWh / 50 kW = 1.05 h = 63 min.
+    expect(estimateChargeMinutes(50)).toBeCloseTo(63, 1);
   });
 
-  it("langsamer Lader skaliert umgekehrt zur Leistung (50 kW → 63 min)", () => {
-    expect(estimateChargeMinutes(50)).toBeCloseTo(63, 5);
+  it("schneller Lader → Fahrzeugkurve begrenzt, deutlich schneller als langsamer", () => {
+    const fast = estimateChargeMinutes(300);
+    expect(fast).toBeGreaterThan(0);
+    expect(fast).toBeLessThan(estimateChargeMinutes(50));
   });
 
-  it("unbekannte Leistung (null/0) → Peak-Annahme = bekannte Zeit", () => {
-    expect(estimateChargeMinutes(null)).toBe(MODEL_Y.charge1080Min);
-    expect(estimateChargeMinutes(0)).toBe(MODEL_Y.charge1080Min);
+  it("unbekannte Leistung (null/0) = nur Kurve begrenzt (wie Lader über Peak)", () => {
+    // Peak der Model-Y-Kurve ist 250 kW; ein 300-kW-Lader begrenzt also nicht mehr.
+    expect(estimateChargeMinutes(null)).toBeCloseTo(estimateChargeMinutes(300), 5);
+    expect(estimateChargeMinutes(0)).toBeCloseTo(estimateChargeMinutes(300), 5);
   });
 
   it("monoton: weniger kW nie schneller", () => {
@@ -65,6 +66,14 @@ describe("estimateChargeMinutes", () => {
     );
     expect(estimateChargeMinutes(100)).toBeGreaterThanOrEqual(
       estimateChargeMinutes(150),
+    );
+  });
+
+  it("ein größerer Akku lädt 10→80 % länger als ein kleiner (gleiche Säule)", () => {
+    const small = { ...MODEL_Y, usableKwh: 40 };
+    const big = { ...MODEL_Y, usableKwh: 90 };
+    expect(estimateChargeMinutes(50, big)).toBeGreaterThan(
+      estimateChargeMinutes(50, small),
     );
   });
 });

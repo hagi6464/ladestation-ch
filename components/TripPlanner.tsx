@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { CorridorStation, TripRoute } from "@/lib/types";
 import { findCpoTariff, type CpoTariff } from "@/lib/cpo-tariffs";
 import {
   estimateChargeMinutes,
   chargeWindowKm,
   type ChargePref,
+  type Vehicle,
 } from "@/lib/vehicle";
 import { GeocodeField, type GeocodeResult } from "@/components/GeocodeField";
 import { Button } from "@/components/ui/Button";
@@ -41,7 +42,12 @@ type Props = {
   locateError: string | null;
   /** Per GPS erkannte Ortschaft — wird ins Startfeld geschrieben (nur Anzeige). */
   locatedLabel: string | null;
-  vehicleName: string;
+  /** Auswählbare Fahrzeuge (Default Model Y + open-ev-data-Datensatz). */
+  vehicles: Vehicle[];
+  /** Aktuell gewähltes Fahrzeug. */
+  selectedVehicle: Vehicle;
+  /** Fahrzeug wählen (ID wird in localStorage gemerkt). */
+  onVehicleChange: (id: string) => void;
   soc: number;
   onSocChange: (n: number) => void;
   consumption: number;
@@ -112,7 +118,9 @@ export function TripPlanner({
   locating,
   locateError,
   locatedLabel,
-  vehicleName,
+  vehicles,
+  selectedVehicle,
+  onVehicleChange,
   soc,
   onSocChange,
   consumption,
@@ -143,6 +151,18 @@ export function TripPlanner({
   // Zuletzt per GPS gesetzter Feldtext — unterscheidet „zeigt Mein Standort"
   // von einer manuellen Eingabe (die nie überschrieben wird).
   const [gpsLabel, setGpsLabel] = useState<string | null>(null);
+
+  // Fahrzeuge nach Marke gruppieren (für <optgroup> im Picker), Reihenfolge = erstes
+  // Auftreten in der bereits nach Name sortierten Liste (Default Model Y zuerst).
+  const vehicleGroups = useMemo(() => {
+    const groups: { brand: string; items: Vehicle[] }[] = [];
+    for (const v of vehicles) {
+      const existing = groups.find((g) => g.brand === v.brand);
+      if (existing) existing.items.push(v);
+      else groups.push({ brand: v.brand, items: [v] });
+    }
+    return groups;
+  }, [vehicles]);
 
   // Neue GPS-Ortschaft ins Startfeld übernehmen (guarded Render-Anpassung).
   const [prevLocatedLabel, setPrevLocatedLabel] = useState<string | null>(null);
@@ -269,6 +289,30 @@ export function TripPlanner({
           ariaLabel="Zielort"
         />
 
+        {/* Fahrzeug */}
+        <div>
+          <SectionLabel as="label">Fahrzeug</SectionLabel>
+          <select
+            value={selectedVehicle.id}
+            onChange={(e) => onVehicleChange(e.target.value)}
+            className="w-full rounded-control border border-border-strong bg-field px-2 py-1.5 text-base text-primary outline-none"
+            aria-label="Fahrzeug wählen"
+          >
+            {vehicleGroups.map((group) => (
+              <optgroup key={group.brand} label={group.brand}>
+                {group.items.map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.name}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+          <div className="mt-0.5 t-caption tabular-nums text-tertiary">
+            {selectedVehicle.usableKwh} kWh · DC bis {selectedVehicle.dcPeakKw} kW
+          </div>
+        </div>
+
         {/* Ladezustand */}
         <div>
           <div className="mb-1 flex items-baseline justify-between">
@@ -300,7 +344,7 @@ export function TripPlanner({
 
         {/* Verbrauch + Ankunft (Drehrad/Select — kein iOS-Auto-Zoom) */}
         <div className="t-caption text-tertiary">
-          Standard: {vehicleName} — anpassbar
+          Verbrauch laut {selectedVehicle.name} — anpassbar
         </div>
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
@@ -446,7 +490,10 @@ export function TripPlanner({
                 const dc = cpo ? minDcPerKwh(cpo) : null;
                 const chargeMin =
                   Math.round(
-                    estimateChargeMinutes(s.properties.maxPowerKw) / 5,
+                    estimateChargeMinutes(
+                      s.properties.maxPowerKw,
+                      selectedVehicle,
+                    ) / 5,
                   ) * 5;
                 return (
                   <li key={s.properties.evseId}>

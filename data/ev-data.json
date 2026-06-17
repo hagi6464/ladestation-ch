@@ -1,0 +1,2434 @@
+[
+  {
+    "id": "6033b26c-1b3c-441b-9f78-7b7cd5512051",
+    "name": "Airways U5 (2020)",
+    "brand": "Airways",
+    "model": "U5",
+    "usableKwh": 63,
+    "consumptionKwh100": 18.8,
+    "dcPeakKw": 100,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 95
+      },
+      {
+        "percentage": 75,
+        "power": 100
+      },
+      {
+        "percentage": 100,
+        "power": 6.6
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "c6a6bd26-6a8f-4ab7-baf3-6cfa057044e3",
+    "name": "Audi e-tron 50 (2019)",
+    "brand": "Audi",
+    "model": "e-tron 50",
+    "usableKwh": 65,
+    "consumptionKwh100": 22.7,
+    "dcPeakKw": 125,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 118
+      },
+      {
+        "percentage": 75,
+        "power": 125
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "059c028d-b2a6-4a8d-947a-158c7537b290",
+    "name": "Audi e-tron 50 22kW-AC (2019)",
+    "brand": "Audi",
+    "model": "e-tron 50",
+    "usableKwh": 65,
+    "consumptionKwh100": 22.7,
+    "dcPeakKw": 125,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 118
+      },
+      {
+        "percentage": 75,
+        "power": 125
+      },
+      {
+        "percentage": 100,
+        "power": 22
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "a9a177bf-9ce5-4b67-b3ef-51af248b48c2",
+    "name": "Audi e-tron 55 (2019)",
+    "brand": "Audi",
+    "model": "e-tron 55",
+    "usableKwh": 86.5,
+    "consumptionKwh100": 23.4,
+    "dcPeakKw": 155,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 137
+      },
+      {
+        "percentage": 70,
+        "power": 155
+      },
+      {
+        "percentage": 72,
+        "power": 150
+      },
+      {
+        "percentage": 78,
+        "power": 120
+      },
+      {
+        "percentage": 82,
+        "power": 105
+      },
+      {
+        "percentage": 100,
+        "power": 50
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "27d7610e-9a77-498a-b1b5-28d4bc92cbf2",
+    "name": "Audi e-tron 55 22kW-AC (2019)",
+    "brand": "Audi",
+    "model": "e-tron 55",
+    "usableKwh": 86.5,
+    "consumptionKwh100": 23.4,
+    "dcPeakKw": 155,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 137
+      },
+      {
+        "percentage": 70,
+        "power": 155
+      },
+      {
+        "percentage": 72,
+        "power": 150
+      },
+      {
+        "percentage": 78,
+        "power": 120
+      },
+      {
+        "percentage": 82,
+        "power": 105
+      },
+      {
+        "percentage": 100,
+        "power": 50
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "dbf24ffc-3270-409b-b4da-ec386fa36657",
+    "name": "BMW i3 120 Ah",
+    "brand": "BMW",
+    "model": "i3",
+    "usableKwh": 37.9,
+    "consumptionKwh100": 16.1,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 44
+      },
+      {
+        "percentage": 85,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 3
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "e67dc450-d658-4bee-bd0f-a750d445b2f9",
+    "name": "BMW i3 60 Ah",
+    "brand": "BMW",
+    "model": "i3",
+    "usableKwh": 18.8,
+    "consumptionKwh100": 14.5,
+    "dcPeakKw": 47,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 43
+      },
+      {
+        "percentage": 30,
+        "power": 47
+      },
+      {
+        "percentage": 33,
+        "power": 44
+      },
+      {
+        "percentage": 62,
+        "power": 44
+      },
+      {
+        "percentage": 100,
+        "power": 3
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "0ec3f440-136c-49f1-8917-c629a27146c7",
+    "name": "BMW i3 94 Ah",
+    "brand": "BMW",
+    "model": "i3",
+    "usableKwh": 27.2,
+    "consumptionKwh100": 16,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 44
+      },
+      {
+        "percentage": 60,
+        "power": 46
+      },
+      {
+        "percentage": 80,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 3
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "45b68c71-cd11-4bd7-a03f-fdaae259635d",
+    "name": "Citroen C-Zero",
+    "brand": "Citroen",
+    "model": "C-Zero",
+    "usableKwh": 14.5,
+    "consumptionKwh100": 17.1,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 47
+      },
+      {
+        "percentage": 75,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 3.6
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "430ca2cd-bd4b-482a-8776-85a8c7d3435c",
+    "name": "DS 3 Crossback E-Tense 11 kW-AC (2020)",
+    "brand": "DS",
+    "model": "3 Crossback E-Tense",
+    "usableKwh": 46,
+    "consumptionKwh100": 18.4,
+    "dcPeakKw": 100,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 95
+      },
+      {
+        "percentage": 75,
+        "power": 100
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "3b5bb8d1-0f34-4c05-861c-45d19a8883b9",
+    "name": "DS 3 Crossback E-Tense 7,2 kW-AC (2020)",
+    "brand": "DS",
+    "model": "3 Crossback E-Tense",
+    "usableKwh": 46,
+    "consumptionKwh100": 18.4,
+    "dcPeakKw": 100,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 95
+      },
+      {
+        "percentage": 75,
+        "power": 100
+      },
+      {
+        "percentage": 100,
+        "power": 7.4
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "c0a26929-1157-4fb4-a999-4f172df9cad7",
+    "name": "Ford Focus electric (2017)",
+    "brand": "Ford",
+    "model": "Focus electric",
+    "usableKwh": 33.5,
+    "consumptionKwh100": 16.4,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 47
+      },
+      {
+        "percentage": 75,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 6.6
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "5bfa9a87-7b35-4e3a-bd3f-dc2ac55e184b",
+    "name": "Honda e (2020)",
+    "brand": "Honda",
+    "model": "e",
+    "usableKwh": 32,
+    "consumptionKwh100": 16,
+    "dcPeakKw": 60,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 57
+      },
+      {
+        "percentage": 75,
+        "power": 60
+      },
+      {
+        "percentage": 100,
+        "power": 6.6
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "c576bee8-8066-4174-bc69-5fe9f2e666ee",
+    "name": "Hyundai Ioniq (2016)",
+    "brand": "Hyundai",
+    "model": "Ioniq",
+    "usableKwh": 28,
+    "consumptionKwh100": 14.4,
+    "dcPeakKw": 69,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 60
+      },
+      {
+        "percentage": 76,
+        "power": 69
+      },
+      {
+        "percentage": 84,
+        "power": 23
+      },
+      {
+        "percentage": 92,
+        "power": 23
+      },
+      {
+        "percentage": 100,
+        "power": 10
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "3038b11b-2dfc-4f9f-b22c-4bfdc08d0c4b",
+    "name": "Hyundai Ioniq (2019)",
+    "brand": "Hyundai",
+    "model": "Ioniq",
+    "usableKwh": 38.3,
+    "consumptionKwh100": 15.3,
+    "dcPeakKw": 47,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 44
+      },
+      {
+        "percentage": 75,
+        "power": 47
+      },
+      {
+        "percentage": 100,
+        "power": 7.2
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "6cc437e9-b842-4c1b-9c08-9ca2d46d22a9",
+    "name": "Hyundai Kona 39 kWh (2018)",
+    "brand": "Hyundai",
+    "model": "Kona",
+    "usableKwh": 39.2,
+    "consumptionKwh100": 15.4,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 47
+      },
+      {
+        "percentage": 75,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 7.2
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "8df35b23-dcc6-4590-83c7-5578da4c4809",
+    "name": "Hyundai Kona 64 kWh (2018)",
+    "brand": "Hyundai",
+    "model": "Kona",
+    "usableKwh": 64,
+    "consumptionKwh100": 15.8,
+    "dcPeakKw": 77,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 70
+      },
+      {
+        "percentage": 40,
+        "power": 77
+      },
+      {
+        "percentage": 42,
+        "power": 70
+      },
+      {
+        "percentage": 53,
+        "power": 71
+      },
+      {
+        "percentage": 55,
+        "power": 57
+      },
+      {
+        "percentage": 71,
+        "power": 58
+      },
+      {
+        "percentage": 72,
+        "power": 38
+      },
+      {
+        "percentage": 76,
+        "power": 38
+      },
+      {
+        "percentage": 78,
+        "power": 25
+      },
+      {
+        "percentage": 88,
+        "power": 25
+      },
+      {
+        "percentage": 100,
+        "power": 8
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "c1fd1277-5d77-416b-bb25-84bd21f57963",
+    "name": "Hyundai Kona 64 kWh (2020)",
+    "brand": "Hyundai",
+    "model": "Kona",
+    "usableKwh": 64,
+    "consumptionKwh100": 15.8,
+    "dcPeakKw": 77,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 70
+      },
+      {
+        "percentage": 40,
+        "power": 77
+      },
+      {
+        "percentage": 42,
+        "power": 70
+      },
+      {
+        "percentage": 53,
+        "power": 71
+      },
+      {
+        "percentage": 55,
+        "power": 57
+      },
+      {
+        "percentage": 71,
+        "power": 58
+      },
+      {
+        "percentage": 72,
+        "power": 38
+      },
+      {
+        "percentage": 76,
+        "power": 38
+      },
+      {
+        "percentage": 78,
+        "power": 25
+      },
+      {
+        "percentage": 88,
+        "power": 25
+      },
+      {
+        "percentage": 100,
+        "power": 8
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "8da12395-cf7a-4ccf-886f-e25ade426457",
+    "name": "Jaguar i-Pace",
+    "brand": "Jaguar",
+    "model": "i-Pace",
+    "usableKwh": 84,
+    "consumptionKwh100": 23.2,
+    "dcPeakKw": 105,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 100
+      },
+      {
+        "percentage": 30,
+        "power": 105
+      },
+      {
+        "percentage": 80,
+        "power": 55
+      },
+      {
+        "percentage": 90,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "66cb7bea-24b7-458f-ae3e-11d4a852568b",
+    "name": "Kia e-Niro 39 kWh (2018)",
+    "brand": "Kia",
+    "model": "e-Niro",
+    "usableKwh": 39,
+    "consumptionKwh100": 16.3,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 47
+      },
+      {
+        "percentage": 75,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 7.2
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "0f7eae0b-43be-48f8-b4a0-1a8266fd07a9",
+    "name": "Kia e-Niro 64 kWh (2018)",
+    "brand": "Kia",
+    "model": "e-Niro",
+    "usableKwh": 64,
+    "consumptionKwh100": 17.3,
+    "dcPeakKw": 77,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 70
+      },
+      {
+        "percentage": 40,
+        "power": 77
+      },
+      {
+        "percentage": 42,
+        "power": 70
+      },
+      {
+        "percentage": 53,
+        "power": 71
+      },
+      {
+        "percentage": 55,
+        "power": 57
+      },
+      {
+        "percentage": 71,
+        "power": 58
+      },
+      {
+        "percentage": 72,
+        "power": 38
+      },
+      {
+        "percentage": 76,
+        "power": 38
+      },
+      {
+        "percentage": 78,
+        "power": 25
+      },
+      {
+        "percentage": 88,
+        "power": 25
+      },
+      {
+        "percentage": 100,
+        "power": 8
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "68cbedff-8994-4b77-bfb5-6aa22962e3a2",
+    "name": "Kia e-Niro 64 kWh (2020)",
+    "brand": "Kia",
+    "model": "e-Niro",
+    "usableKwh": 64,
+    "consumptionKwh100": 17.3,
+    "dcPeakKw": 77,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 70
+      },
+      {
+        "percentage": 40,
+        "power": 77
+      },
+      {
+        "percentage": 42,
+        "power": 70
+      },
+      {
+        "percentage": 53,
+        "power": 71
+      },
+      {
+        "percentage": 55,
+        "power": 57
+      },
+      {
+        "percentage": 71,
+        "power": 58
+      },
+      {
+        "percentage": 72,
+        "power": 38
+      },
+      {
+        "percentage": 76,
+        "power": 38
+      },
+      {
+        "percentage": 78,
+        "power": 25
+      },
+      {
+        "percentage": 88,
+        "power": 25
+      },
+      {
+        "percentage": 100,
+        "power": 8
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "58661a4c-e1f9-4dc2-8d09-3bb42be62554",
+    "name": "Kia e-Soul 39 kWh (2019)",
+    "brand": "Kia",
+    "model": "e-Soul",
+    "usableKwh": 39,
+    "consumptionKwh100": 17,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 47
+      },
+      {
+        "percentage": 75,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 7.2
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "3c933da2-1fa1-4094-825a-a181610dbfd0",
+    "name": "Kia e-Soul 64 kWh (2019)",
+    "brand": "Kia",
+    "model": "e-Soul",
+    "usableKwh": 64,
+    "consumptionKwh100": 17.5,
+    "dcPeakKw": 77,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 70
+      },
+      {
+        "percentage": 40,
+        "power": 77
+      },
+      {
+        "percentage": 42,
+        "power": 70
+      },
+      {
+        "percentage": 53,
+        "power": 71
+      },
+      {
+        "percentage": 55,
+        "power": 57
+      },
+      {
+        "percentage": 71,
+        "power": 58
+      },
+      {
+        "percentage": 72,
+        "power": 38
+      },
+      {
+        "percentage": 76,
+        "power": 38
+      },
+      {
+        "percentage": 78,
+        "power": 25
+      },
+      {
+        "percentage": 88,
+        "power": 25
+      },
+      {
+        "percentage": 100,
+        "power": 8
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "add28704-7b59-474d-bfa6-2338e54ccaef",
+    "name": "Kia Soul 27 kWh",
+    "brand": "Kia",
+    "model": "Soul",
+    "usableKwh": 27,
+    "consumptionKwh100": 17.6,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 47
+      },
+      {
+        "percentage": 75,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 6.6
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "5e1746c9-56a2-4fb9-8a76-b75c95a037ee",
+    "name": "Kia Soul 30 kWh",
+    "brand": "Kia",
+    "model": "Soul",
+    "usableKwh": 30,
+    "consumptionKwh100": 17.6,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 47
+      },
+      {
+        "percentage": 75,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 6.6
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "176af738-f385-4dc8-9243-9c701fbd7759",
+    "name": "Mazda MX-30 (2020)",
+    "brand": "Mazda",
+    "model": "MX-30",
+    "usableKwh": 32,
+    "consumptionKwh100": 17.8,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 47
+      },
+      {
+        "percentage": 75,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 6.6
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "5335d545-cfeb-4bca-bb11-cf0966f1b5ca",
+    "name": "Mercedes Benz EQC (2019)",
+    "brand": "Mercedes Benz",
+    "model": "EQC",
+    "usableKwh": 80,
+    "consumptionKwh100": 21.6,
+    "dcPeakKw": 125,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 105
+      },
+      {
+        "percentage": 39,
+        "power": 125
+      },
+      {
+        "percentage": 70,
+        "power": 87
+      },
+      {
+        "percentage": 84,
+        "power": 68
+      },
+      {
+        "percentage": 100,
+        "power": 25
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "8b0195b6-5318-46d9-a6fd-1b5f75e8b495",
+    "name": "MG ZS EV (2020)",
+    "brand": "MG",
+    "model": "ZS EV",
+    "usableKwh": 44.5,
+    "consumptionKwh100": 19.8,
+    "dcPeakKw": 55,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 52
+      },
+      {
+        "percentage": 75,
+        "power": 55
+      },
+      {
+        "percentage": 100,
+        "power": 6.6
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "d8c11860-a582-4784-9e58-d29e94a67fc2",
+    "name": "Mini Cooper SE (2020)",
+    "brand": "Mini",
+    "model": "Cooper SE",
+    "usableKwh": 28.9,
+    "consumptionKwh100": 16.1,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 47
+      },
+      {
+        "percentage": 75,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "2c7abcf4-0ba0-4feb-9e9b-b47661072feb",
+    "name": "Mitsubishi i-Miev",
+    "brand": "Mitsubishi",
+    "model": "i-Miev",
+    "usableKwh": 14.5,
+    "consumptionKwh100": 12.9,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 47
+      },
+      {
+        "percentage": 75,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 3.6
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "86290f48-f554-4db5-bd35-4a8b7828689a",
+    "name": "Nissan e-NV 200 24 kWh",
+    "brand": "Nissan",
+    "model": "e-NV 200",
+    "usableKwh": 24,
+    "consumptionKwh100": 20,
+    "dcPeakKw": 46,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 43
+      },
+      {
+        "percentage": 75,
+        "power": 46
+      },
+      {
+        "percentage": 100,
+        "power": 3.6
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "2644bfd3-a593-4276-bb1f-c8965e33797e",
+    "name": "Nissan e-NV 200 24 kWh 6,6 kW-AC",
+    "brand": "Nissan",
+    "model": "e-NV 200",
+    "usableKwh": 24,
+    "consumptionKwh100": 20,
+    "dcPeakKw": 46,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 43
+      },
+      {
+        "percentage": 75,
+        "power": 46
+      },
+      {
+        "percentage": 100,
+        "power": 6.6
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "daa3573d-60ea-4c7a-8048-79c575e3db4c",
+    "name": "Nissan e-NV 200 40 kWh",
+    "brand": "Nissan",
+    "model": "e-NV 200",
+    "usableKwh": 38,
+    "consumptionKwh100": 20,
+    "dcPeakKw": 46,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 43
+      },
+      {
+        "percentage": 75,
+        "power": 46
+      },
+      {
+        "percentage": 100,
+        "power": 6.6
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "dc7d163b-29bc-45cf-8156-60eb3e3b1294",
+    "name": "Nissan Leaf 24 kWh (2011)",
+    "brand": "Nissan",
+    "model": "Leaf",
+    "usableKwh": 24,
+    "consumptionKwh100": 16.9,
+    "dcPeakKw": 46,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 40
+      },
+      {
+        "percentage": 22,
+        "power": 46
+      },
+      {
+        "percentage": 100,
+        "power": 10
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "3b649ae3-935b-425b-b5d6-75c549b96d40",
+    "name": "Nissan Leaf 24 kWh 6,6 kW-AC (2011)",
+    "brand": "Nissan",
+    "model": "Leaf",
+    "usableKwh": 24,
+    "consumptionKwh100": 16.9,
+    "dcPeakKw": 46,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 40
+      },
+      {
+        "percentage": 22,
+        "power": 46
+      },
+      {
+        "percentage": 100,
+        "power": 10
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "83ec0576-bfb8-400a-9af9-483b2684673c",
+    "name": "Nissan Leaf 30 kWh (2015)",
+    "brand": "Nissan",
+    "model": "Leaf",
+    "usableKwh": 30,
+    "consumptionKwh100": 16.5,
+    "dcPeakKw": 47,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 41
+      },
+      {
+        "percentage": 80,
+        "power": 47
+      },
+      {
+        "percentage": 90,
+        "power": 30
+      },
+      {
+        "percentage": 100,
+        "power": 10
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "74f2c3a5-f78f-459a-823a-dfc0a21e5aeb",
+    "name": "Nissan Leaf 30 kWh 6,6 kW-AC (2015)",
+    "brand": "Nissan",
+    "model": "Leaf",
+    "usableKwh": 30,
+    "consumptionKwh100": 16.5,
+    "dcPeakKw": 47,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 41
+      },
+      {
+        "percentage": 80,
+        "power": 47
+      },
+      {
+        "percentage": 90,
+        "power": 30
+      },
+      {
+        "percentage": 100,
+        "power": 10
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "77028f96-eb9b-4c65-b452-c92011b1fc1c",
+    "name": "Nissan Leaf 40 kWh (2017)",
+    "brand": "Nissan",
+    "model": "Leaf",
+    "usableKwh": 38,
+    "consumptionKwh100": 16.4,
+    "dcPeakKw": 45,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 41
+      },
+      {
+        "percentage": 62,
+        "power": 45
+      },
+      {
+        "percentage": 65,
+        "power": 36
+      },
+      {
+        "percentage": 100,
+        "power": 15
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "78b14a0f-5c62-4885-95ef-2e3f81197260",
+    "name": "Nissan Leaf e+ 62 kWh (2019)",
+    "brand": "Nissan",
+    "model": "Leaf",
+    "usableKwh": 62,
+    "consumptionKwh100": 17.2,
+    "dcPeakKw": 100,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 95
+      },
+      {
+        "percentage": 75,
+        "power": 100
+      },
+      {
+        "percentage": 100,
+        "power": 6.6
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "f33f0a4f-9b53-4e21-807b-f8b2ca4a24f6",
+    "name": "Opel Ampera e CCS (2017)",
+    "brand": "Opel",
+    "model": "Ampera e",
+    "usableKwh": 60,
+    "consumptionKwh100": 17.3,
+    "dcPeakKw": 45,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 45
+      },
+      {
+        "percentage": 50,
+        "power": 45
+      },
+      {
+        "percentage": 100,
+        "power": 15
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "6f96c616-e87a-4958-bbe7-b4278be00170",
+    "name": "Opel Corsa-e 11 kW-AC (2020)",
+    "brand": "Opel",
+    "model": "Corsa-e",
+    "usableKwh": 47.5,
+    "consumptionKwh100": 16.4,
+    "dcPeakKw": 97,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 97
+      },
+      {
+        "percentage": 16,
+        "power": 97
+      },
+      {
+        "percentage": 17,
+        "power": 78
+      },
+      {
+        "percentage": 46,
+        "power": 78
+      },
+      {
+        "percentage": 47,
+        "power": 52
+      },
+      {
+        "percentage": 68,
+        "power": 52
+      },
+      {
+        "percentage": 69,
+        "power": 27
+      },
+      {
+        "percentage": 83,
+        "power": 27
+      },
+      {
+        "percentage": 84,
+        "power": 11
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "1cec7821-632f-4f17-8a58-644b6ab23f44",
+    "name": "Opel Corsa-e 7,2 kW-AC (2020)",
+    "brand": "Opel",
+    "model": "Corsa-e",
+    "usableKwh": 47.5,
+    "consumptionKwh100": 16.4,
+    "dcPeakKw": 97,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 97
+      },
+      {
+        "percentage": 16,
+        "power": 97
+      },
+      {
+        "percentage": 17,
+        "power": 78
+      },
+      {
+        "percentage": 46,
+        "power": 78
+      },
+      {
+        "percentage": 47,
+        "power": 52
+      },
+      {
+        "percentage": 68,
+        "power": 52
+      },
+      {
+        "percentage": 69,
+        "power": 27
+      },
+      {
+        "percentage": 83,
+        "power": 27
+      },
+      {
+        "percentage": 84,
+        "power": 11
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "9d101a26-eaaa-4058-a251-5221b45ffd91",
+    "name": "Peugeot e-2008 11 kW-AC (2020)",
+    "brand": "Peugeot",
+    "model": "e-2008",
+    "usableKwh": 47.5,
+    "consumptionKwh100": 18,
+    "dcPeakKw": 100,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 95
+      },
+      {
+        "percentage": 75,
+        "power": 100
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "72695d36-29c4-4726-8ca8-5333fb3f9865",
+    "name": "Peugeot e-2008 7,2 kW-AC (2020)",
+    "brand": "Peugeot",
+    "model": "e-2008",
+    "usableKwh": 47.5,
+    "consumptionKwh100": 18,
+    "dcPeakKw": 97,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 97
+      },
+      {
+        "percentage": 16,
+        "power": 97
+      },
+      {
+        "percentage": 17,
+        "power": 78
+      },
+      {
+        "percentage": 46,
+        "power": 78
+      },
+      {
+        "percentage": 47,
+        "power": 52
+      },
+      {
+        "percentage": 68,
+        "power": 52
+      },
+      {
+        "percentage": 69,
+        "power": 27
+      },
+      {
+        "percentage": 83,
+        "power": 27
+      },
+      {
+        "percentage": 84,
+        "power": 11
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "de7bac96-33ed-44f2-964e-21a4878e9f00",
+    "name": "Peugeot e-208 11 kW-AC (2020)",
+    "brand": "Peugeot",
+    "model": "e-208",
+    "usableKwh": 47.5,
+    "consumptionKwh100": 16.1,
+    "dcPeakKw": 97,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 97
+      },
+      {
+        "percentage": 16,
+        "power": 97
+      },
+      {
+        "percentage": 17,
+        "power": 78
+      },
+      {
+        "percentage": 46,
+        "power": 78
+      },
+      {
+        "percentage": 47,
+        "power": 52
+      },
+      {
+        "percentage": 68,
+        "power": 52
+      },
+      {
+        "percentage": 69,
+        "power": 27
+      },
+      {
+        "percentage": 83,
+        "power": 27
+      },
+      {
+        "percentage": 84,
+        "power": 11
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "926efa33-4c55-43df-80f3-4b8d2d65a00a",
+    "name": "Peugeot e-208 7,2 kW-AC (2020)",
+    "brand": "Peugeot",
+    "model": "e-208",
+    "usableKwh": 47.5,
+    "consumptionKwh100": 16.1,
+    "dcPeakKw": 97,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 97
+      },
+      {
+        "percentage": 16,
+        "power": 97
+      },
+      {
+        "percentage": 17,
+        "power": 78
+      },
+      {
+        "percentage": 46,
+        "power": 78
+      },
+      {
+        "percentage": 47,
+        "power": 52
+      },
+      {
+        "percentage": 68,
+        "power": 52
+      },
+      {
+        "percentage": 69,
+        "power": 27
+      },
+      {
+        "percentage": 83,
+        "power": 27
+      },
+      {
+        "percentage": 84,
+        "power": 11
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "28b61ff5-734a-412e-9241-dec4c27d1a38",
+    "name": "Peugeot I-on",
+    "brand": "Peugeot",
+    "model": "I-on",
+    "usableKwh": 14.5,
+    "consumptionKwh100": 12.9,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 47
+      },
+      {
+        "percentage": 75,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 3.6
+      }
+    ],
+    "plug": "chademo"
+  },
+  {
+    "id": "c9025ab4-1c85-40d8-86ab-ee406de3b716",
+    "name": "Polestar 2 (2020)",
+    "brand": "Polestar",
+    "model": "2",
+    "usableKwh": 72.5,
+    "consumptionKwh100": 17.1,
+    "dcPeakKw": 150,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 142
+      },
+      {
+        "percentage": 75,
+        "power": 150
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "34b5ef32-efea-48fc-8386-3800d0b737f0",
+    "name": "Porsche Taycan 4S (2020)",
+    "brand": "Porsche",
+    "model": "Taycan",
+    "usableKwh": 71,
+    "consumptionKwh100": 19.5,
+    "dcPeakKw": 225,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 213
+      },
+      {
+        "percentage": 75,
+        "power": 225
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "6990914a-6a0d-49d4-87f5-ee86ee33344c",
+    "name": "Porsche Taycan 4S Plus (2020)",
+    "brand": "Porsche",
+    "model": "Taycan",
+    "usableKwh": 83.7,
+    "consumptionKwh100": 19.7,
+    "dcPeakKw": 270,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 256
+      },
+      {
+        "percentage": 75,
+        "power": 270
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "a12f033f-f2c2-44bd-b62c-7019898a72d0",
+    "name": "Porsche Taycan Turbo (2020)",
+    "brand": "Porsche",
+    "model": "Taycan",
+    "usableKwh": 83.7,
+    "consumptionKwh100": 21.5,
+    "dcPeakKw": 270,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 256
+      },
+      {
+        "percentage": 75,
+        "power": 270
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "4c04db3b-c493-4b90-9859-21b7304a4ffc",
+    "name": "Porsche Taycan Turbo S (2020)",
+    "brand": "Porsche",
+    "model": "Taycan",
+    "usableKwh": 83.7,
+    "consumptionKwh100": 22.3,
+    "dcPeakKw": 270,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 256
+      },
+      {
+        "percentage": 75,
+        "power": 270
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "c53b5947-23a3-420c-9798-f3846732e41a",
+    "name": "Renault Zoe R110 ZE 40 (2019)",
+    "brand": "Renault",
+    "model": "Zoe",
+    "usableKwh": 41,
+    "consumptionKwh100": 16.1,
+    "dcPeakKw": 45,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 42
+      },
+      {
+        "percentage": 75,
+        "power": 45
+      },
+      {
+        "percentage": 100,
+        "power": 22
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "de3a8751-00c9-46d1-9e7a-ad830835c6a7",
+    "name": "Renault Zoe ZE50 (2019)",
+    "brand": "Renault",
+    "model": "Zoe",
+    "usableKwh": 52,
+    "consumptionKwh100": 16.5,
+    "dcPeakKw": 46,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 41
+      },
+      {
+        "percentage": 52,
+        "power": 46
+      },
+      {
+        "percentage": 80,
+        "power": 27
+      },
+      {
+        "percentage": 100,
+        "power": 22
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "2ae110f8-8906-4b03-b4bc-83e5577c1cc1",
+    "name": "SAIC Maxus EV80 (2018)",
+    "brand": "SAIC",
+    "model": "Maxus EV80",
+    "usableKwh": 56,
+    "consumptionKwh100": 35,
+    "dcPeakKw": 28,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 26
+      },
+      {
+        "percentage": 75,
+        "power": 28
+      },
+      {
+        "percentage": 100,
+        "power": 6.6
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "2eea1ef2-0fd1-481d-adee-68044666614e",
+    "name": "Seat Mii Electric CCS (2020)",
+    "brand": "Seat",
+    "model": "Mii Electric",
+    "usableKwh": 32.3,
+    "consumptionKwh100": 16.6,
+    "dcPeakKw": 34,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 32
+      },
+      {
+        "percentage": 27,
+        "power": 34
+      },
+      {
+        "percentage": 80,
+        "power": 14
+      },
+      {
+        "percentage": 100,
+        "power": 7
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "ffcd3116-4e17-49ff-a926-941c062643ea",
+    "name": "Skoda CITIGOe iV CCS (2020)",
+    "brand": "Skoda",
+    "model": "CITIGOe iV",
+    "usableKwh": 32.3,
+    "consumptionKwh100": 16.6,
+    "dcPeakKw": 34,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 32
+      },
+      {
+        "percentage": 27,
+        "power": 34
+      },
+      {
+        "percentage": 80,
+        "power": 14
+      },
+      {
+        "percentage": 100,
+        "power": 7
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "7de25a64-e9fa-484f-bf99-d02b02cfb17d",
+    "name": "Tesla Model 3 LR",
+    "brand": "Tesla",
+    "model": "Model 3",
+    "usableKwh": 74,
+    "consumptionKwh100": 16.1,
+    "dcPeakKw": 149,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 130
+      },
+      {
+        "percentage": 52,
+        "power": 149
+      },
+      {
+        "percentage": 60,
+        "power": 110
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "93c82e06-1aa3-4c19-8f81-b9fac0c598c3",
+    "name": "Tesla Model 3 SR+",
+    "brand": "Tesla",
+    "model": "Model 3",
+    "usableKwh": 50,
+    "consumptionKwh100": 15.3,
+    "dcPeakKw": 149,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 130
+      },
+      {
+        "percentage": 52,
+        "power": 149
+      },
+      {
+        "percentage": 60,
+        "power": 110
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "b5aa307e-a6b9-46e7-939e-2dd525870c13",
+    "name": "Tesla Model S 100",
+    "brand": "Tesla",
+    "model": "Model S",
+    "usableKwh": 95,
+    "consumptionKwh100": 18.4,
+    "dcPeakKw": 140,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 125
+      },
+      {
+        "percentage": 43,
+        "power": 140
+      },
+      {
+        "percentage": 80,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "80e7ef22-27f8-4e93-8c86-7a6a0a227e5d",
+    "name": "Tesla Model S 70",
+    "brand": "Tesla",
+    "model": "Model S",
+    "usableKwh": 67,
+    "consumptionKwh100": 18.5,
+    "dcPeakKw": 100,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 95
+      },
+      {
+        "percentage": 75,
+        "power": 100
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "ed3fe177-d852-49bd-84ca-8ecd8d7ec3b1",
+    "name": "Tesla Model S 70, 22 kW-AC",
+    "brand": "Tesla",
+    "model": "Model S",
+    "usableKwh": 67,
+    "consumptionKwh100": 18.5,
+    "dcPeakKw": 100,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 95
+      },
+      {
+        "percentage": 75,
+        "power": 100
+      },
+      {
+        "percentage": 100,
+        "power": 22
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "7f709186-39c3-420f-9caf-1fdb424f7953",
+    "name": "Tesla Model S 75",
+    "brand": "Tesla",
+    "model": "Model S",
+    "usableKwh": 72.5,
+    "consumptionKwh100": 18.5,
+    "dcPeakKw": 120,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 114
+      },
+      {
+        "percentage": 75,
+        "power": 120
+      },
+      {
+        "percentage": 100,
+        "power": 16.5
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "0a663bbf-3b87-4e7a-bd7a-3e9c39961a2b",
+    "name": "Tesla Model S 85",
+    "brand": "Tesla",
+    "model": "Model S",
+    "usableKwh": 76,
+    "consumptionKwh100": 19.1,
+    "dcPeakKw": 140,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 125
+      },
+      {
+        "percentage": 43,
+        "power": 140
+      },
+      {
+        "percentage": 80,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "32922583-e434-4ed2-afc1-4d8fde67aeda",
+    "name": "Tesla Model S 90",
+    "brand": "Tesla",
+    "model": "Model S",
+    "usableKwh": 81,
+    "consumptionKwh100": 18.2,
+    "dcPeakKw": 140,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 125
+      },
+      {
+        "percentage": 43,
+        "power": 140
+      },
+      {
+        "percentage": 80,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "7490520f-fe11-4148-a9b6-3882f06ee082",
+    "name": "Tesla Model X 100D (2017)",
+    "brand": "Tesla",
+    "model": "Model X",
+    "usableKwh": 100,
+    "consumptionKwh100": 20,
+    "dcPeakKw": 140,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 125
+      },
+      {
+        "percentage": 43,
+        "power": 140
+      },
+      {
+        "percentage": 80,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "92ffd46c-fe26-4805-81ba-fbadce4d524f",
+    "name": "Tesla Model X 60D (2016)",
+    "brand": "Tesla",
+    "model": "Model X",
+    "usableKwh": 60,
+    "consumptionKwh100": 16,
+    "dcPeakKw": 140,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 125
+      },
+      {
+        "percentage": 43,
+        "power": 140
+      },
+      {
+        "percentage": 80,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "1b3105fa-527a-491f-ac26-5bfa94bfa45d",
+    "name": "Tesla Model X 75D (2019)",
+    "brand": "Tesla",
+    "model": "Model X",
+    "usableKwh": 75,
+    "consumptionKwh100": 20,
+    "dcPeakKw": 140,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 125
+      },
+      {
+        "percentage": 43,
+        "power": 140
+      },
+      {
+        "percentage": 80,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "d03d6e42-d6f8-4e3f-b527-a3c1d1e40f9d",
+    "name": "Tesla Model X 90D (2016)",
+    "brand": "Tesla",
+    "model": "Model X",
+    "usableKwh": 90,
+    "consumptionKwh100": 20,
+    "dcPeakKw": 140,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 125
+      },
+      {
+        "percentage": 43,
+        "power": 140
+      },
+      {
+        "percentage": 80,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "eb8d28ec-8df7-40a8-8dd7-badf738f0832",
+    "name": "Tesla Model X Maximum Range (2019)",
+    "brand": "Tesla",
+    "model": "Model X",
+    "usableKwh": 100,
+    "consumptionKwh100": 20,
+    "dcPeakKw": 140,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 125
+      },
+      {
+        "percentage": 43,
+        "power": 140
+      },
+      {
+        "percentage": 80,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "0aa5220a-6da7-4dc0-a0a1-714bea4fded3",
+    "name": "Tesla Model X P100D (2017)",
+    "brand": "Tesla",
+    "model": "Model X",
+    "usableKwh": 100,
+    "consumptionKwh100": 22,
+    "dcPeakKw": 140,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 125
+      },
+      {
+        "percentage": 43,
+        "power": 140
+      },
+      {
+        "percentage": 80,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "908e578f-f890-4716-93e8-7c0f75e46bb5",
+    "name": "Tesla Model X P90D (2016)",
+    "brand": "Tesla",
+    "model": "Model X",
+    "usableKwh": 90,
+    "consumptionKwh100": 21,
+    "dcPeakKw": 140,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 125
+      },
+      {
+        "percentage": 43,
+        "power": 140
+      },
+      {
+        "percentage": 80,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "355eadbb-0c97-4a66-993d-8fdc61a77ef5",
+    "name": "Tesla Model X Performance (2019)",
+    "brand": "Tesla",
+    "model": "Model X",
+    "usableKwh": 100,
+    "consumptionKwh100": 22,
+    "dcPeakKw": 140,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 125
+      },
+      {
+        "percentage": 43,
+        "power": 140
+      },
+      {
+        "percentage": 80,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "b7c4ddb8-4806-4328-a4e6-4abb4746016d",
+    "name": "Tesla Model X Standard Range (2019)",
+    "brand": "Tesla",
+    "model": "Model X",
+    "usableKwh": 75,
+    "consumptionKwh100": 20,
+    "dcPeakKw": 140,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 125
+      },
+      {
+        "percentage": 43,
+        "power": 140
+      },
+      {
+        "percentage": 80,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 12
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "f1b46b0a-b101-4072-a246-0b52f0cc51f5",
+    "name": "Volkswagen e-Golf CCS (2014)",
+    "brand": "Volkswagen",
+    "model": "e-Golf",
+    "usableKwh": 21.2,
+    "consumptionKwh100": 15.8,
+    "dcPeakKw": 44,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 40
+      },
+      {
+        "percentage": 76,
+        "power": 44
+      },
+      {
+        "percentage": 81,
+        "power": 25
+      },
+      {
+        "percentage": 93,
+        "power": 16
+      },
+      {
+        "percentage": 100,
+        "power": 8
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "f0132135-9415-4403-818b-cee07f81ceb2",
+    "name": "Volkswagen e-Golf CCS (2017)",
+    "brand": "Volkswagen",
+    "model": "e-Golf",
+    "usableKwh": 31.5,
+    "consumptionKwh100": 16.4,
+    "dcPeakKw": 40,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 39
+      },
+      {
+        "percentage": 60,
+        "power": 40
+      },
+      {
+        "percentage": 80,
+        "power": 37
+      },
+      {
+        "percentage": 100,
+        "power": 10
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "a0347619-a7fe-4dd2-be4e-3ef615783481",
+    "name": "Volkswagen e-up CCS (2013)",
+    "brand": "Volkswagen",
+    "model": "e-up",
+    "usableKwh": 16.5,
+    "consumptionKwh100": 16.8,
+    "dcPeakKw": 44,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 40
+      },
+      {
+        "percentage": 76,
+        "power": 44
+      },
+      {
+        "percentage": 81,
+        "power": 25
+      },
+      {
+        "percentage": 93,
+        "power": 16
+      },
+      {
+        "percentage": 100,
+        "power": 8
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "fc5b3c94-c0eb-4515-af3d-4a4106ffe29f",
+    "name": "Volkswagen e-up CCS (2020)",
+    "brand": "Volkswagen",
+    "model": "e-up",
+    "usableKwh": 32.3,
+    "consumptionKwh100": 16.6,
+    "dcPeakKw": 34,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 32
+      },
+      {
+        "percentage": 27,
+        "power": 34
+      },
+      {
+        "percentage": 80,
+        "power": 14
+      },
+      {
+        "percentage": 100,
+        "power": 7
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "cb995cc3-84d9-4c87-89dc-f9dee7a47156",
+    "name": "Volkswagen ID.3 Long Range (2020)",
+    "brand": "Volkswagen",
+    "model": "ID.3",
+    "usableKwh": 77,
+    "consumptionKwh100": 17.1,
+    "dcPeakKw": 125,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 118
+      },
+      {
+        "percentage": 75,
+        "power": 125
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "d8044adf-2538-4d45-b2d8-2b2fd0951766",
+    "name": "Volkswagen ID.3 Mid Range (2020)",
+    "brand": "Volkswagen",
+    "model": "ID.3",
+    "usableKwh": 58,
+    "consumptionKwh100": 16.6,
+    "dcPeakKw": 100,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 95
+      },
+      {
+        "percentage": 75,
+        "power": 100
+      },
+      {
+        "percentage": 100,
+        "power": 11
+      }
+    ],
+    "plug": "ccs"
+  },
+  {
+    "id": "0a7e79c1-ecd6-4639-bac1-9c9e49fec84c",
+    "name": "Volkswagen ID.3 Standard Range (2020)",
+    "brand": "Volkswagen",
+    "model": "ID.3",
+    "usableKwh": 45,
+    "consumptionKwh100": 16.4,
+    "dcPeakKw": 50,
+    "chargingCurve": [
+      {
+        "percentage": 0,
+        "power": 47
+      },
+      {
+        "percentage": 75,
+        "power": 50
+      },
+      {
+        "percentage": 100,
+        "power": 7.2
+      }
+    ],
+    "plug": "ccs"
+  }
+]

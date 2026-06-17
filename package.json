@@ -14,6 +14,7 @@
     "db:push": "dotenv -e .env.local -- drizzle-kit push",
     "sync:static": "tsx scripts/sync-bfe-static.ts",
     "sync:static:local": "dotenv -e .env.local -- tsx scripts/sync-bfe-static.ts",
+    "sync:ev-data": "tsx scripts/sync-ev-data.ts",
     "check:cpo-urls": "tsx scripts/check-cpo-urls.ts"
   },
   "dependencies": {
