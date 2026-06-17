@@ -191,17 +191,9 @@ export function TripPlanner({
     >
       <div className="mb-3 flex items-start justify-between gap-3">
         <h2 className="t-title text-primary">Reise planen</h2>
-        <div className="-mr-1 -mt-1 flex items-center">
-          <IconButton
-            label="Fahrzeug wählen"
-            onClick={() => setVehicleSheetOpen(true)}
-          >
-            <IconCar size={20} />
-          </IconButton>
-          <IconButton label="Schliessen" onClick={onClose}>
-            <IconClose size={20} />
-          </IconButton>
-        </div>
+        <IconButton label="Schliessen" onClick={onClose} className="-mr-1 -mt-1">
+          <IconClose size={20} />
+        </IconButton>
       </div>
 
       {/* Nur auf dem Handy im Hochformat: Hinweis aufs Querformat. */}
@@ -342,6 +334,15 @@ export function TripPlanner({
             (Reserve ≈ {Math.round(reserveKm)} km für {arrivalSoc}% am Ziel)
           </div>
           <div className="mt-0.5">
+            <button
+              type="button"
+              onClick={() => setVehicleSheetOpen(true)}
+              aria-label="Auto auswählen"
+              title="Auto auswählen"
+              className="mr-1 inline-flex align-middle text-secondary hover:text-primary"
+            >
+              <IconCar size={16} />
+            </button>
             Verbrauch:{" "}
             <select
               value={consumption}
