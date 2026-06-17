@@ -5,33 +5,48 @@ import { useEffect, useState } from "react";
 const STORAGE_KEY = "ladestation-vehicle";
 const EVENT_NAME = "ladestation-vehicle-changed";
 
-function readStorage(): string | null {
+/** Auswahl-Kennung — nur Identifikatoren, KEINE Spezifikationen (Tarif-konform). */
+export type VehicleKey = { make: string; model: string; year?: number };
+
+function readStorage(): VehicleKey | null {
   if (typeof window === "undefined") return null;
   try {
-    return window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as unknown;
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      typeof (parsed as VehicleKey).make === "string" &&
+      typeof (parsed as VehicleKey).model === "string"
+    ) {
+      return parsed as VehicleKey;
+    }
   } catch {
-    return null;
+    // fall through
   }
+  return null;
 }
 
-function writeStorage(id: string): void {
+function writeStorage(key: VehicleKey): void {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, id);
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(key));
   window.dispatchEvent(new CustomEvent(EVENT_NAME));
 }
 
 /**
- * Merkt die gewählte Fahrzeug-ID in localStorage (gemustert nach
- * {@link useFavorites}). Cross-Tab-Sync über ein CustomEvent.
+ * Merkt die gewählte Fahrzeug-Kennung (Marke/Modell/Jahr) in localStorage. Die
+ * Spezifikationen werden NICHT gespeichert, sondern bei Bedarf live neu geholt.
+ * Cross-Tab-Sync über ein CustomEvent (gemustert nach useFavorites).
  */
-export function useSelectedVehicleId(): {
-  vehicleId: string | null;
-  setVehicleId: (id: string) => void;
+export function useSelectedVehicleKey(): {
+  vehicleKey: VehicleKey | null;
+  setVehicleKey: (key: VehicleKey) => void;
 } {
-  const [vehicleId, setId] = useState<string | null>(null);
+  const [vehicleKey, setKey] = useState<VehicleKey | null>(null);
 
   useEffect(() => {
-    const refresh = () => setId(readStorage());
+    const refresh = () => setKey(readStorage());
     const t = setTimeout(refresh, 0);
     window.addEventListener(EVENT_NAME, refresh);
     return () => {
@@ -41,10 +56,10 @@ export function useSelectedVehicleId(): {
   }, []);
 
   return {
-    vehicleId,
-    setVehicleId: (id: string) => {
-      setId(id);
-      writeStorage(id);
+    vehicleKey,
+    setVehicleKey: (key: VehicleKey) => {
+      setKey(key);
+      writeStorage(key);
     },
   };
 }

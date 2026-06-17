@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { CorridorStation, TripRoute } from "@/lib/types";
+import type { VehicleKey } from "@/lib/selected-vehicle";
 import { findCpoTariff, type CpoTariff } from "@/lib/cpo-tariffs";
 import {
   estimateChargeMinutes,
@@ -42,12 +43,12 @@ type Props = {
   locateError: string | null;
   /** Per GPS erkannte Ortschaft — wird ins Startfeld geschrieben (nur Anzeige). */
   locatedLabel: string | null;
-  /** Auswählbare Fahrzeuge (Default Model Y + open-ev-data-Datensatz). */
-  vehicles: Vehicle[];
-  /** Aktuell gewähltes Fahrzeug. */
+  /** Aktuell gewähltes Fahrzeug (Default Model Y, sonst live aus API Ninjas). */
   selectedVehicle: Vehicle;
-  /** Fahrzeug wählen (ID wird in localStorage gemerkt). */
-  onVehicleChange: (id: string) => void;
+  /** true, während die Spezifikationen des gewählten Autos geladen werden. */
+  vehicleLoading: boolean;
+  /** Fahrzeug übernehmen (Kennung wird in localStorage gemerkt, Specs neu geholt). */
+  onVehicleSelect: (key: VehicleKey) => void;
   soc: number;
   onSocChange: (n: number) => void;
   consumption: number;
@@ -118,9 +119,9 @@ export function TripPlanner({
   locating,
   locateError,
   locatedLabel,
-  vehicles,
   selectedVehicle,
-  onVehicleChange,
+  vehicleLoading,
+  onVehicleSelect,
   soc,
   onSocChange,
   consumption,
@@ -152,17 +153,46 @@ export function TripPlanner({
   // von einer manuellen Eingabe (die nie überschrieben wird).
   const [gpsLabel, setGpsLabel] = useState<string | null>(null);
 
-  // Fahrzeuge nach Marke gruppieren (für <optgroup> im Picker), Reihenfolge = erstes
-  // Auftreten in der bereits nach Name sortierten Liste (Default Model Y zuerst).
-  const vehicleGroups = useMemo(() => {
-    const groups: { brand: string; items: Vehicle[] }[] = [];
-    for (const v of vehicles) {
-      const existing = groups.find((g) => g.brand === v.brand);
-      if (existing) existing.items.push(v);
-      else groups.push({ brand: v.brand, items: [v] });
+  // Fahrzeug-Live-Suche (API Ninjas): nur auf Klick abfragen, Quota schonen.
+  const [vehMake, setVehMake] = useState("");
+  const [vehModel, setVehModel] = useState("");
+  const [vehSearching, setVehSearching] = useState(false);
+  const [vehResult, setVehResult] = useState<Vehicle | null>(null);
+  const [vehError, setVehError] = useState<string | null>(null);
+  const [vehSearched, setVehSearched] = useState(false);
+
+  async function handleVehicleSearch() {
+    const make = vehMake.trim();
+    const model = vehModel.trim();
+    if (!make && !model) return;
+    setVehSearching(true);
+    setVehError(null);
+    setVehResult(null);
+    setVehSearched(true);
+    try {
+      const params = new URLSearchParams();
+      if (make) params.set("make", make);
+      if (model) params.set("model", model);
+      const res = await fetch(`/api/ev-spec?${params}`);
+      if (!res.ok) {
+        throw new Error(
+          res.status === 503
+            ? "Fahrzeugsuche ist nicht konfiguriert."
+            : "Suche fehlgeschlagen — bitte später erneut versuchen.",
+        );
+      }
+      const list = (await res.json()) as Vehicle[];
+      if (list.length === 0) {
+        setVehError("Kein Fahrzeug gefunden — Marke/Modell genauer angeben.");
+      } else {
+        setVehResult(list[0]);
+      }
+    } catch (e) {
+      setVehError(e instanceof Error ? e.message : "Suche fehlgeschlagen.");
+    } finally {
+      setVehSearching(false);
     }
-    return groups;
-  }, [vehicles]);
+  }
 
   // Neue GPS-Ortschaft ins Startfeld übernehmen (guarded Render-Anpassung).
   const [prevLocatedLabel, setPrevLocatedLabel] = useState<string | null>(null);
@@ -289,28 +319,93 @@ export function TripPlanner({
           ariaLabel="Zielort"
         />
 
-        {/* Fahrzeug */}
+        {/* Fahrzeug — Live-Suche (API Ninjas) */}
         <div>
           <SectionLabel as="label">Fahrzeug</SectionLabel>
-          <select
-            value={selectedVehicle.id}
-            onChange={(e) => onVehicleChange(e.target.value)}
-            className="w-full rounded-control border border-border-strong bg-field px-2 py-1.5 text-base text-primary outline-none"
-            aria-label="Fahrzeug wählen"
-          >
-            {vehicleGroups.map((group) => (
-              <optgroup key={group.brand} label={group.brand}>
-                {group.items.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.name}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
-          <div className="mt-0.5 t-caption tabular-nums text-tertiary">
-            {selectedVehicle.usableKwh} kWh · DC bis {selectedVehicle.dcPeakKw} kW
+          <div className="rounded-card border border-border bg-surface px-2.5 py-2">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="truncate text-sm font-medium text-primary">
+                {selectedVehicle.name}
+                {vehicleLoading && (
+                  <span className="ml-1 text-tertiary">· lädt …</span>
+                )}
+              </span>
+            </div>
+            <div className="mt-0.5 t-caption tabular-nums text-tertiary">
+              {selectedVehicle.usableKwh} kWh · DC bis {selectedVehicle.dcPeakKw} kW
+            </div>
           </div>
+
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <input
+              type="text"
+              value={vehMake}
+              onChange={(e) => setVehMake(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleVehicleSearch()}
+              placeholder="Marke (z. B. Tesla)"
+              aria-label="Marke"
+              className="w-full rounded-control border border-border-strong bg-field px-2 py-1.5 text-base text-primary outline-none"
+            />
+            <input
+              type="text"
+              value={vehModel}
+              onChange={(e) => setVehModel(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleVehicleSearch()}
+              placeholder="Modell (z. B. Model 3)"
+              aria-label="Modell"
+              className="w-full rounded-control border border-border-strong bg-field px-2 py-1.5 text-base text-primary outline-none"
+            />
+          </div>
+          <Button
+            variant="secondary"
+            className="mt-2 w-full"
+            loading={vehSearching}
+            disabled={!vehMake.trim() && !vehModel.trim()}
+            onClick={handleVehicleSearch}
+          >
+            Fahrzeug suchen
+          </Button>
+
+          {vehError && (
+            <InfoCallout tone="warn" className="mt-2">
+              {vehError}
+            </InfoCallout>
+          )}
+
+          {vehResult && (
+            <div className="mt-2 flex items-center gap-2 rounded-card border border-brand bg-brand-soft px-2.5 py-2">
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-medium text-primary">
+                  {vehResult.name}
+                </span>
+                <span className="block t-caption tabular-nums text-tertiary">
+                  {vehResult.usableKwh} kWh · DC bis {vehResult.dcPeakKw} kW ·{" "}
+                  {vehResult.consumptionKwh100} kWh/100&nbsp;km
+                </span>
+              </span>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  onVehicleSelect({
+                    make: vehResult.brand,
+                    model: vehResult.model,
+                  });
+                  setVehResult(null);
+                  setVehSearched(false);
+                  setVehMake("");
+                  setVehModel("");
+                }}
+              >
+                Übernehmen
+              </Button>
+            </div>
+          )}
+
+          {!vehResult && !vehError && !vehSearched && (
+            <p className="mt-1 t-caption text-tertiary">
+              Standard: {selectedVehicle.name}. Eigenes Auto suchen zum Anpassen.
+            </p>
+          )}
         </div>
 
         {/* Ladezustand */}

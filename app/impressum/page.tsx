@@ -74,9 +74,9 @@ export default function ImpressumPage() {
         zugehörigen Kartendiensten.
       </p>
       <p className="mt-3 text-sm leading-relaxed">
-        Die Fahrzeugdaten (Batterie, Verbrauch, Ladekurven) im Reiseplaner
-        stammen aus dem Projekt open-ev-data von OpenChargingCloud, veröffentlicht
-        unter der MIT-Lizenz.
+        Die Fahrzeugdaten (Batterie, Verbrauch, Ladeleistung) im Reiseplaner
+        werden über die Electric Vehicle API von API Ninjas (api-ninjas.com)
+        abgerufen.
       </p>
 
       <h2 className="mt-8 t-title text-primary">Haftungsausschluss</h2>

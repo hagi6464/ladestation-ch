@@ -17,7 +17,7 @@ import {
   type ChargePref,
 } from "@/components/TripPlanner";
 import { useFavorites } from "@/lib/favorites";
-import { useSelectedVehicleId } from "@/lib/selected-vehicle";
+import { useSelectedVehicleKey } from "@/lib/selected-vehicle";
 import { haversineKm, distanceToRouteKm, pointAtKm } from "@/lib/geo";
 import {
   MODEL_Y,
@@ -150,7 +150,7 @@ export default function Page() {
   // Standard an: auf Reisen sind Schnelllader ohne Umweg fast immer gewollt.
   const [highwayOnly, setHighwayOnly] = useState(true);
   const [chargePref, setChargePref] = useState<ChargePref>("middle");
-  const { vehicleId: selectedVehicleId, setVehicleId } = useSelectedVehicleId();
+  const { vehicleKey, setVehicleKey } = useSelectedVehicleKey();
   const [selectedStopIds, setSelectedStopIds] = useState<string[]>([]);
   const appliedSuggestionRef = useRef<string | null>(null);
   // Standortabfrage — geteilt vom Suchfeld (Hauptschirm) und Reiseplaner-Startfeld.
@@ -289,24 +289,23 @@ export default function Page() {
   ]);
 
   // ---- Reiseplaner ------------------------------------------------------
-  // Kuratierte Fahrzeugliste (open-ev-data, gebündelt) + Default Model Y voranstellen.
-  const vehiclesQuery = useQuery<Vehicle[], Error>({
-    queryKey: ["vehicles"],
+  // Gewähltes Fahrzeug live aus API Ninjas auflösen (nur Kennung wird gemerkt,
+  // Specs werden bei Bedarf neu geholt). Ohne Auswahl: Default Model Y.
+  const vehicleSpecQuery = useQuery<Vehicle[], Error>({
+    queryKey: ["ev-spec", vehicleKey],
     queryFn: async ({ signal }) => {
-      const res = await fetch("/api/vehicles", { signal });
-      if (!res.ok) throw new Error("vehicles failed");
+      const params = new URLSearchParams();
+      if (vehicleKey!.make) params.set("make", vehicleKey!.make);
+      if (vehicleKey!.model) params.set("model", vehicleKey!.model);
+      if (vehicleKey!.year) params.set("year", String(vehicleKey!.year));
+      const res = await fetch(`/api/ev-spec?${params}`, { signal });
+      if (!res.ok) throw new Error("ev-spec failed");
       return res.json();
     },
-    staleTime: Infinity,
+    enabled: !!vehicleKey,
+    staleTime: 60 * 60_000,
   });
-  const vehicles = useMemo<Vehicle[]>(
-    () => [MODEL_Y, ...(vehiclesQuery.data ?? [])],
-    [vehiclesQuery.data],
-  );
-  const selectedVehicle = useMemo<Vehicle>(
-    () => vehicles.find((v) => v.id === selectedVehicleId) ?? MODEL_Y,
-    [vehicles, selectedVehicleId],
-  );
+  const selectedVehicle = vehicleSpecQuery.data?.[0] ?? MODEL_Y;
 
   // Beim Fahrzeugwechsel den Verbrauch auf den Fahrzeug-Default setzen; innerhalb
   // desselben Fahrzeugs bleibt eine manuelle Anpassung erhalten (guarded Render-
@@ -679,9 +678,9 @@ export default function Page() {
         locating={locating}
         locateError={locateError}
         locatedLabel={locatedLabel}
-        vehicles={vehicles}
         selectedVehicle={selectedVehicle}
-        onVehicleChange={setVehicleId}
+        vehicleLoading={vehicleSpecQuery.isFetching}
+        onVehicleSelect={setVehicleKey}
         soc={soc}
         onSocChange={setSoc}
         consumption={consumption}
