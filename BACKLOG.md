@@ -282,6 +282,31 @@ Ideen rund um Nutzungsmessung, Feedback und Reichweite. Bewusst niedrige Prio.
 
 ---
 
+## Code-Hygiene & Projekt-Review (Prio 2)
+
+### Kompletter Code- & Architektur-Review + Aufräumen
+**Status:** Todo, **Prio 2** (aufgenommen 2026-06-17).
+
+**Warum:** Durch die vielen Umbauten (u. a. Fahrzeugdaten open-ev-data-Snapshot → API-Ninjas-Live-Suche, Vehicle-Picker mehrfach umgezogen, UI-Redesign, Reiseplaner-Iterationen, früher gebaute+verworfene Ads/Affiliate/Pro-Abo) ist toter Code / ungenutzte Konfiguration wahrscheinlich. Einmal sauber durchgehen.
+
+**Fragen, die der Review beantworten soll:**
+1. **Was wird noch gebraucht** vs. **alte Versuche/Implementierungen**, die nicht mehr in Gebrauch sind und gelöscht werden können (Komponenten, lib-Module, Routes, Skripte, Assets).
+2. **Welche APIs sind aktiv im Einsatz?** (Stand jetzt vermutet: BFE/geo.admin – Stationen; OpenRouteService – Routing; Photon – Geocode/Reverse; **API Ninjas** – Fahrzeugdaten; Payrexx – Trinkgeld-Link; Vercel Web Analytics.)
+3. **Welche API-Keys / Env-Variablen sind in Vercel bzw. `.env.local` vorhanden, aber ungenutzt?** Pro Variable prüfen, ob sie im Code referenziert wird; ungenutzte aus Vercel + `.env.local` entfernen.
+4. **Tote Code-Abschnitte** durch die Umbauten finden und entfernen (verwaiste Exports, nicht importierte Dateien, auskommentierte Reste).
+
+**Konkrete Verdachtskandidaten (Startpunkte, zu verifizieren):**
+- **`CHARGEPRICE_API_KEY` / `CHARGEPRICE_BASE_URL`** in `.env.local` — vermutlich nie verdrahtet (Chargeprice-Lizenz war offen). `grep` nach Verwendung; wenn nichts → aus `.env.local` + Vercel löschen.
+- Reste der **open-ev-data-Snapshot-Lösung** (entfernt in `c1c3e74`) — gegenprüfen, dass nichts mehr referenziert (Tests, Imports, package.json-Scripts).
+- Früher gebaute, dann zurückgerollte **Ads/Affiliate/Pro-Abo** (laut Monetarisierungs-Abschnitt nur in Git-History — bestätigen, dass im Arbeitsbaum nichts übrig ist).
+- `lib/cpo-tariffs.ts`, `scripts/check-cpo-urls.ts` — noch genutzt? (CPO-Tarife ja via StationSheet/TripPlanner; check-Skript nur manuell.)
+
+**Wie (Methode):** `grep`/`knip` bzw. `ts-prune` für ungenutzte Exports, `depcheck` für ungenutzte npm-Dependencies; Env-Variablen per `grep -rE "process.env.<NAME>"` gegen die Vercel-/`.env.local`-Liste abgleichen; `next build` als Gegenprobe. Funde erst sammeln, dann gezielt löschen (ein Commit „chore: dead code/config entfernt").
+
+**Aufwand:** ~2–4 h (Analyse + Aufräumen), je nach Fundmenge.
+
+---
+
 ## Sortier-Hinweis
 
 Wenn unklar was als Nächstes — Vorschlag nach **Nutzen/Aufwand**:
