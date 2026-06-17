@@ -282,6 +282,30 @@ Ideen rund um Nutzungsmessung, Feedback und Reichweite. Bewusst niedrige Prio.
 
 ---
 
+## Offene Folge-Tasks — Fahrzeugdaten / API Ninjas (Stand 2026-06-17)
+
+Zum späteren Weiterfahren festgehalten. Kontext: Fahrzeugauswahl im Reiseplaner läuft jetzt über die **API Ninjas Electric Vehicle API** (Live-Suche per Marke/Modell, Server-Proxy `app/api/ev-spec/route.ts`, Mapping `lib/ev-ninjas.ts`, Auswahl gemerkt in localStorage via `lib/selected-vehicle.ts`). Default ohne Auswahl ist `MODEL_Y`.
+
+### ⚠️ Prod-Blocker: `API_NINJAS_KEY` in Vercel setzen
+**Status:** offen. Lokal in `.env.local` gesetzt und getestet (Tesla/VW/Hyundai/Nissan ok), aber **in Vercel fehlt der Key noch** → in Produktion liefert die Fahrzeugsuche 503 (Fallback auf Model Y, kein Crash).
+**Wie:** Vercel → Projekt → Settings → Environment Variables → `API_NINJAS_KEY` (Production, ggf. Preview) → **Redeploy**.
+
+### API-Ninjas Gratis-Tarif: Grenzen + Folge-Entscheidung
+**Status:** offen / zu entscheiden.
+- **Verbrauch gesperrt:** `vehicle_consumption` ist im Gratis-Tarif „premium only" → wir nutzen `DEFAULT_CONSUMPTION_KWH100 = 18` (im Planer anpassbar). Batterie + Ladeleistung kommen echt.
+- **Nur 1 Treffer pro Abfrage** (limit>1 = Premium) → Suche zeigt das beste Einzel-Match, keine Liste.
+**Optionen später:** (a) bezahlter API-Ninjas-Tarif (schaltet `vehicle_consumption` + mehr Treffer frei), oder (b) kuratierter Verbrauchs-Default je Fahrzeugklasse statt pauschal 18, oder (c) so belassen (Nutzer korrigiert den Verbrauch selbst).
+
+### Geräte-Live-Test (iPhone) der neuen Reiseplaner-UI
+**Status:** offen (am Gerät noch nicht verifiziert).
+Zu prüfen: Auto-Icon vor der „Verbrauch:"-Zeile öffnet das **VehicleSheet**; Suche „Tesla/Model 3" → Treffer → „Übernehmen" schliesst Sheet, Reichweite + „Verbrauch laut …" aktualisieren sich; Auswahl überlebt Reload (localStorage); CHAdeMO-Auto (z. B. Nissan Leaf) ändert den Korridor-Steckerfilter. Layout: Ladezustand-Balken 3/4 + „Ankunft mit" 1/4 auf einer Zeile, Verbrauchszahl als verstecktes Dropdown (kein iOS-Zoom?), „ab hier laden"-Marker mit Label auf der Karte.
+
+### Weiterhin offen (bereits separat getrackt)
+- 🔝 **Payrexx-TWINT-Diagnose** (TOP-Prio, siehe Memory/Changelog).
+- iPhone-Gesamttest des Reiseplaners (Route Grenchen→Chur etc.).
+
+---
+
 ## Code-Hygiene & Projekt-Review (Prio 2)
 
 ### Kompletter Code- & Architektur-Review + Aufräumen
