@@ -292,9 +292,9 @@ export function TripPlanner({
           ariaLabel="Zielort"
         />
 
-        {/* Ladezustand (schmaler Balken) + Ankunft mit auf einer Zeile */}
-        <div className="grid grid-cols-2 items-start gap-3">
-          <div>
+        {/* Ladezustand (breiter Balken) + Ankunft mit auf einer Zeile */}
+        <div className="grid grid-cols-4 items-start gap-3">
+          <div className="col-span-3">
             <div className="mb-1 flex items-baseline justify-between gap-1">
               <SectionLabel as="label" className="mb-0">
                 Ladezustand
@@ -315,7 +315,7 @@ export function TripPlanner({
             />
           </div>
 
-          <label className="block">
+          <label className="col-span-1 block">
             <SectionLabel>Ankunft mit</SectionLabel>
             <select
               value={arrivalSoc}
@@ -325,7 +325,7 @@ export function TripPlanner({
             >
               {ARRIVAL_OPTIONS.map((p) => (
                 <option key={p} value={p}>
-                  {p}% am Ziel
+                  {p}%
                 </option>
               ))}
             </select>
