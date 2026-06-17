@@ -11,6 +11,7 @@ import {
   type Vehicle,
 } from "@/lib/vehicle";
 import { GeocodeField, type GeocodeResult } from "@/components/GeocodeField";
+import { VehicleSheet } from "@/components/VehicleSheet";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { Badge } from "@/components/ui/Badge";
@@ -18,6 +19,7 @@ import { InfoCallout } from "@/components/ui/InfoCallout";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import {
+  IconCar,
   IconCheck,
   IconClose,
   IconLocate,
@@ -153,46 +155,8 @@ export function TripPlanner({
   // von einer manuellen Eingabe (die nie überschrieben wird).
   const [gpsLabel, setGpsLabel] = useState<string | null>(null);
 
-  // Fahrzeug-Live-Suche (API Ninjas): nur auf Klick abfragen, Quota schonen.
-  const [vehMake, setVehMake] = useState("");
-  const [vehModel, setVehModel] = useState("");
-  const [vehSearching, setVehSearching] = useState(false);
-  const [vehResult, setVehResult] = useState<Vehicle | null>(null);
-  const [vehError, setVehError] = useState<string | null>(null);
-  const [vehSearched, setVehSearched] = useState(false);
-
-  async function handleVehicleSearch() {
-    const make = vehMake.trim();
-    const model = vehModel.trim();
-    if (!make && !model) return;
-    setVehSearching(true);
-    setVehError(null);
-    setVehResult(null);
-    setVehSearched(true);
-    try {
-      const params = new URLSearchParams();
-      if (make) params.set("make", make);
-      if (model) params.set("model", model);
-      const res = await fetch(`/api/ev-spec?${params}`);
-      if (!res.ok) {
-        throw new Error(
-          res.status === 503
-            ? "Fahrzeugsuche ist nicht konfiguriert."
-            : "Suche fehlgeschlagen — bitte später erneut versuchen.",
-        );
-      }
-      const list = (await res.json()) as Vehicle[];
-      if (list.length === 0) {
-        setVehError("Kein Fahrzeug gefunden — Marke/Modell genauer angeben.");
-      } else {
-        setVehResult(list[0]);
-      }
-    } catch (e) {
-      setVehError(e instanceof Error ? e.message : "Suche fehlgeschlagen.");
-    } finally {
-      setVehSearching(false);
-    }
-  }
+  // Fahrzeugauswahl ausgelagert ins VehicleSheet (Icon-Knopf im Kopf).
+  const [vehicleSheetOpen, setVehicleSheetOpen] = useState(false);
 
   // Neue GPS-Ortschaft ins Startfeld übernehmen (guarded Render-Anpassung).
   const [prevLocatedLabel, setPrevLocatedLabel] = useState<string | null>(null);
@@ -226,9 +190,17 @@ export function TripPlanner({
     >
       <div className="mb-3 flex items-start justify-between gap-3">
         <h2 className="t-title text-primary">Reise planen</h2>
-        <IconButton label="Schliessen" onClick={onClose} className="-mr-1 -mt-1">
-          <IconClose size={20} />
-        </IconButton>
+        <div className="-mr-1 -mt-1 flex items-center">
+          <IconButton
+            label="Fahrzeug wählen"
+            onClick={() => setVehicleSheetOpen(true)}
+          >
+            <IconCar size={20} />
+          </IconButton>
+          <IconButton label="Schliessen" onClick={onClose}>
+            <IconClose size={20} />
+          </IconButton>
+        </div>
       </div>
 
       {/* Nur auf dem Handy im Hochformat: Hinweis aufs Querformat. */}
@@ -318,95 +290,6 @@ export function TripPlanner({
           }
           ariaLabel="Zielort"
         />
-
-        {/* Fahrzeug — Live-Suche (API Ninjas) */}
-        <div>
-          <SectionLabel as="label">Fahrzeug</SectionLabel>
-          <div className="rounded-card border border-border bg-surface px-2.5 py-2">
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="truncate text-sm font-medium text-primary">
-                {selectedVehicle.name}
-                {vehicleLoading && (
-                  <span className="ml-1 text-tertiary">· lädt …</span>
-                )}
-              </span>
-            </div>
-            <div className="mt-0.5 t-caption tabular-nums text-tertiary">
-              {selectedVehicle.usableKwh} kWh · DC bis {selectedVehicle.dcPeakKw} kW
-            </div>
-          </div>
-
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            <input
-              type="text"
-              value={vehMake}
-              onChange={(e) => setVehMake(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleVehicleSearch()}
-              placeholder="Marke (z. B. Tesla)"
-              aria-label="Marke"
-              className="w-full rounded-control border border-border-strong bg-field px-2 py-1.5 text-base text-primary outline-none"
-            />
-            <input
-              type="text"
-              value={vehModel}
-              onChange={(e) => setVehModel(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleVehicleSearch()}
-              placeholder="Modell (z. B. Model 3)"
-              aria-label="Modell"
-              className="w-full rounded-control border border-border-strong bg-field px-2 py-1.5 text-base text-primary outline-none"
-            />
-          </div>
-          <Button
-            variant="secondary"
-            className="mt-2 w-full"
-            loading={vehSearching}
-            disabled={!vehMake.trim() && !vehModel.trim()}
-            onClick={handleVehicleSearch}
-          >
-            Fahrzeug suchen
-          </Button>
-
-          {vehError && (
-            <InfoCallout tone="warn" className="mt-2">
-              {vehError}
-            </InfoCallout>
-          )}
-
-          {vehResult && (
-            <div className="mt-2 flex items-center gap-2 rounded-card border border-brand bg-brand-soft px-2.5 py-2">
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium text-primary">
-                  {vehResult.name}
-                </span>
-                <span className="block t-caption tabular-nums text-tertiary">
-                  {vehResult.usableKwh} kWh · DC bis {vehResult.dcPeakKw} kW ·{" "}
-                  {vehResult.consumptionKwh100} kWh/100&nbsp;km
-                </span>
-              </span>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  onVehicleSelect({
-                    make: vehResult.brand,
-                    model: vehResult.model,
-                  });
-                  setVehResult(null);
-                  setVehSearched(false);
-                  setVehMake("");
-                  setVehModel("");
-                }}
-              >
-                Übernehmen
-              </Button>
-            </div>
-          )}
-
-          {!vehResult && !vehError && !vehSearched && (
-            <p className="mt-1 t-caption text-tertiary">
-              Standard: {selectedVehicle.name}. Eigenes Auto suchen zum Anpassen.
-            </p>
-          )}
-        </div>
 
         {/* Ladezustand */}
         <div>
@@ -701,6 +584,14 @@ export function TripPlanner({
           </p>
         </div>
       )}
+
+      <VehicleSheet
+        open={vehicleSheetOpen}
+        onClose={() => setVehicleSheetOpen(false)}
+        selectedVehicle={selectedVehicle}
+        vehicleLoading={vehicleLoading}
+        onVehicleSelect={onVehicleSelect}
+      />
     </aside>
   );
 }

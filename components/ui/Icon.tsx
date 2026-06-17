@@ -4,6 +4,7 @@ import { forwardRef } from "react";
 import {
   ArrowLeft,
   BookOpen,
+  Car,
   Check,
   ChevronDown,
   ChevronRight,
@@ -58,6 +59,7 @@ function styled(Base: LucideIcon, displayName: string): LucideIcon {
 
 export const IconArrowLeft = styled(ArrowLeft, "IconArrowLeft");
 export const IconBookOpen = styled(BookOpen, "IconBookOpen");
+export const IconCar = styled(Car, "IconCar");
 export const IconCheck = styled(Check, "IconCheck");
 export const IconChevronDown = styled(ChevronDown, "IconChevronDown");
 export const IconChevronRight = styled(ChevronRight, "IconChevronRight");
