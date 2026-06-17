@@ -339,9 +339,9 @@ export function TripPlanner({
               onClick={() => setVehicleSheetOpen(true)}
               aria-label="Auto auswählen"
               title="Auto auswählen"
-              className="mr-1 inline-flex align-middle text-secondary hover:text-primary"
+              className="mr-1 inline-flex items-center border-b border-dotted pb-0.5 align-middle text-secondary hover:text-primary"
             >
-              <IconCar size={16} />
+              <IconCar size={20} />
             </button>
             Verbrauch:{" "}
             <select
