@@ -21,6 +21,7 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import {
   IconCar,
   IconCheck,
+  IconChevronDown,
   IconClose,
   IconLocate,
   IconNavigation,
@@ -291,58 +292,29 @@ export function TripPlanner({
           ariaLabel="Zielort"
         />
 
-        {/* Ladezustand */}
-        <div>
-          <div className="mb-1 flex items-baseline justify-between">
-            <SectionLabel as="label" className="mb-0">
-              Ladezustand
-            </SectionLabel>
-            <span className="text-sm font-semibold tabular-nums text-primary">
-              {soc}%
-            </span>
+        {/* Ladezustand (schmaler Balken) + Ankunft mit auf einer Zeile */}
+        <div className="grid grid-cols-2 items-start gap-3">
+          <div>
+            <div className="mb-1 flex items-baseline justify-between gap-1">
+              <SectionLabel as="label" className="mb-0">
+                Ladezustand
+              </SectionLabel>
+              <span className="text-sm font-semibold tabular-nums text-primary">
+                {soc}%
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={5}
+              value={soc}
+              onChange={(e) => onSocChange(Number(e.target.value))}
+              className="w-full accent-brand"
+              aria-label="Ladezustand in Prozent"
+            />
           </div>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            step={5}
-            value={soc}
-            onChange={(e) => onSocChange(Number(e.target.value))}
-            className="w-full accent-brand"
-            aria-label="Ladezustand in Prozent"
-          />
-          <div className="mt-0.5 t-caption text-tertiary">
-            Reichweite ≈{" "}
-            <span className="font-semibold tabular-nums">
-              {Math.round(rangeKm)} km
-            </span>{" "}
-            (Reserve ≈ {Math.round(reserveKm)} km für {arrivalSoc}% am Ziel)
-          </div>
-        </div>
 
-        {/* Verbrauch + Ankunft (Drehrad/Select — kein iOS-Auto-Zoom) */}
-        <div className="t-caption text-tertiary">
-          Verbrauch laut {selectedVehicle.name} — anpassbar
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <label className="block">
-            <SectionLabel>Verbrauch</SectionLabel>
-            <select
-              value={consumption}
-              onChange={(e) => onConsumptionChange(Number(e.target.value))}
-              className="w-full rounded-control border border-border-strong bg-field px-2 py-1.5 text-base text-primary outline-none"
-              aria-label="Verbrauch in kWh pro 100 km"
-            >
-              {CONSUMPTION_OPTIONS.map((v) => (
-                <option key={v} value={v}>
-                  {v}
-                </option>
-              ))}
-            </select>
-            <span className="mt-0.5 block t-caption text-tertiary">
-              kWh/100&nbsp;km
-            </span>
-          </label>
           <label className="block">
             <SectionLabel>Ankunft mit</SectionLabel>
             <select
@@ -353,12 +325,42 @@ export function TripPlanner({
             >
               {ARRIVAL_OPTIONS.map((p) => (
                 <option key={p} value={p}>
-                  {p}%
+                  {p}% am Ziel
                 </option>
               ))}
             </select>
-            <span className="mt-0.5 block t-caption text-tertiary">am Ziel</span>
           </label>
+        </div>
+
+        {/* Reichweite + Verbrauch (Verbrauch-Zahl = verstecktes Dropdown) */}
+        <div className="t-caption leading-relaxed text-tertiary">
+          <div>
+            Reichweite ≈{" "}
+            <span className="font-semibold tabular-nums text-secondary">
+              {Math.round(rangeKm)} km
+            </span>{" "}
+            (Reserve ≈ {Math.round(reserveKm)} km für {arrivalSoc}% am Ziel)
+          </div>
+          <div className="mt-0.5">
+            Verbrauch:{" "}
+            <select
+              value={consumption}
+              onChange={(e) => onConsumptionChange(Number(e.target.value))}
+              aria-label="Verbrauch in kWh pro 100 km anpassen"
+              className="cursor-pointer appearance-none bg-transparent text-base font-semibold text-primary underline decoration-dotted underline-offset-2 outline-none"
+            >
+              {CONSUMPTION_OPTIONS.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+            <IconChevronDown
+              size={12}
+              className="pointer-events-none -ml-0.5 inline align-middle text-tertiary"
+            />{" "}
+            kWh/100&nbsp;km laut {selectedVehicle.name}
+          </div>
         </div>
 
         {/* Lade-Position + Autobahn-Filter (eine Zeile) */}
