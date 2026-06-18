@@ -574,10 +574,14 @@ export function Map({
     if (!chargeMarkerRef.current) {
       const el = document.createElement("div");
       el.style.pointerEvents = "none";
+      el.style.position = "relative";
+      // Punkt bleibt exakt am Ort (Marker zentriert die 24×24-Box); das Label
+      // liegt absolut darunter und vergrössert die Box nicht.
       el.innerHTML = `
         <span class="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-amber-500 shadow-md">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>
-        </span>`;
+        </span>
+        <span class="absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded-full bg-surface/95 px-2 py-0.5 text-[11px] font-semibold text-primary shadow-popover backdrop-blur">Ab hier laden</span>`;
       chargeMarkerRef.current = new maplibregl.Marker({ element: el })
         .setLngLat(chargeFromPoint)
         .addTo(map);
