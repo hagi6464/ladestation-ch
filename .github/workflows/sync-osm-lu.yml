@@ -1,0 +1,36 @@
+name: OSM LU Sync
+
+# Vorerst NUR manuell auslösbar (Actions-Tab → Run workflow). LU ist klein (~550
+# Zeilen) und unkritisch fürs Volumen; der schedule bleibt dennoch bis zum
+# Gesamt-Entscheid über die Auslands-Syncs auskommentiert.
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 2 * * 1" # wöchentlich (OSM ändert sich laufend)
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run OSM LU sync
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: pnpm sync:osm-lu

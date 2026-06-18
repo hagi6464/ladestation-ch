@@ -69,7 +69,12 @@ export default function ImpressumPage() {
         Die Ladestationsdaten für die Schweiz stammen aus den öffentlich
         zugänglichen Daten von ich-tanke-strom.ch des Bundesamts für Energie
         (BFE). Die Daten für Österreich stammen aus dem Ladestellenverzeichnis
-        der E-Control (api.e-control.at).
+        der E-Control (api.e-control.at). Die Daten für Frankreich stammen aus der
+        Base nationale des IRVE (transport.data.gouv.fr, Etalab/data.gouv.fr,
+        Lizenz Licence Ouverte). Die Daten für Deutschland stammen aus dem
+        Ladesäulenregister der Bundesnetzagentur (data.bundesnetzagentur.de). Die
+        Daten für Luxemburg stammen aus OpenStreetMap und seinen Mitwirkenden
+        (© OpenStreetMap-Mitwirkende, Lizenz ODbL).
       </p>
       <p className="mt-3 text-sm leading-relaxed">
         Das Kartenmaterial basiert auf Daten von OpenStreetMap sowie den

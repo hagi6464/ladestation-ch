@@ -17,6 +17,15 @@
     "poc:econtrol-at": "dotenv -e .env.local -- tsx scripts/poc-econtrol-at.ts",
     "sync:econtrol-at": "tsx scripts/sync-econtrol-at.ts",
     "sync:econtrol-at:local": "dotenv -e .env.local -- tsx scripts/sync-econtrol-at.ts",
+    "poc:irve-fr": "tsx scripts/poc-irve-fr.ts",
+    "sync:irve-fr": "tsx scripts/sync-irve-fr.ts",
+    "sync:irve-fr:local": "dotenv -e .env.local -- tsx scripts/sync-irve-fr.ts",
+    "poc:bnetza-de": "tsx scripts/poc-bnetza-de.ts",
+    "sync:bnetza-de": "tsx scripts/sync-bnetza-de.ts",
+    "sync:bnetza-de:local": "dotenv -e .env.local -- tsx scripts/sync-bnetza-de.ts",
+    "poc:osm-lu": "tsx scripts/poc-osm-lu.ts",
+    "sync:osm-lu": "tsx scripts/sync-osm-lu.ts",
+    "sync:osm-lu:local": "dotenv -e .env.local -- tsx scripts/sync-osm-lu.ts",
     "check:cpo-urls": "tsx scripts/check-cpo-urls.ts"
   },
   "dependencies": {
