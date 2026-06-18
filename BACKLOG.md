@@ -259,6 +259,16 @@ Ideen rund um Nutzungsmessung, Feedback und Reichweite. Bewusst niedrige Prio.
 
 ## Tech / Infra
 
+### Infrastruktur für EU-Ausweitung (Vercel / Neon / Fremd-APIs)
+**Status:** Einschätzung 2026-06-19 (Frage: limitieren Hoster/DB bei DACH+NL+LU bzw. EU?). Kein technischer Show-Stopper, aber drei Schwellen.
+- **Vercel-Tarif (gilt schon heute):** Fair-Use wertet den **Trinkgeld-Button als kommerziell** → Hobby formal unzulässig, **Pro (~20 $/Mt)** nötig. Zusätzlich kappt Hobby Funktionen bei **60 s** (Status-Endpoint will 120 s, Static 300 s). **Cron-Mythos entkräftet:** der 10-Min-Sync läuft über GitHub Actions, nicht Vercel-Cron → 1×/Tag-Limit betrifft uns NICHT. Gegenmittel: Status-Sync wie den Static-Sync ganz in die GitHub Action verlegen (kein Vercel-Dauerlimit) oder Pro.
+- **Neon:** Free = 0,5 GB Storage / 100 Compute-Std. CH ~18k ok; **DACH+NL+LU (~300–500k) sprengt schon die 0,5 GB**, EU (~1M+) klar → **Launch ~5–20 $/Mt**, Region Frankfurt. Hebel: für Auslandsquellen `raw`-jsonb NICHT speichern + Geo-Index (GiST) für bbox statt nur BTree(lat,lon).
+- **ORS (Routing) + Photon (Geocode):** Fair-Use-Tagesquotas, kein SLA; skalieren mit Nutzerzahl (nur bei Route/Suche), nicht mit Stationszahl. Gegenmittel: **Per-IP-Rate-Limit** auf `/api/route`+`/api/geocode` (siehe Punkt 5 Analytics-Block) + vorhandenes Caching; später ORS/Photon self-hosten. OpenFreeMap-Tiles + API Ninjas nachrangig.
+- **Grobe Kosten:** DACH+NL+LU ~20–30 $/Mt, volle EU/mehr Traffic ~35–70 $+/Mt.
+- **DSGVO:** Neon Frankfurt, Analytics cookielos; Impressum/Datenschutz bei EU-Publikum gegenprüfen.
+
+**Aufwand:** Account-Upgrades = Minuten (Dashboard, durch User). Code-Anpassungen (Status-Sync→Action, `raw` weglassen, Geo-Index, Rate-Limit) ~3–5 h, erst bei tatsächlicher Ausweitung.
+
 ### Echter Offline-Modus
 **Warum:** PWA ist installiert, aber ohne Internet kommt nix. Karten-Tiles + zuletzt geladene Stationen offline cachen wäre praktisch (Tunnel-Fahrt, schlechtes Netz).
 
