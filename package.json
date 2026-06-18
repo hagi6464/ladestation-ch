@@ -15,6 +15,8 @@
     "sync:static": "tsx scripts/sync-bfe-static.ts",
     "sync:static:local": "dotenv -e .env.local -- tsx scripts/sync-bfe-static.ts",
     "poc:econtrol-at": "dotenv -e .env.local -- tsx scripts/poc-econtrol-at.ts",
+    "sync:econtrol-at": "tsx scripts/sync-econtrol-at.ts",
+    "sync:econtrol-at:local": "dotenv -e .env.local -- tsx scripts/sync-econtrol-at.ts",
     "check:cpo-urls": "tsx scripts/check-cpo-urls.ts"
   },
   "dependencies": {

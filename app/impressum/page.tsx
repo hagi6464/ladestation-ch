@@ -66,8 +66,10 @@ export default function ImpressumPage() {
 
       <h2 className="mt-8 t-title text-primary">Datenquellen</h2>
       <p className="mt-2 text-sm leading-relaxed">
-        Die Ladestationsdaten stammen aus den öffentlich zugänglichen Daten von
-        ich-tanke-strom.ch des Bundesamts für Energie (BFE).
+        Die Ladestationsdaten für die Schweiz stammen aus den öffentlich
+        zugänglichen Daten von ich-tanke-strom.ch des Bundesamts für Energie
+        (BFE). Die Daten für Österreich stammen aus dem Ladestellenverzeichnis
+        der E-Control (api.e-control.at).
       </p>
       <p className="mt-3 text-sm leading-relaxed">
         Das Kartenmaterial basiert auf Daten von OpenStreetMap sowie den

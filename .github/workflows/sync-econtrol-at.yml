@@ -1,0 +1,39 @@
+name: E-Control AT Sync
+
+on:
+  schedule:
+    # Täglich 03:00 UTC (versetzt zum BFE-Sync um 04:00). Der Crawl dauert einige
+    # Minuten (N+1-Modell), daher kein Kurzintervall.
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run E-Control AT sync
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # API-Key des E-Control-Ladestellenverzeichnisses (als GitHub-Secret anlegen).
+          ECONTROL_API_USER: ${{ secrets.ECONTROL_API_USER }}
+          # Freigeschaltete Domain (muss als Referer mit dem Key übereinstimmen).
+          ECONTROL_REFERER: https://ladestation-ch.vercel.app
+        run: pnpm sync:econtrol-at
